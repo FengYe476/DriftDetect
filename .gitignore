@@ -1,24 +1,104 @@
+# 1. Python
 __pycache__/
-*.pyc
-.pytest_cache/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+pip-log.txt
+pip-delete-this-directory.txt
+
+# 2. Virtual environments
+.venv/
 venv/
 env/
+ENV/
+.env
+env.bak/
+venv.bak/
 
-*.h5
-*.pkl
-*.npy
-checkpoints/
-logs/
-
+# 3. IDE / editor
 .vscode/
 .idea/
 *.swp
-
+*.swo
+*~
 .DS_Store
 Thumbs.db
 
-results/*/*.png
-experiments/*/outputs/
+# 4. Jupyter
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
 
-!.gitkeep
-!**/.gitkeep
+# 5. Testing / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# 6. External repositories
+external/*
+!external/.gitkeep
+
+# 7. Large result artifacts (project-specific — important)
+# Rollout data — only manifest.json is tracked
+results/rollouts/*
+!results/rollouts/.gitkeep
+!results/rollouts/manifest.json
+
+# Model checkpoints — only training_log.csv is tracked
+results/checkpoints/*
+!results/checkpoints/.gitkeep
+!results/checkpoints/**/training_log.csv
+
+# Training logs directory — keep CSVs but ignore tensorboard, wandb, etc.
+results/training_logs/*.tfevents.*
+results/training_logs/wandb/
+results/training_logs/*.log
+
+# Figures and tables: COMMIT these (they're outputs we want in git for paper drafts)
+# (no ignore rules for results/figures/ or results/tables/)
+
+# 8. Model file extensions (catch-all safety net)
+*.ckpt
+*.pt
+*.pth
+*.npz
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+!**/manifest.json
+!**/training_log.csv
+!**/*_log.csv
+
+# 9. OS / temp
+*.tmp
+*.bak
+*.orig
+
+# 10. Secrets / local config
+.env.local
+secrets.yaml
+*.key
+*.pem
