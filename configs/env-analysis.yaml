@@ -33,4 +33,4 @@ dependencies:
   # Install src/ as editable package via pip
   - pip
   - pip:
-      - -e .
+      - -e "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect"

@@ -9,10 +9,10 @@ dependencies:
   # Pin to Python 3.10 for maximum compatibility with DreamerV3 dependencies
   - python=3.10
   
-  # PyTorch with CUDA 12.1 (conservative choice - works with CUDA 12.6 driver)
-  # RTX 4060 Laptop has 8GB VRAM - use memory-efficient settings in training configs
+  # PyTorch with native MPS (Metal Performance Shaders) support for Apple Silicon
+  # M5 Pro has unified memory - GPU shares system RAM, no separate VRAM limit
+  # Use torch.device("mps") to access GPU acceleration
   - pytorch=2.1.*
-  - pytorch-cuda=12.1
   - torchvision
   
   # Core scientific stack
@@ -29,4 +29,4 @@ dependencies:
       - mujoco==3.1.*  # MuJoCo physics engine
       
       # Install src/ as editable package
-      - -e C:/Users/YF/Desktop/DriftDetect/DriftDetect/DriftDetect
+      - -e "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect"
