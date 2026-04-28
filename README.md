@@ -23,19 +23,19 @@ See [PROPOSAL.md](./PROPOSAL.md) for the full proposal.
 
 - [x] Proposal
 - [x] Environment setup (macOS M5 Pro, PyTorch 2.1.2 MPS, conda 25.11.0)
-- [🔄] DreamerV3 baseline (external repos cloned, checkpoint exploration pending)
-- [ ] Diagnostic pipeline
+- [x] DreamerV3 baseline (no pretrained checkpoints available, pipeline validated with random weights)
+- [🔄] Diagnostic pipeline (extract_rollout.py complete, sanity check pending)
 - [ ] Cross-architecture analysis
 - [ ] Toy validation
 - [ ] Paper draft
 
-**Last updated:** April 28, 2026 (Week 1 complete)
+**Last updated:** April 28, 2026 (Week 2 in progress)
 
 ## Timeline
 
 | Phase | Status | ETA | Notes |
 |---|---|---|---|
-| Month 1: Setup & Baseline | 🟢 Week 1 Complete | 2026-05 | macOS M5 Pro, PyTorch MPS, envs verified |
+| Month 1: Setup & Baseline | 🟢 Week 1-2 Complete | 2026-05 | Pipeline validated, no pretrained checkpoints |
 | Month 2: Core Diagnostics | ⚪ Not started | 2026-06 | Next: extract_rollout.py |
 | Month 3: Cross-Architecture Analysis | ⚪ Not started | 2026-07 | |
 | Month 4: Theory & Toy Validation | ⚪ Not started | 2026-08 | |
@@ -78,6 +78,57 @@ See [PROPOSAL.md](./PROPOSAL.md) for the full proposal.
 4. Create sanity check notebook
 
 **Compute used:** ~0 GPU-hours (setup only, no training)  
+**Remaining budget:** ~200 GPU-hours
+
+---
+
+## Week 2 Summary (April 28, 2026)
+
+**DreamerV3 Baseline & Pipeline Validation - COMPLETE ✅**
+
+### What was done:
+1. **Checkpoint exploration (Task 1)**:
+   - Investigated NM512/dreamerv3-torch for pretrained weights
+   - **Conclusion**: No pretrained checkpoints available
+   - Evidence: Repo marked "Outdated", maintainer confirmed no plans to share (Issue #70)
+   - Alternative: Use random-init agent for pipeline validation
+
+2. **Pipeline implementation (Task 2)**:
+   - Created `src/diagnostics/extract_rollout.py` (304 lines)
+   - Open-loop RSSM imagination via `dynamics.img_step()`
+   - Verified on dmc_cheetah_run with MPS device
+   - Data format validated: true_obs vs imagined_obs aligned correctly
+
+3. **External dependencies**:
+   - Added: gym, tensorboard, ruamel.yaml to env-dreamerv3
+   - Applied temporary patches to external/dreamerv3-torch for MPS support:
+     - `envs/dmc.py`: Fix list+tuple concatenation
+     - `networks.py`, `tools.py`: Change default device from "cuda" to "cpu"
+     - `models.py`: Pass device parameter to ImagBehavior.actor
+
+### Key findings:
+- ✅ Pipeline works end-to-end: env reset/step, imagination loop, decoder, NPZ storage
+- ✅ Data shapes correct: (200, 17) obs, (200, 6) actions for Cheetah Run
+- ✅ MPS device functional for inference (M5 Pro GPU acceleration working)
+- ⚠️ No scientifically meaningful rollouts yet (random weights as expected)
+
+### Technical validation:
+```python
+# Verified data format
+true_obs:      (200, 17)  # position(8) + velocity(9)
+imagined_obs:  (200, 17)  # same shape, aligned to actions
+actions:       (200, 6)   # Cheetah joint actions
+rewards:       (200,)
+metadata:      task, seed, alignment info
+```
+
+### Next steps (Week 2 remainder):
+1. Create sanity check notebook (`notebooks/01_sanity_rollouts.ipynb`)
+2. Visualize true vs imagined trajectories
+3. Document external patches for reproducibility
+4. Week 3-4: Explore checkpoint sources or test M5 Pro training feasibility
+
+**Compute used:** ~0 GPU-hours (pipeline validation only, ~5 min MPS inference)  
 **Remaining budget:** ~200 GPU-hours
 
 ## Key References
