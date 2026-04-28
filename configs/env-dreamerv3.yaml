@@ -1,0 +1,32 @@
+name: env-dreamerv3
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+
+dependencies:
+  # Pin to Python 3.10 for maximum compatibility with DreamerV3 dependencies
+  - python=3.10
+  
+  # PyTorch with CUDA 12.1 (conservative choice - works with CUDA 12.6 driver)
+  # RTX 4060 Laptop has 8GB VRAM - use memory-efficient settings in training configs
+  - pytorch=2.1.*
+  - pytorch-cuda=12.1
+  - torchvision
+  
+  # Core scientific stack
+  - numpy=1.24.*  # DreamerV3 tested with numpy <1.25
+  - scipy
+  
+  # Gymnasium and control environments
+  - pip
+  - pip:
+      # DreamerV3 uses older gym API - install via pip for version control
+      - gymnasium==0.29.*
+      - shimmy[dm-control]==1.3.*  # DeepMind Control Suite wrapper
+      - dm-control==1.0.*
+      - mujoco==3.1.*  # MuJoCo physics engine
+      
+      # Install src/ as editable package
+      - -e .

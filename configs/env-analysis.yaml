@@ -1,0 +1,36 @@
+name: env-analysis
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  # Use Python 3.11 for analysis (newer than dreamerv3 env, better scipy/numpy compatibility)
+  - python=3.11
+  
+  # Core scientific stack - latest stable versions
+  - numpy>=1.26
+  - scipy>=1.11
+  - matplotlib>=3.8
+  - pandas>=2.1
+  
+  # Jupyter for notebooks
+  - jupyter
+  - ipykernel
+  - notebook
+  
+  # Testing
+  - pytest>=7.0
+  - pytest-cov>=4.0
+  
+  # Code quality
+  - black
+  - ruff
+  
+  # Additional analysis tools
+  - seaborn  # Statistical visualization
+  - scikit-learn  # For any ML-based analysis components
+  
+  # Install src/ as editable package via pip
+  - pip
+  - pip:
+      - -e .
