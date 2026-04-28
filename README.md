@@ -22,23 +22,63 @@ See [PROPOSAL.md](./PROPOSAL.md) for the full proposal.
 ## Current Status
 
 - [x] Proposal
-- [ ] Environment setup
-- [ ] DreamerV3 baseline
+- [x] Environment setup (macOS M5 Pro, PyTorch 2.1.2 MPS, conda 25.11.0)
+- [🔄] DreamerV3 baseline (external repos cloned, checkpoint exploration pending)
 - [ ] Diagnostic pipeline
 - [ ] Cross-architecture analysis
 - [ ] Toy validation
 - [ ] Paper draft
 
+**Last updated:** April 28, 2026 (Week 1 complete)
+
 ## Timeline
 
-| Phase | Status | ETA |
-|---|---|---|
-| Month 1: Setup & Baseline | 🟡 Planning | 2026-05 |
-| Month 2: Core Diagnostics | ⚪ Not started | 2026-06 |
-| Month 3: Cross-Architecture Analysis | ⚪ Not started | 2026-07 |
-| Month 4: Theory & Toy Validation | ⚪ Not started | 2026-08 |
-| Month 5: Analysis & Writing | ⚪ Not started | 2026-09 |
-| Month 6: Revision & Submission | ⚪ Not started | 2026-10 |
+| Phase | Status | ETA | Notes |
+|---|---|---|---|
+| Month 1: Setup & Baseline | 🟢 Week 1 Complete | 2026-05 | macOS M5 Pro, PyTorch MPS, envs verified |
+| Month 2: Core Diagnostics | ⚪ Not started | 2026-06 | Next: extract_rollout.py |
+| Month 3: Cross-Architecture Analysis | ⚪ Not started | 2026-07 | |
+| Month 4: Theory & Toy Validation | ⚪ Not started | 2026-08 | |
+| Month 5: Analysis & Writing | ⚪ Not started | 2026-09 | |
+| Month 6: Revision & Submission | ⚪ Not started | 2026-10 | |
+
+---
+
+## Week 1 Summary (April 28, 2026)
+
+**Environment Setup - COMPLETE ✅**
+
+### What was done:
+- Created project skeleton (src/, configs/, results/, docs/, tests/, etc.)
+- Configured `.gitignore` with comprehensive rules for Python + ML artifacts
+- Set up `pyproject.toml` and `setup.cfg` for package management
+- Created two isolated conda environments:
+  - **env-analysis**: Python 3.11 + numpy/scipy/matplotlib/jupyter (for diagnostics)
+  - **env-dreamerv3**: Python 3.10 + PyTorch 2.1.2 MPS + gymnasium + dm-control (for model inference)
+- Cloned external dependencies:
+  - NM512/dreamerv3-torch (commit `6ef8646`)
+  - nicklashansen/dreamer4 (commit `bdeddfe`)
+- Documented setup process in `docs/setup.md` and `docs/external_repos.md`
+
+### Platform:
+- macOS Apple Silicon M5 Pro
+- PyTorch 2.1.2 with **MPS GPU acceleration verified** (`torch.backends.mps.is_available() = True`)
+- Conda 25.11.0
+
+### Key achievements:
+- ✅ Both environments verified working (all imports successful)
+- ✅ `src/` package installed as editable in both environments
+- ✅ Full reproducibility documented (167-line setup guide)
+- ✅ Git history clean (7 semantic commits)
+
+### Next steps (Week 2):
+1. Check NM512 repo for pretrained DreamerV3 checkpoints
+2. Implement `src/diagnostics/extract_rollout.py`
+3. Run first rollout extraction on Cheetah Run
+4. Create sanity check notebook
+
+**Compute used:** ~0 GPU-hours (setup only, no training)  
+**Remaining budget:** ~200 GPU-hours
 
 ## Key References
 
