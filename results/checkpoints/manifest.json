@@ -1,19 +1,40 @@
 {
   "checkpoints": [
     {
+      "name": "cheetah_run_500k",
       "task": "dmc_cheetah_run",
       "steps": 505000,
+      "target_steps": 500000,
       "filename": "cheetah_run_500k.pt",
+      "location": "results/checkpoints/cheetah_run_500k.pt",
       "date": "2026-04-29",
+      "status": "ready_for_week_4_rollout_extraction",
+      "hardware": {
+        "provider": "RunPod",
+        "gpu": "RTX 4090"
+      },
+      "training": {
+        "batch_size": 32,
+        "parallel_envs": 8,
+        "duration_hours": 9.5,
+        "cost_usd": 6.65
+      },
       "performance": {
         "eval_return_peak": 791.1,
         "eval_return_stable": "730-750",
-        "train_return_avg": "715-720"
-      },
-      "config": {
-        "batch_size": 32,
-        "envs": 8,
-        "gpu": "RTX 4090"
+        "eval_return_timeline": {
+          "365k": 727.0,
+          "465k": 735.5,
+          "485k": 791.1,
+          "495k": 753.7,
+          "505k": 655.2
+        },
+        "train_return": {
+          "488k_avg": 701.0,
+          "496k_avg": 709.0,
+          "504k_avg": 718.0,
+          "504k_max": 774.9
+        }
       },
       "sha256": "TODO: compute after download"
     }
