@@ -1,0 +1,21 @@
+{
+  "checkpoints": [
+    {
+      "task": "dmc_cheetah_run",
+      "steps": 505000,
+      "filename": "cheetah_run_500k.pt",
+      "date": "2026-04-29",
+      "performance": {
+        "eval_return_peak": 791.1,
+        "eval_return_stable": "730-750",
+        "train_return_avg": "715-720"
+      },
+      "config": {
+        "batch_size": 32,
+        "envs": 8,
+        "gpu": "RTX 4090"
+      },
+      "sha256": "TODO: compute after download"
+    }
+  ]
+}
