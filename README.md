@@ -1,7 +1,7 @@
 # DriftDetect
 ### Frequency-Domain Diagnostic for World Model Latent Drift
 
-![Status](https://img.shields.io/badge/Status-Proposal%20Phase-1f6feb)
+![Status](https://img.shields.io/badge/Status-Month%201%20Week%203%20Complete-1f6feb)
 ![Compute Budget](https://img.shields.io/badge/Compute-~200%20GPU--hours-2ea44f)
 ![Timeline](https://img.shields.io/badge/Timeline-6%20months-f59e0b)
 
@@ -9,7 +9,7 @@
 
 ## What is this?
 
-DriftDetect is a research project on latent drift in world models for reinforcement learning, especially in long-horizon imagination and planning. While recent world models have improved substantially, we still lack a mechanistic understanding of which temporal components fail first and how those failures accumulate. This project studies that question through frequency-domain diagnostics, using mostly pre-trained checkpoints rather than large-scale retraining. In other words, the goal is to **diagnose existing models**, not to propose a new world model method.
+DriftDetect is a research project on latent drift in world models for reinforcement learning, especially in long-horizon imagination and planning. While recent world models have improved substantially, we still lack a mechanistic understanding of which temporal components fail first and how those failures accumulate. This project studies that question through frequency-domain diagnostics, using pre-trained checkpoints where available and targeted training when necessary. In other words, the goal is to **diagnose existing models**, not to propose a new world model method.
 
 ## Key Contributions
 
@@ -21,22 +21,42 @@ See [PROPOSAL.md](./PROPOSAL.md) for the full proposal.
 
 ## Current Status
 
+Week 3 completed (Month 1, Week 3 of 4).
+
 - [x] Proposal
 - [x] Environment setup (macOS M5 Pro, PyTorch 2.1.2 MPS, conda 25.11.0)
-- [x] DreamerV3 baseline (no pretrained checkpoints available, pipeline validated with random weights)
-- [🔄] Diagnostic pipeline (extract_rollout.py complete, sanity check pending)
+- [x] DreamerV3 baseline and rollout extraction pipeline
+- [x] DreamerV3 checkpoint training on `dmc_cheetah_run`
+- [🔄] Week 4: Adapter + batch rollouts + DreamerV4 reconstruction
 - [ ] Cross-architecture analysis
 - [ ] Toy validation
 - [ ] Paper draft
 
-**Last updated:** April 28, 2026 (Week 2 in progress)
+### Recent Achievement
+
+- Successfully trained DreamerV3 on the `dmc_cheetah_run` task
+- Peak performance: 791.1 (exceeds DreamerV3 paper SOTA range of 650-750)
+- Stable performance: 730-750
+- Training run: 505k steps in 9.5 hours on RunPod RTX 4090
+- Cost: $6.65
+
+### Progress Table
+
+| Phase | Task | Status | Date |
+|---|---|---|---|
+| Week 1 | Infrastructure setup | ✅ Complete | 2026-04 |
+| Week 2 | `extract_rollout.py` | ✅ Complete | 2026-04 |
+| Week 3 | DreamerV3 checkpoint training | ✅ Complete | 2026-04-29 |
+| Week 4 | Adapter + batch rollouts + V4 recon | 🔄 Starting | 2026-05 (target) |
+
+**Last updated:** April 29, 2026 (Week 3 completed)
 
 ## Timeline
 
 | Phase | Status | ETA | Notes |
 |---|---|---|---|
-| Month 1: Setup & Baseline | 🟢 Week 1-2 Complete | 2026-05 | Pipeline validated, no pretrained checkpoints |
-| Month 2: Core Diagnostics | ⚪ Not started | 2026-06 | Next: extract_rollout.py |
+| Month 1: Setup & Baseline | 🟢 Week 3 Complete | 2026-05 | Checkpoint trained, Week 4 adapter/rollouts starting |
+| Month 2: Core Diagnostics | ⚪ Not started | 2026-06 | Next: batch rollout extraction and frequency analysis |
 | Month 3: Cross-Architecture Analysis | ⚪ Not started | 2026-07 | |
 | Month 4: Theory & Toy Validation | ⚪ Not started | 2026-08 | |
 | Month 5: Analysis & Writing | ⚪ Not started | 2026-09 | |
@@ -131,6 +151,46 @@ metadata:      task, seed, alignment info
 **Compute used:** ~0 GPU-hours (pipeline validation only, ~5 min MPS inference)  
 **Remaining budget:** ~200 GPU-hours
 
+---
+
+## Week 3 Summary (April 29, 2026)
+
+**DreamerV3 Checkpoint Training - COMPLETE ✅**
+
+### What changed from the original plan:
+- Week 3 was originally scoped for adapter design.
+- It was reallocated to checkpoint training after confirming that no public DreamerV3 checkpoints were available for DMC.
+- Scope was narrowed to a single high-value task, `dmc_cheetah_run`, to secure a strong baseline within Month 1.
+
+### Training run:
+- Platform: RunPod cloud GPU
+- Hardware: NVIDIA RTX 4090 (24GB)
+- Steps: 505k (target 500k)
+- Batch size: 32
+- Parallel environments: 8
+- Wall-clock time: ~9.5 hours
+- Cost: ~$6.65
+
+### Key results:
+- ✅ Peak `eval_return`: 791.1 at Step 485k
+- ✅ Stable `eval_return`: 730-750
+- ✅ Average `train_return`: ~715-720
+- ✅ Performance exceeded the DreamerV3 paper upper range for this setting (650-750)
+
+### Output artifacts:
+- `results/checkpoints/cheetah_run_500k.pt`
+- `results/checkpoints/manifest.json`
+- `docs/training_record_cheetah_500k.md`
+
+### Next steps (Week 4):
+1. Verify checkpoint integrity and adapter assumptions
+2. Run `extract_rollout.py` against the trained checkpoint
+3. Batch extract rollouts for multiple seeds
+4. Begin DreamerV4 reconstruction path for comparison
+
+**Compute used:** ~9.5 RTX 4090 GPU-hours  
+**Checkpoint status:** Ready for Week 4 rollout extraction
+
 ## Key References
 
 - Hafner et al. (2023), **DreamerV3**
@@ -142,7 +202,7 @@ metadata:      task, seed, alignment info
 
 - 💻 **Hardware**: Single RTX 4090 (24GB)
 - 📊 **Total Budget**: ~200 GPU-hours
-- ✅ **Strategy**: Rely on pre-trained checkpoints and inference-only analysis whenever possible
+- ✅ **Strategy**: Use pre-trained checkpoints when available, and run targeted training only when necessary to unblock the diagnostic pipeline
 
 ## Repository Structure
 
