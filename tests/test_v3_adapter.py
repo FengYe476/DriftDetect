@@ -49,12 +49,21 @@ def test_adapter_output_shapes(adapter_rollout: dict) -> None:
 def test_adapter_numerical_consistency(adapter_rollout: dict) -> None:
     """
     Adapter output is numerically close to extract_rollout.py output.
-    L2 difference between adapter and script output should be < 1e-3.
+    Use tighter thresholds for deterministic env/policy outputs and a looser
+    threshold for long-horizon imagined observations.
     """
     reference = np.load(REFERENCE, allow_pickle=True)
+    thresholds = {
+        "true_obs": 1e-5,
+        "imagined_obs": 1e-3,
+        "actions": 1e-5,
+        "rewards": 1e-5,
+    }
     for key in ("true_obs", "imagined_obs", "actions", "rewards"):
         diff = np.linalg.norm(adapter_rollout[key] - reference[key])
-        assert diff < 1e-3, f"{key} L2 diff too large: {diff}"
+        threshold = thresholds[key]
+        print(f"{key:<12} L2 diff = {diff:.2e} (threshold {threshold:.0e})")
+        assert diff < threshold, f"{key} L2 diff too large: {diff}"
 
 
 def test_adapter_drift_grows(adapter_rollout: dict) -> None:
