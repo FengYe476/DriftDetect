@@ -1,8 +1,7 @@
-"""Extract a validation rollout from a randomly initialized NM512 DreamerV3.
+"""Extract a validation rollout from an NM512 DreamerV3.
 
-This script is for Week 2 pipeline validation only. The agent is not trained,
-so the imagined observations are expected to be poor; the useful signal here is
-whether env stepping, RSSM imagination, decoding, and NPZ storage all connect.
+The default path still supports Week 2 random-init validation, and --checkpoint
+loads trained weights for Week 4 rollout extraction.
 """
 
 from __future__ import annotations
@@ -26,16 +25,17 @@ DEFAULT_OUTPUT = REPO_ROOT / "results" / "rollouts" / "cheetah_random_seed0.npz"
 
 sys.path.insert(0, str(DREAMER_ROOT))
 
+# Proprio extraction does not need rendered frames. Avoid GLFW initialization in
+# non-interactive macOS shells; callers can opt back in with DRIFTDETECT_MUJOCO_GL.
+if "DRIFTDETECT_MUJOCO_GL" not in os.environ and sys.platform == "darwin":
+    os.environ["DRIFTDETECT_MUJOCO_GL"] = "disable"
+
 from dreamer import Dreamer, make_env  # noqa: E402
 import tools  # noqa: E402
 
 
-# dreamer.py sets MUJOCO_GL=osmesa on import. On macOS, let the caller override
-# it, otherwise default to glfw before dm_control is imported by the env wrapper.
 if "DRIFTDETECT_MUJOCO_GL" in os.environ:
     os.environ["MUJOCO_GL"] = os.environ["DRIFTDETECT_MUJOCO_GL"]
-elif sys.platform == "darwin":
-    os.environ["MUJOCO_GL"] = "glfw"
 
 
 class NullLogger:
@@ -125,8 +125,38 @@ def action_for_env(
     return {"action": action_np}, action
 
 
+def install_dummy_image_renderer(env: Any, size: Sequence[int]) -> None:
+    """Avoid OpenGL rendering for proprio-only DMC extraction."""
+
+    image_shape = tuple(size) + (3,)
+
+    def render_dummy(*_args: Any, **_kwargs: Any) -> np.ndarray:
+        return np.zeros(image_shape, dtype=np.uint8)
+
+    current = env
+    while current is not None:
+        if hasattr(current, "render"):
+            current.render = render_dummy
+        current = getattr(current, "env", None)
+
+
+def normalize_checkpoint_state_dict(
+    state_dict: Mapping[str, torch.Tensor],
+) -> dict[str, torch.Tensor]:
+    return {key.replace("._orig_mod.", "."): value for key, value in state_dict.items()}
+
+
 def resolve_output_path(output_path: str | Path | None) -> Path:
     path = Path(output_path) if output_path is not None else DEFAULT_OUTPUT
+    if not path.is_absolute():
+        path = REPO_ROOT / path
+    return path
+
+
+def resolve_checkpoint_path(checkpoint_path: str | Path | None) -> Path | None:
+    if checkpoint_path is None:
+        return None
+    path = Path(checkpoint_path)
     if not path.is_absolute():
         path = REPO_ROOT / path
     return path
@@ -146,7 +176,9 @@ def extract_rollout(
     horizon: int = 200,
     total_steps: int = 1000,
     output_path: str | Path | None = None,
+    checkpoint_path: str | Path | None = None,
     device: str | None = None,
+    verbose: bool = False,
 ) -> Path:
     if imagination_start < 0:
         raise ValueError("imagination_start must be non-negative.")
@@ -155,17 +187,24 @@ def extract_rollout(
     if total_steps < imagination_start + horizon:
         raise ValueError("total_steps must cover the full imagination window.")
 
+    def log(message: str) -> None:
+        if verbose:
+            print(message, flush=True)
+
+    log("Loading DreamerV3 config.")
     config = load_config(task=task, seed=seed, device=device)
     tools.set_seed_everywhere(seed)
 
+    log("Creating evaluation environment.")
     env = make_env(config, "eval", 0)
+    install_dummy_image_renderer(env, config.size)
     config.num_actions = (
         env.action_space.n
         if hasattr(env.action_space, "n")
         else env.action_space.shape[0]
     )
 
-    # Random initialization by construction: no checkpoint is loaded here.
+    log("Constructing Dreamer agent.")
     agent = Dreamer(
         env.observation_space,
         env.action_space,
@@ -173,6 +212,14 @@ def extract_rollout(
         logger=NullLogger(),
         dataset=None,
     ).to(config.device)
+    checkpoint = resolve_checkpoint_path(checkpoint_path)
+    if checkpoint is not None:
+        log(f"Loading checkpoint from {display_path(checkpoint)}.")
+        checkpoint_data = torch.load(checkpoint, map_location=config.device)
+        agent.load_state_dict(
+            normalize_checkpoint_state_dict(checkpoint_data["agent_state_dict"])
+        )
+        log("Checkpoint loaded into agent.")
     agent.requires_grad_(requires_grad=False)
     agent.eval()
 
@@ -189,6 +236,7 @@ def extract_rollout(
     actions_list: list[np.ndarray] = []
     rewards_list: list[float] = []
 
+    log("Resetting environment and starting rollout.")
     obs = env.reset()
     done = np.ones(1, dtype=bool)
     agent_state = None
@@ -196,6 +244,8 @@ def extract_rollout(
 
     try:
         for step in range(total_steps):
+            if verbose and step % 100 == 0:
+                print(f"  step {step}/{total_steps}", flush=True)
             with torch.no_grad():
                 policy_output, agent_state = agent(
                     batch_obs(obs), done, agent_state, training=False
@@ -249,7 +299,14 @@ def extract_rollout(
         "imagination_start": imagination_start,
         "horizon": horizon,
         "seed": seed,
-        "agent_type": "dreamerv3_random_init",
+        "agent_type": (
+            "dreamerv3_trained_checkpoint"
+            if checkpoint is not None
+            else "dreamerv3_random_init"
+        ),
+        "checkpoint_path": (
+            display_path(checkpoint) if checkpoint is not None else None
+        ),
         "obs_keys": obs_keys,
         "obs_alignment": (
             "true and imagined arrays contain next observations for actions "
@@ -290,8 +347,14 @@ if __name__ == "__main__":
     parser.add_argument("--horizon", type=int, default=200)
     parser.add_argument("--total_steps", type=int, default=1000)
     parser.add_argument("--output", default=str(DEFAULT_OUTPUT.relative_to(REPO_ROOT)))
+    parser.add_argument("--checkpoint", default=None)
     parser.add_argument("--device", default=None)
+    parser.add_argument("--verbose", action="store_true")
     args = parser.parse_args()
+
+    if args.verbose:
+        print(f"Using checkpoint: {args.checkpoint or 'random initialization'}", flush=True)
+        print(f"Device override: {args.device or 'auto'}", flush=True)
 
     extract_rollout(
         task=args.task,
@@ -300,5 +363,7 @@ if __name__ == "__main__":
         horizon=args.horizon,
         total_steps=args.total_steps,
         output_path=args.output,
+        checkpoint_path=args.checkpoint,
         device=args.device,
+        verbose=args.verbose,
     )
