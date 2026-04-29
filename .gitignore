@@ -77,8 +77,8 @@ results/training_logs/wandb/
 results/training_logs/*.log
 results/training_test/
 
-# Figures and tables: COMMIT these (they're outputs we want in git for paper drafts)
-# (no ignore rules for results/figures/ or results/tables/)
+# Figures and tables: keep directories tracked, but ignore generated PDFs
+results/figures/*.pdf
 
 # 8. Model file extensions (catch-all safety net)
 *.ckpt
