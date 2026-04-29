@@ -27,7 +27,7 @@ Month 2, Week 3 is in progress.
 - [x] Month 2 Week 1: Latent collection fix, 20 v2 rollouts, `freq_decompose` module
 - [x] Month 2 Week 2: `error_curves` module, imagination window ablation
 - [x] Month 2 Week 3: Figure 1 generated, Cartpole training in progress
-- [ ] Month 2 Week 4: Cartpole diagnostics, filter ablation, Month 2 summary
+- [🔄] Month 2 Week 4: Filter ablation complete, Cartpole diagnostics pending
 
 ### Recent Achievement
 
@@ -37,6 +37,7 @@ Month 2, Week 3 is in progress.
 - Figure 1 generated: `dc_trend` carries 46.7% of latent MSE, while high frequency carries only 4.2%, confirming frequency-asymmetric drift.
 - Imagination window ablation (`start in {50, 200, 500}`): qualitative drift pattern is consistent across episode phases, but magnitude is phase-dependent.
 - Finding A status: **SUPPORTED with caveats**.
+- Filter ablation (Butterworth vs Chebyshev vs FIR): `dc_trend` dominance and high-freq suppression are robust across all three filters. Exact magnitudes vary about 20-30% but qualitative Finding A conclusions are unchanged.
 
 ### Progress Table
 
@@ -49,7 +50,7 @@ Month 2, Week 3 is in progress.
 | Month 2 | Week 1 | Latent fix + v2 rollouts + `freq_decompose` | ✅ Complete | 2026-04 |
 | Month 2 | Week 2 | `error_curves` + window ablation | ✅ Complete | 2026-04 |
 | Month 2 | Week 3 | Figure 1 + Cartpole training prep | 🔄 In Progress | 2026-04-29 |
-| Month 2 | Week 4 | Cartpole diagnostics + filter ablation + summary | ⏳ Planned | 2026-05 |
+| Month 2 | Week 4 | Filter ablation + Cartpole diagnostics | 🔄 In Progress | 2026-05 |
 
 **Last updated:** April 29, 2026 (Month 2 Week 3 in progress)
 

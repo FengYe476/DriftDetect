@@ -93,10 +93,38 @@
 - Expected cost: about `$7`.
 - Expected completion: pending.
 
-## Week 4: Planned
+## Week 4: Filter Ablation + Cartpole Diagnostics — IN PROGRESS
 
-- Cartpole rollout extraction + Figure 1 comparison.
-- Filter ablation (Butterworth vs Chebyshev vs FIR).
+### Filter Ablation — COMPLETE
+
+Tested three bandpass filter types on all 20 Cheetah v2 rollouts:
+
+- Butterworth order 4 (default)
+- Chebyshev Type I order 4 (1 dB ripple)
+- FIR (`numtaps=51`)
+
+Key results:
+
+- `dc_trend` is the dominant band for all three filters in both latent and obs space.
+- `high` is the smallest latent band for all three filters.
+- Obs-space band rankings are identical across all three filters.
+- Latent-space FIR swaps `very_low` and `mid`, but these bands differ by only about 3% in absolute MSE and do not change the main interpretation.
+- Max deviation across filters: `32.1%` (latent), `37.4%` (obs). This is driven by Chebyshev's steeper rolloff concentrating energy differently, not by qualitative disagreement.
+- Conclusion: Finding A is qualitatively robust to filter choice.
+- Default remains Butterworth order 4 for all subsequent analysis.
+- Full report: `docs/filter_ablation.md`.
+- Raw data: `results/tables/filter_ablation.csv`.
+
+### Cartpole Training — IN PROGRESS
+
+- Running on RunPod RTX 4090, same hyperparameters as Cheetah.
+- Expected completion: pending.
+- After completion: rollout extraction + Figure 1 comparison.
+
+### Still Planned
+
+- Cartpole rollout extraction and diagnostics.
+- Cross-task comparison (Cheetah vs Cartpole drift patterns).
 - Month 2 summary + Finding A final judgment.
 - Tag: `v0.2-month2-figure1`.
 
@@ -107,6 +135,7 @@
 3. `include_latent` flag (backward-compatible adapter extension).
 4. Pooled PCA across seeds (shared basis for cross-seed comparison).
 5. Phase-dependent framing (not pure steady-state).
+6. Butterworth as default filter (ablation confirmed qualitative robustness).
 
 ## Compute Budget
 
