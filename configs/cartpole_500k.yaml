@@ -1,0 +1,12 @@
+# DreamerV3 Cartpole Swingup Training Config
+# Target: RunPod RTX 4090, ~500k steps, ~9-12 hours
+# Expected cost: ~$7
+
+task: dmc_cartpole_swingup
+steps: 500000
+batch_size: 32
+envs: 8
+
+# These match the Cheetah training run that produced 791.1 peak eval return.
+# Cartpole Swingup may need different settings - monitor eval_return during
+# training and adjust if performance plateaus early.
