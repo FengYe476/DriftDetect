@@ -1,0 +1,618 @@
+{
+  "version": "v2",
+  "generated_at": "2026-04-29T21:42:28.680508+00:00",
+  "task": "dmc_cheetah_run",
+  "checkpoint": "results/checkpoints/cheetah_run_500k.pt",
+  "total_steps": 1000,
+  "imagination_start": 200,
+  "horizon": 200,
+  "latent_spec": {
+    "latent_dim": 1536,
+    "deter_dim": 512,
+    "stoch_discrete": true,
+    "num_categoricals": 32,
+    "num_classes": 32
+  },
+  "files": [
+    {
+      "file": "results/rollouts/cheetah_v3_seed0_v2.npz",
+      "seed": 0,
+      "sha256": "c4cccbb6cc5d35cb67fbb4b528d74a79e913e100cc3070a84f118f2f6565e9eb",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed1_v2.npz",
+      "seed": 1,
+      "sha256": "60ba63165eeb009893d6e5551750c48a92d4cbf69da1e84d590461c1bcaf1ac6",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed2_v2.npz",
+      "seed": 2,
+      "sha256": "c87b83e5870f58c47f000ad5c71adf546cf0e124fbfff9b1fba4df318b145a8a",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed3_v2.npz",
+      "seed": 3,
+      "sha256": "b43eddf6e740bee34d8dd4b4a0b4a5c54e33851c9d96db1c5d5f3067b890ba76",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed4_v2.npz",
+      "seed": 4,
+      "sha256": "9edc9a7b885473cc021cac6bd52f01dfb29f422d86b6c3d2ab11540cdd1f189d",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed5_v2.npz",
+      "seed": 5,
+      "sha256": "4941780b314839bdba271ad271c024829ccf6baa68b6a09826d544d0eed3a9ae",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed6_v2.npz",
+      "seed": 6,
+      "sha256": "9b1b689288b78e185076a0ef1715d00e37ff889d390d672e2af655aedce0c1bf",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed7_v2.npz",
+      "seed": 7,
+      "sha256": "e2f46a376b7f8d603862b62508155d0c3ff756f9cd739bd4c2a8c69e7df19130",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed8_v2.npz",
+      "seed": 8,
+      "sha256": "005bf32df85edb36eb556bd52217ea78f71018973a15e153a3c2ae3c4cff0632",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed9_v2.npz",
+      "seed": 9,
+      "sha256": "2c404a17bfea4472c3bb39b25e7424faa77e450d96d2bd8de6dd75c7f02b24b1",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed10_v2.npz",
+      "seed": 10,
+      "sha256": "9ce599dd98fdc8a4e2b92041c639f9e81680535efe968ea2d1e3b18d4134be1d",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed11_v2.npz",
+      "seed": 11,
+      "sha256": "8aa5c7dd5cae5279bab35d0495cb0a5a22b54f221ff0c3a326f9ef1a7d4dcdf5",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed12_v2.npz",
+      "seed": 12,
+      "sha256": "5d4713c3ec115c07e721584cc3212deeeafb25a4bb49315000789520a1628845",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed13_v2.npz",
+      "seed": 13,
+      "sha256": "e365340e0bd61f8bbddedc0dc8b36749a9c12a3dc07623fd67895898fc67090b",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed14_v2.npz",
+      "seed": 14,
+      "sha256": "bcae1e3221ceb40b8681b78fe1361611642716ba14408c8ba25f6b7081f74afa",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed15_v2.npz",
+      "seed": 15,
+      "sha256": "c5f2add71e760f593142c894902facd6f45fa082a06f979a6b54e8c23a8e9901",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed16_v2.npz",
+      "seed": 16,
+      "sha256": "f6510c09def3a4951bb3b16730e93a4e2585ab11da396841d7816bcf95ecf7ac",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed17_v2.npz",
+      "seed": 17,
+      "sha256": "c0d8a13d355750124506199fc0d84c2830323c8bf8bddad7471e785fbddbfb6a",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed18_v2.npz",
+      "seed": 18,
+      "sha256": "2d6b8304dce1c9b517dbf6255a183d040111745a8683f2603e1cf88b540c355b",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed19_v2.npz",
+      "seed": 19,
+      "sha256": "d8b44c857af837a353c4947eaf18747e3e920eb36913fd1b6cd9d7c1d7a4c3ce",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    }
+  ]
+}
