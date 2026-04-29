@@ -72,12 +72,26 @@ class WorldModelAdapter(ABC):
         total_steps: int,
         imagination_start: int,
         horizon: int,
+        include_latent: bool = False,
     ) -> dict:
         """
         Full pipeline: collect true rollout + run imagination.
-        Returns dict with true_obs, imagined_obs, actions, rewards.
+
+        When include_latent=False (default), returns the v1 rollout dict with
+        true_obs, imagined_obs, actions, and rewards.
+
+        When include_latent=True, subclasses that support latent collection may
+        extend the returned dict with true_latent and imagined_latent, both
+        shaped (horizon, latent_dim), where latent_dim is implementation-defined.
+
         This method is NOT abstract - subclasses get it for free.
         """
+        if include_latent:
+            # Subclasses may override extract_rollout to support include_latent=True.
+            raise NotImplementedError(
+                "This adapter does not implement include_latent=True."
+            )
+
         true_obs, actions, rewards = self.collect_true_rollout(
             seed=seed,
             total_steps=total_steps,
