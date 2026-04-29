@@ -1,0 +1,430 @@
+{
+  "generated_at": "2026-04-29T20:18:29.876419+00:00",
+  "task": "dmc_cheetah_run",
+  "checkpoint": "results/checkpoints/cheetah_run_500k.pt",
+  "total_steps": 1000,
+  "imagination_start": 200,
+  "horizon": 200,
+  "files": [
+    {
+      "file": "results/rollouts/cheetah_v3_seed0.npz",
+      "sha256": "4fbbaecdd8e4beeabd6d296669f3a4c7e52a8fce737ea571151ac8908dc3c48d",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed1.npz",
+      "sha256": "a82f365deb915acb1c9967c98ba7daa4de5c36739b2bb838f3dd985057f3e4e3",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed2.npz",
+      "sha256": "f26ed31a693190b2e6e0f37199131f355a8eddae1bd5ef38c232ff09f307ef31",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed3.npz",
+      "sha256": "2e86eeeb120e105578f9e86f6f9382676ccdd2ca9122ba64d543298a509ac161",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed4.npz",
+      "sha256": "04d20d5f72f2e3e6b2edd627677bca22d9f9c658a1900e30c4265afb0c6f7393",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed5.npz",
+      "sha256": "78cb8294967fc1b0c2bb242e66f3c4ec40b1663d9855a7c0e5a851141c63f17e",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed6.npz",
+      "sha256": "36ee8ed76266898419a9064b0f07106efb112e7b1fa69f615ba1a08976f3c5be",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed7.npz",
+      "sha256": "e4673f04cc39676b957d7b3f176c922b929c6f5561f8829d5d4e5001c2bccd92",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed8.npz",
+      "sha256": "08ad22994dd10764f04a2741f47c3a1567cd851e916b29ed00ce94376628cd4e",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed9.npz",
+      "sha256": "9f109991783ad0ceff43422f1f5d8ea1f2b01415dbb00c3a0317824eacd6ff50",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed10.npz",
+      "sha256": "c4af4f5ba69ded2c060f1cedeb398850396a6c826d01619685aadbb82d8fc18b",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed11.npz",
+      "sha256": "c9d3d7a1d9879bd40f0380f80432e0811822babbb0075c56b0a69b1614b30086",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed12.npz",
+      "sha256": "d725da269e6500b3bdde2b4c6727bb311784a65ca700cca057bdb0599c4e63ab",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed13.npz",
+      "sha256": "baf03c87a4fb28585ca292706c068071824394e7b9f83fb3694cc516f9d97afb",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed14.npz",
+      "sha256": "37a215fe7f681da1240a4f885e0ed85d4bb9bb87281abcf3ef3b3b87a6c7e7a8",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed15.npz",
+      "sha256": "0f8edeffc524ac1ad13ec888ea0f78b4f2d06b4d1ec5d55fc3a27f44f14e4481",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed16.npz",
+      "sha256": "f7360367ff49e581155bf27ec1f8c007879300aa3f209dfb4a104882b39f324f",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed17.npz",
+      "sha256": "0c454d4815adc97cb88a67b5f0f1e4f7cf46cf09411837ae4d2422c6db51ddcf",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed18.npz",
+      "sha256": "1644b002b297c1253e0dd6bc30ca30e826cd509bda2b661302727be9df8eee3e",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cheetah_v3_seed19.npz",
+      "sha256": "3b83c1d3c5e6d97f2d0edfa8496cbce557075f1c452a61f87c7d346dbd499a51",
+      "shapes": {
+        "true_obs": [
+          200,
+          17
+        ],
+        "imagined_obs": [
+          200,
+          17
+        ],
+        "actions": [
+          200,
+          6
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    }
+  ]
+}
