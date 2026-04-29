@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
-from scipy.signal import butter, sosfiltfilt
+from scipy.signal import butter, cheby1, filtfilt, firwin, sosfiltfilt
 
 
 DEFAULT_BANDS = {
@@ -23,6 +23,8 @@ DEFAULT_BANDS = {
     "high": (0.20, 0.50),
 }
 DETER_SLICE = slice(1024, 1536)  # get_feat() = concat([stoch(1024), deter(512)])
+FILTER_TYPES = {"butterworth", "chebyshev1", "fir"}
+FIR_NUMTAPS = 51
 
 
 @dataclass(frozen=True)
@@ -104,6 +106,7 @@ def bandpass(
     high: float,
     fs: float = 1.0,
     order: int = 4,
+    filter_type: str = "butterworth",
 ) -> np.ndarray:
     """Filter a 1D signal into a frequency band with zero phase shift."""
 
@@ -120,6 +123,10 @@ def bandpass(
         raise ValueError("Band frequencies must be non-negative.")
     if high < low:
         raise ValueError("high must be greater than or equal to low.")
+    if filter_type not in FILTER_TYPES:
+        raise ValueError(
+            f"filter_type must be one of {sorted(FILTER_TYPES)}, got {filter_type!r}."
+        )
 
     nyquist = fs / 2.0
     if low == 0 and high >= nyquist:
@@ -128,12 +135,20 @@ def bandpass(
         return np.full_like(signal_1d, signal_1d.mean())
 
     high = min(high, nyquist)
+    if filter_type == "fir":
+        return _fir_filter(
+            signal_1d,
+            low=low,
+            high=high,
+            fs=fs,
+        )
+
     if low == 0:
-        sos = butter(order, high, btype="lowpass", output="sos", fs=fs)
+        sos = _iir_sos(filter_type, order, high, btype="lowpass", fs=fs)
     elif high >= nyquist:
-        sos = butter(order, low, btype="highpass", output="sos", fs=fs)
+        sos = _iir_sos(filter_type, order, low, btype="highpass", fs=fs)
     else:
-        sos = butter(order, (low, high), btype="bandpass", output="sos", fs=fs)
+        sos = _iir_sos(filter_type, order, (low, high), btype="bandpass", fs=fs)
 
     padlen = min(signal_1d.size - 1, 3 * (2 * sos.shape[0] + 1))
     return sosfiltfilt(sos, signal_1d, padlen=padlen)
@@ -146,6 +161,7 @@ def decompose(
     n_pcs: int | None = None,
     var_threshold: float = 0.95,
     pca: PCAResult | None = None,
+    filter_type: str = "butterworth",
 ) -> dict[str, Any]:
     """Decompose latent, deter-only, PCA, or obs-space signals into bands."""
 
@@ -155,7 +171,13 @@ def decompose(
         var_threshold=var_threshold,
         pca=pca,
     )
-    return _filter_prepared(prepared, info, fs=fs, bands=bands)
+    return _filter_prepared(
+        prepared,
+        info,
+        fs=fs,
+        bands=bands,
+        filter_type=filter_type,
+    )
 
 
 def decompose_pair(
@@ -170,6 +192,7 @@ def decompose_pair(
     n_pcs = kwargs.pop("n_pcs", None)
     var_threshold = kwargs.pop("var_threshold", 0.95)
     pca = kwargs.pop("pca", None)
+    filter_type = kwargs.pop("filter_type", "butterworth")
     if kwargs:
         unknown = ", ".join(sorted(kwargs))
         raise TypeError(f"Unexpected keyword arguments: {unknown}")
@@ -188,12 +211,19 @@ def decompose_pair(
         pca=shared_pca,
     )
 
-    true_decomposed = _filter_prepared(true_prepared, true_info, fs=fs, bands=bands)
+    true_decomposed = _filter_prepared(
+        true_prepared,
+        true_info,
+        fs=fs,
+        bands=bands,
+        filter_type=filter_type,
+    )
     imagined_decomposed = _filter_prepared(
         imagined_prepared,
         imagined_info,
         fs=fs,
         bands=bands,
+        filter_type=filter_type,
     )
     return true_decomposed, imagined_decomposed
 
@@ -267,21 +297,72 @@ def _filter_prepared(
     info: dict[str, Any],
     fs: float,
     bands: dict[str, tuple[float, float]] | None,
+    filter_type: str,
 ) -> dict[str, Any]:
     active_bands = DEFAULT_BANDS if bands is None else bands
     result: dict[str, Any] = {}
     for name, (low, high) in active_bands.items():
         filtered = np.empty_like(prepared, dtype=np.float64)
         for dim in range(prepared.shape[1]):
-            filtered[:, dim] = bandpass(prepared[:, dim], low=low, high=high, fs=fs)
+            filtered[:, dim] = bandpass(
+                prepared[:, dim],
+                low=low,
+                high=high,
+                fs=fs,
+                filter_type=filter_type,
+            )
         result[name] = filtered.astype(np.float32)
 
     result["_info"] = {
         **info,
         "bands": {name: tuple(bounds) for name, bounds in active_bands.items()},
         "fs": fs,
+        "filter_type": filter_type,
     }
     return result
+
+
+def _iir_sos(
+    filter_type: str,
+    order: int,
+    cutoff: float | tuple[float, float],
+    btype: str,
+    fs: float,
+) -> np.ndarray:
+    if filter_type == "butterworth":
+        return butter(order, cutoff, btype=btype, output="sos", fs=fs)
+    if filter_type == "chebyshev1":
+        return cheby1(order, 1.0, cutoff, btype=btype, output="sos", fs=fs)
+    raise ValueError(f"IIR SOS requested for non-IIR filter {filter_type!r}.")
+
+
+def _fir_filter(
+    signal_1d: np.ndarray,
+    low: float,
+    high: float,
+    fs: float,
+) -> np.ndarray:
+    nyquist = fs / 2.0
+    numtaps = _fir_numtaps(signal_1d.size)
+    if low == 0:
+        taps = firwin(numtaps, high, pass_zero=True, fs=fs)
+    elif high >= nyquist:
+        taps = firwin(numtaps, low, pass_zero=False, fs=fs)
+    else:
+        taps = firwin(numtaps, (low, high), pass_zero=False, fs=fs)
+
+    padlen = min(signal_1d.size - 1, 3 * (numtaps - 1))
+    return filtfilt(taps, [1.0], signal_1d, padlen=padlen)
+
+
+def _fir_numtaps(signal_length: int) -> int:
+    if signal_length < 8:
+        return 3
+    max_taps = max(3, (signal_length - 1) // 3)
+    numtaps = min(FIR_NUMTAPS, max_taps)
+    if numtaps % 2 == 0:
+        numtaps -= 1
+    return max(3, numtaps)
 
 
 def _as_2d_float(array: np.ndarray, name: str) -> np.ndarray:

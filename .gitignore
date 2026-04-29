@@ -79,6 +79,8 @@ results/training_test/
 
 # Figures and tables: keep directories tracked, but ignore generated PDFs
 results/figures/*.pdf
+results/tables/*.parquet
+results/tables/*.csv
 
 # 8. Model file extensions (catch-all safety net)
 *.ckpt
