@@ -1,7 +1,7 @@
 # DriftDetect
 ### Frequency-Domain Diagnostic for World Model Latent Drift
 
-![Status](https://img.shields.io/badge/Status-Month%201%20Week%203%20Complete-1f6feb)
+![Status](https://img.shields.io/badge/Status-Month%202%20Week%203%20In%20Progress-1f6feb)
 ![Compute Budget](https://img.shields.io/badge/Compute-~200%20GPU--hours-2ea44f)
 ![Timeline](https://img.shields.io/badge/Timeline-6%20months-f59e0b)
 
@@ -21,42 +21,44 @@ See [PROPOSAL.md](./PROPOSAL.md) for the full proposal.
 
 ## Current Status
 
-Week 3 completed (Month 1, Week 3 of 4).
+Month 2, Week 3 is in progress.
 
-- [x] Proposal
-- [x] Environment setup (macOS M5 Pro, PyTorch 2.1.2 MPS, conda 25.11.0)
-- [x] DreamerV3 baseline and rollout extraction pipeline
-- [x] DreamerV3 checkpoint training on `dmc_cheetah_run`
-- [🔄] Week 4: Adapter + batch rollouts + DreamerV4 reconstruction
-- [ ] Cross-architecture analysis
-- [ ] Toy validation
-- [ ] Paper draft
+- [x] Month 1: Infrastructure, checkpoint, adapter, 20 v1 rollouts
+- [x] Month 2 Week 1: Latent collection fix, 20 v2 rollouts, `freq_decompose` module
+- [x] Month 2 Week 2: `error_curves` module, imagination window ablation
+- [x] Month 2 Week 3: Figure 1 generated, Cartpole training in progress
+- [ ] Month 2 Week 4: Cartpole diagnostics, filter ablation, Month 2 summary
 
 ### Recent Achievement
 
-- Successfully trained DreamerV3 on the `dmc_cheetah_run` task
-- Peak performance: 791.1 (exceeds DreamerV3 paper SOTA range of 650-750)
-- Stable performance: 730-750
-- Training run: 505k steps in 9.5 hours on RunPod RTX 4090
-- Cost: $6.65
+- Latent probe revealed `get_feat() = concat([stoch(1024), deter(512)])`, confirming deter-only analysis is the correct approach.
+- 20 v2 rollouts with latent trajectories of shape `(200, 1536)` were extracted and verified.
+- Frequency decomposition module implemented: 5 bands, Butterworth order 4, PCA on the deter portion.
+- Figure 1 generated: `dc_trend` carries 46.7% of latent MSE, while high frequency carries only 4.2%, confirming frequency-asymmetric drift.
+- Imagination window ablation (`start in {50, 200, 500}`): qualitative drift pattern is consistent across episode phases, but magnitude is phase-dependent.
+- Finding A status: **SUPPORTED with caveats**.
 
 ### Progress Table
 
-| Phase | Task | Status | Date |
-|---|---|---|---|
-| Week 1 | Infrastructure setup | ✅ Complete | 2026-04 |
-| Week 2 | `extract_rollout.py` | ✅ Complete | 2026-04 |
-| Week 3 | DreamerV3 checkpoint training | ✅ Complete | 2026-04-29 |
-| Week 4 | Adapter + batch rollouts + V4 recon | 🔄 Starting | 2026-05 (target) |
+| Month | Week | Focus | Status | Date |
+|---|---|---|---|---|
+| Month 1 | Week 1 | Infrastructure setup | ✅ Complete | 2026-04 |
+| Month 1 | Week 2 | Baseline extraction pipeline | ✅ Complete | 2026-04 |
+| Month 1 | Week 3 | DreamerV3 Cheetah checkpoint training | ✅ Complete | 2026-04-29 |
+| Month 1 | Week 4 | Adapter integration + 20 v1 rollouts | ✅ Complete | 2026-04 |
+| Month 2 | Week 1 | Latent fix + v2 rollouts + `freq_decompose` | ✅ Complete | 2026-04 |
+| Month 2 | Week 2 | `error_curves` + window ablation | ✅ Complete | 2026-04 |
+| Month 2 | Week 3 | Figure 1 + Cartpole training prep | 🔄 In Progress | 2026-04-29 |
+| Month 2 | Week 4 | Cartpole diagnostics + filter ablation + summary | ⏳ Planned | 2026-05 |
 
-**Last updated:** April 29, 2026 (Week 3 completed)
+**Last updated:** April 29, 2026 (Month 2 Week 3 in progress)
 
 ## Timeline
 
 | Phase | Status | ETA | Notes |
 |---|---|---|---|
-| Month 1: Setup & Baseline | 🟢 Week 3 Complete | 2026-05 | Checkpoint trained, Week 4 adapter/rollouts starting |
-| Month 2: Core Diagnostics | ⚪ Not started | 2026-06 | Next: batch rollout extraction and frequency analysis |
+| Month 1: Setup & Baseline | ✅ Complete | 2026-04 | Infrastructure, checkpoint, adapter, and 20 v1 rollouts completed |
+| Month 2: Core Diagnostics | 🟡 Week 3 In Progress | 2026-05 | Figure 1 complete, Cartpole baseline in progress, Week 4 ablations pending |
 | Month 3: Cross-Architecture Analysis | ⚪ Not started | 2026-07 | |
 | Month 4: Theory & Toy Validation | ⚪ Not started | 2026-08 | |
 | Month 5: Analysis & Writing | ⚪ Not started | 2026-09 | |
@@ -202,6 +204,10 @@ metadata:      task, seed, alignment info
 
 - 💻 **Hardware**: Single RTX 4090 (24GB)
 - 📊 **Total Budget**: ~200 GPU-hours
+- ✅ **Cheetah training**: ~9.5 GPU-hours, ~$6.65
+- 🔄 **Cartpole training**: ~9-12 GPU-hours, ~$7 (in progress)
+- 💸 **Total spent / committed**: ~$13-14
+- ⏳ **Remaining budget**: ~180 GPU-hours
 - ✅ **Strategy**: Use pre-trained checkpoints when available, and run targeted training only when necessary to unblock the diagnostic pipeline
 
 ## Repository Structure
@@ -212,6 +218,8 @@ metadata:      task, seed, alignment info
 - `src/analysis/` — statistical analysis, summaries, and plotting utilities.
 - `src/utils/` — shared helpers and general-purpose utilities.
 - `experiments/` — experiment configs, scripts, and run-specific outputs.
+- `results/rollouts/` — rollout datasets, manifests, and window ablation outputs.
+- `results/rollouts/window_ablation/` — imagination-start ablation rollouts.
 - `results/figures/` — generated plots and visual results.
 - `results/tables/` — tabular summaries and evaluation outputs.
 - `notebooks/` — exploratory notebooks and prototype analysis.
