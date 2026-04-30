@@ -1,7 +1,7 @@
 # DriftDetect
 ### Frequency-Domain Diagnostic for World Model Latent Drift
 
-![Status](https://img.shields.io/badge/Status-Month%202%20Complete-1f6feb)
+![Status](https://img.shields.io/badge/Status-Month%203%20In%20Progress-1f6feb)
 ![Compute Budget](https://img.shields.io/badge/Compute-~200%20GPU--hours-2ea44f)
 ![Timeline](https://img.shields.io/badge/Timeline-6%20months-f59e0b)
 
@@ -21,13 +21,17 @@ See [PROPOSAL.md](./PROPOSAL.md) for the full proposal.
 
 ## Current Status
 
-Month 2 is complete.
+Month 3 is in progress.
 
 - [x] Month 1: Infrastructure, checkpoint, adapter, 20 v1 rollouts
 - [x] Month 2 Week 1: Latent collection fix, 20 v2 rollouts, `freq_decompose` module
 - [x] Month 2 Week 2: `error_curves` module, imagination window ablation
 - [x] Month 2 Week 3: Figure 1 generated, Cartpole training complete
 - [x] Month 2 Week 4: Filter ablation, Cartpole diagnostics, cross-task comparison
+- [x] Month 3 Week 1: D1 decoder amplification + high-frequency checkpoint training launched
+- [x] Month 3 Week 2: D2 Lipschitz probe + D3 linear/nonlinear separation
+- [ ] Month 3 Week 3: Training dynamics pipeline + Figure 3
+- [ ] Month 3 Week 4: V4 deep recon + Finding E verdict + Month 3 summary
 
 ### Recent Achievement
 
@@ -36,6 +40,8 @@ Month 2 is complete.
 - Cross-task comparison confirms the drift pattern is intrinsic to RSSM, not task-specific.
 - Full diagnostic pipeline operational: `freq_decompose` + `error_curves` + Figure 1 generation.
 - Two strong checkpoints: Cheetah (peak 791.1) and Cartpole (peak ~854).
+- Decoder amplification experiments D1-D3 complete: trained decoder amplifies drift overall, but not preferentially along `dc_trend`.
+- Finding E not supported as an independent finding; trend dominance appears latent-intrinsic.
 
 ### Progress Table
 
@@ -50,8 +56,12 @@ Month 2 is complete.
 | Month 2 | Week 3 | Figure 1 + Cartpole training | ✅ Complete | 2026-04-30 |
 | Month 2 | Week 4 | Filter ablation + Cartpole diagnostics | ✅ Complete | 2026-04-30 |
 | Month 2 | Summary | Final judgment + release tag | ✅ Complete | 2026-04-30 |
+| Month 3 | Week 1 | D1 decoder amplification + high-freq checkpoint training launched | ✅ Complete | 2026-04-30 |
+| Month 3 | Week 2 | D2 Lipschitz probe + D3 linear/nonlinear separation | ✅ Complete | 2026-04-30 |
+| Month 3 | Week 3 | Training dynamics pipeline + Figure 3 | ⏳ In Progress |  |
+| Month 3 | Week 4 | V4 deep recon + Finding E verdict + Month 3 summary | ⚪ Not started |  |
 
-**Last updated:** April 30, 2026 (Month 2 complete)
+**Last updated:** April 30, 2026 (Month 3 in progress)
 
 ## Timeline
 
@@ -59,7 +69,7 @@ Month 2 is complete.
 |---|---|---|---|
 | Month 1: Setup & Baseline | ✅ Complete | 2026-04 | Infrastructure, checkpoint, adapter, and 20 v1 rollouts completed |
 | Month 2: Core Diagnostics | ✅ Complete | 2026-04 | Finding A supported across two tasks with filter and window ablations complete |
-| Month 3: Cross-Architecture Analysis | ⚪ Not started | 2026-07 | Training-dynamics analysis and V4 reconnaissance not started |
+| Month 3: Cross-Architecture Analysis | 🔄 In Progress | 2026-07 | Decoder amplification D1-D3 complete; training-dynamics analysis pending checkpoint completion |
 | Month 4: Theory & Toy Validation | ⚪ Not started | 2026-08 | |
 | Month 5: Analysis & Writing | ⚪ Not started | 2026-09 | |
 | Month 6: Revision & Submission | ⚪ Not started | 2026-10 | |
@@ -193,6 +203,30 @@ metadata:      task, seed, alignment info
 **Compute used:** ~9.5 RTX 4090 GPU-hours  
 **Checkpoint status:** Ready for Week 4 rollout extraction
 
+---
+
+## Month 3 Summary (April 30, 2026)
+
+**Decoder Amplification & Training Dynamics - IN PROGRESS 🔄**
+
+### Decoder amplification experiments:
+- ✅ D1 random decoder control complete: trained decoder amplifies drift by ~48% relative to a random decoder.
+- ✅ D2 Lipschitz probe complete: amplification is **not** directional toward `dc_trend`; `dc_trend` has the smallest effective Lipschitz constant.
+- ✅ D3 linear/nonlinear separation complete: decoder nonlinearity appears as constant OOD noise, not a horizon-growing amplification mechanism.
+
+### Finding E verdict:
+- Finding E is **not supported** as an independent finding in its original form.
+- The trained decoder amplifies OOD latent drift, but it does not change the frequency structure of drift.
+- Trend dominance is best interpreted as latent-intrinsic, arising from RSSM open-loop dynamics rather than decoder-specific `dc_trend` amplification.
+- D1-D3 will be used as a supplementary falsification record and discussion clarification.
+
+### Training dynamics:
+- High-frequency Cheetah checkpoint training launched on RunPod.
+- Hardware: RTX 4090.
+- Training target: 500k steps.
+- Checkpoint cadence: `eval_every=5000`, producing approximately 100 archived checkpoints.
+- Training dynamics analysis is pending checkpoint completion.
+
 ## Key References
 
 - Hafner et al. (2023), **DreamerV3**
@@ -206,8 +240,9 @@ metadata:      task, seed, alignment info
 - 📊 **Total Budget**: ~200 GPU-hours
 - ✅ **Cheetah training**: ~9.5 GPU-hours, ~$6.65
 - ✅ **Cartpole training**: ~10 GPU-hours, ~$7.00
-- 💸 **Total spent**: ~$13.65
-- ⏳ **Remaining budget**: ~178.5 GPU-hours
+- 🔄 **Month 3 high-frequency Cheetah training**: ~10 GPU-hours, ~$7.00
+- 💸 **Total spent**: ~$20.65
+- ⏳ **Remaining budget**: ~168.5 GPU-hours
 - ✅ **Strategy**: Use pre-trained checkpoints when available, and run targeted training only when necessary to unblock the diagnostic pipeline
 
 ## Repository Structure

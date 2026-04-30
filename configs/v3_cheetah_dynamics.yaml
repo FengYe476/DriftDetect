@@ -1,0 +1,59 @@
+# DreamerV3 Cheetah Training Dynamics Config
+# Purpose: Month 3 training dynamics experiment for DriftDetect.
+#
+# This run is intended to match the Month 1 Cheetah Run training setup
+# (default NM512 `dmc_proprio` config, with batch_size=32 and envs=8) while
+# increasing checkpoint write frequency so we can study how drift patterns
+# evolve throughout training.
+#
+# Key idea:
+# - Hyperparameters are identical to the Month 1 Cheetah run except for the
+#   checkpoint cadence.
+# - Target training budget is 500k environment steps on `dmc_cheetah_run`.
+# - Desired outputs are approximately 100 intermediate snapshots spanning
+#   steps 5k, 10k, ..., 500k.
+#
+# Important implementation note:
+# - In `external/dreamerv3-torch/dreamer.py`, there is no dedicated
+#   `checkpoint_every` or `save_every` config key.
+# - The code saves `latest.pt` once per training cycle, and that cycle length
+#   is controlled by `eval_every`.
+# - Therefore, `eval_every: 5000` is the correct upstream override for writing
+#   a checkpoint every 5000 environment steps.
+# - Upstream overwrites `latest.pt` on each save. To preserve all ~100
+#   intermediate checkpoints, archive or copy `latest.pt` after each save.
+#
+# Expected training time: ~10h on RTX 4090.
+# Expected storage for archived snapshots: ~21 GB
+#   (~100 checkpoints x ~218 MB each).
+
+task: dmc_cheetah_run
+steps: 500000
+batch_size: 32
+envs: 8
+
+# Effective checkpoint-write cadence in NM512's implementation.
+# `dreamer.py` divides `eval_every` by `action_repeat` internally, then saves
+# `latest.pt` after each train/eval chunk, so `eval_every: 5000` yields
+# checkpoint writes every 5000 environment steps.
+eval_every: 5000
+
+# Usage (on RunPod with CUDA GPU):
+#
+# The upstream CLI does not accept an arbitrary external YAML file directly;
+# it accepts named presets from `external/dreamerv3-torch/configs.yaml` plus
+# explicit CLI overrides. Launch the equivalent run with:
+#
+#   cd external/dreamerv3-torch
+#   python dreamer.py \
+#     --configs dmc_proprio \
+#     --task dmc_cheetah_run \
+#     --logdir ../../results/training_dynamics/cheetah \
+#     --steps 500000 \
+#     --batch_size 32 \
+#     --envs 8 \
+#     --eval_every 5000
+#
+# To retain all intermediate checkpoints, archive each refreshed
+# `../../results/training_dynamics/cheetah/latest.pt` to a unique filename
+# (for example `ckpt_step005000.pt`, `ckpt_step010000.pt`, ...).
