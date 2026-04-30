@@ -1,0 +1,618 @@
+{
+  "version": "v2",
+  "generated_at": "2026-04-30T13:49:47.319779+00:00",
+  "task": "dmc_cartpole_swingup",
+  "checkpoint": "results/checkpoints/cartpole_swingup_500k.pt",
+  "total_steps": 1000,
+  "imagination_start": 200,
+  "horizon": 200,
+  "latent_spec": {
+    "latent_dim": 1536,
+    "deter_dim": 512,
+    "stoch_discrete": true,
+    "num_categoricals": 32,
+    "num_classes": 32
+  },
+  "files": [
+    {
+      "file": "results/rollouts/cartpole_v3_seed0_v2.npz",
+      "seed": 0,
+      "sha256": "d22616f5b4e5e7795f76212604cb9bd63d0d4c53e4e68eb5dca3ebeb5568d85a",
+      "shapes": {
+        "true_obs": [
+          200,
+          5
+        ],
+        "imagined_obs": [
+          200,
+          5
+        ],
+        "actions": [
+          200,
+          1
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cartpole_v3_seed1_v2.npz",
+      "seed": 1,
+      "sha256": "733009611341e87305f327d9e234d1069b3c78150a85dd6364844b02c2c43401",
+      "shapes": {
+        "true_obs": [
+          200,
+          5
+        ],
+        "imagined_obs": [
+          200,
+          5
+        ],
+        "actions": [
+          200,
+          1
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cartpole_v3_seed2_v2.npz",
+      "seed": 2,
+      "sha256": "c447739414a4945b91438cbab9484a52a79766897cad41f4a6ee3577fe3e5331",
+      "shapes": {
+        "true_obs": [
+          200,
+          5
+        ],
+        "imagined_obs": [
+          200,
+          5
+        ],
+        "actions": [
+          200,
+          1
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cartpole_v3_seed3_v2.npz",
+      "seed": 3,
+      "sha256": "d66a5140f2e45cab154e9c58f94c4cdedbcc48721e63792bef7f056a7a2297f9",
+      "shapes": {
+        "true_obs": [
+          200,
+          5
+        ],
+        "imagined_obs": [
+          200,
+          5
+        ],
+        "actions": [
+          200,
+          1
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cartpole_v3_seed4_v2.npz",
+      "seed": 4,
+      "sha256": "d52daf61fe552467ad8290c97e934fa6cbf0e7338cc57d35de3e8209594ebdfc",
+      "shapes": {
+        "true_obs": [
+          200,
+          5
+        ],
+        "imagined_obs": [
+          200,
+          5
+        ],
+        "actions": [
+          200,
+          1
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cartpole_v3_seed5_v2.npz",
+      "seed": 5,
+      "sha256": "4c4bfe961742c4197d4a32bc45b8699f9502bec48232b6c2c2a359611c6eda7d",
+      "shapes": {
+        "true_obs": [
+          200,
+          5
+        ],
+        "imagined_obs": [
+          200,
+          5
+        ],
+        "actions": [
+          200,
+          1
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cartpole_v3_seed6_v2.npz",
+      "seed": 6,
+      "sha256": "e807134d7121181c8b78676900f2a1c1c1236be78dd9937196ab0a7faf8fffd5",
+      "shapes": {
+        "true_obs": [
+          200,
+          5
+        ],
+        "imagined_obs": [
+          200,
+          5
+        ],
+        "actions": [
+          200,
+          1
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cartpole_v3_seed7_v2.npz",
+      "seed": 7,
+      "sha256": "d413a43fdad5965bf2167018f817487a04290354cb14a3de8024714c3438bad6",
+      "shapes": {
+        "true_obs": [
+          200,
+          5
+        ],
+        "imagined_obs": [
+          200,
+          5
+        ],
+        "actions": [
+          200,
+          1
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cartpole_v3_seed8_v2.npz",
+      "seed": 8,
+      "sha256": "d34bb96c39ed8f4560b0879f51b710e3ebf5ec888608dc5f77484748aca1a4fb",
+      "shapes": {
+        "true_obs": [
+          200,
+          5
+        ],
+        "imagined_obs": [
+          200,
+          5
+        ],
+        "actions": [
+          200,
+          1
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cartpole_v3_seed9_v2.npz",
+      "seed": 9,
+      "sha256": "50a141d8f16af2cb96e42d2c2f4cd5a98886364e1738871e1781dc2c0cfc3b5d",
+      "shapes": {
+        "true_obs": [
+          200,
+          5
+        ],
+        "imagined_obs": [
+          200,
+          5
+        ],
+        "actions": [
+          200,
+          1
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cartpole_v3_seed10_v2.npz",
+      "seed": 10,
+      "sha256": "8300de3d038aacae3144aa2b7603e5f292c3a353d41a293e731bf7f1a4e1c574",
+      "shapes": {
+        "true_obs": [
+          200,
+          5
+        ],
+        "imagined_obs": [
+          200,
+          5
+        ],
+        "actions": [
+          200,
+          1
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cartpole_v3_seed11_v2.npz",
+      "seed": 11,
+      "sha256": "b680210670429021324b05f2c2a4d2eacb47b848836d7e0b271bd6a454214b34",
+      "shapes": {
+        "true_obs": [
+          200,
+          5
+        ],
+        "imagined_obs": [
+          200,
+          5
+        ],
+        "actions": [
+          200,
+          1
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cartpole_v3_seed12_v2.npz",
+      "seed": 12,
+      "sha256": "f85bb6613a4afec88c2dd918df91c800d594b027fddf30867299c74547ceb962",
+      "shapes": {
+        "true_obs": [
+          200,
+          5
+        ],
+        "imagined_obs": [
+          200,
+          5
+        ],
+        "actions": [
+          200,
+          1
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cartpole_v3_seed13_v2.npz",
+      "seed": 13,
+      "sha256": "d136d941e67c8525de99b34d6b1fdd2d42369d68ab6294758f0cdffae9a6db0a",
+      "shapes": {
+        "true_obs": [
+          200,
+          5
+        ],
+        "imagined_obs": [
+          200,
+          5
+        ],
+        "actions": [
+          200,
+          1
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cartpole_v3_seed14_v2.npz",
+      "seed": 14,
+      "sha256": "ee79e365edf374fef87085a88268035ea3154972e3be13a0321b6285aa75d6a7",
+      "shapes": {
+        "true_obs": [
+          200,
+          5
+        ],
+        "imagined_obs": [
+          200,
+          5
+        ],
+        "actions": [
+          200,
+          1
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cartpole_v3_seed15_v2.npz",
+      "seed": 15,
+      "sha256": "2f200a78d919f8fb0269b82d4b8520d8fe55663227d12342db076dbb43da8812",
+      "shapes": {
+        "true_obs": [
+          200,
+          5
+        ],
+        "imagined_obs": [
+          200,
+          5
+        ],
+        "actions": [
+          200,
+          1
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cartpole_v3_seed16_v2.npz",
+      "seed": 16,
+      "sha256": "95da7c42109f57150bec0e7e9d971ea12913f72c563aa4c0c38ecdb3fabacf97",
+      "shapes": {
+        "true_obs": [
+          200,
+          5
+        ],
+        "imagined_obs": [
+          200,
+          5
+        ],
+        "actions": [
+          200,
+          1
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cartpole_v3_seed17_v2.npz",
+      "seed": 17,
+      "sha256": "03deb2dd50d84563840c697e21f0c144e97f94e626f0732a47dd12004d5de328",
+      "shapes": {
+        "true_obs": [
+          200,
+          5
+        ],
+        "imagined_obs": [
+          200,
+          5
+        ],
+        "actions": [
+          200,
+          1
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cartpole_v3_seed18_v2.npz",
+      "seed": 18,
+      "sha256": "8a3f1d5be4da5eb5be58ea57c0eeb4275f891e592072c870485a858f98205da3",
+      "shapes": {
+        "true_obs": [
+          200,
+          5
+        ],
+        "imagined_obs": [
+          200,
+          5
+        ],
+        "actions": [
+          200,
+          1
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts/cartpole_v3_seed19_v2.npz",
+      "seed": 19,
+      "sha256": "429281d27fc92f6a473eb76d0028579f46bc7c228d4c8f6e1bce5a839fd6c2de",
+      "shapes": {
+        "true_obs": [
+          200,
+          5
+        ],
+        "imagined_obs": [
+          200,
+          5
+        ],
+        "actions": [
+          200,
+          1
+        ],
+        "rewards": [
+          200
+        ],
+        "true_latent": [
+          200,
+          1536
+        ],
+        "imagined_latent": [
+          200,
+          1536
+        ]
+      }
+    }
+  ]
+}
