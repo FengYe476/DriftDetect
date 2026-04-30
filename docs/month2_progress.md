@@ -1,6 +1,6 @@
-# Month 2 Progress (As of 2026-04-29)
+# Month 2 Progress (As of 2026-04-30)
 
-## Overall Status: ~65% Complete (Week 3 of 4)
+## Overall Status: 100% Complete
 
 ## Week 1: Latent Collection + Frequency Decomposition — COMPLETE
 
@@ -63,7 +63,7 @@
 - Conclusion: **phase-dependent drift** framing — consistent qualitative bias toward low-frequency error, but magnitude modulated by episode phase.
 - Full report: `docs/imagination_window_robustness.md`.
 
-## Week 3: Figure 1 + Cartpole Training — IN PROGRESS
+## Week 3: Figure 1 + Cartpole Training — COMPLETE
 
 ### Figure 1 (Cheetah)
 
@@ -88,12 +88,14 @@
 
 ### Cartpole Training
 
-- Status: IN PROGRESS on RunPod RTX 4090.
+- Status: COMPLETE on RunPod RTX 4090.
 - Config: same hyperparameters as Cheetah (`batch_size=32`, `envs=8`, `500k` steps).
-- Expected cost: about `$7`.
-- Expected completion: pending.
+- Peak observed `eval_return`: about `854`.
+- Stable late-training range: about `820-850`.
+- Cost: about `$7`.
+- Checkpoint: `results/checkpoints/cartpole_swingup_500k.pt` (218 MB).
 
-## Week 4: Filter Ablation + Cartpole Diagnostics — IN PROGRESS
+## Week 4: Filter Ablation + Cartpole Diagnostics — COMPLETE
 
 ### Filter Ablation — COMPLETE
 
@@ -115,18 +117,41 @@ Key results:
 - Full report: `docs/filter_ablation.md`.
 - Raw data: `results/tables/filter_ablation.csv`.
 
-### Cartpole Training — IN PROGRESS
+### Cartpole Rollout Extraction — COMPLETE
 
-- Running on RunPod RTX 4090, same hyperparameters as Cheetah.
-- Expected completion: pending.
-- After completion: rollout extraction + Figure 1 comparison.
+- 20 Cartpole v2 rollouts extracted (`seeds 0-19`) with
+  `true_obs`, `imagined_obs`, `actions`, `rewards`,
+  `true_latent`, and `imagined_latent`.
+- Shapes verified for all seeds: obs `(200, 5)`, latent `(200, 1536)`.
+- L2 latent drift grows in all 20 seeds:
+  `first10 ~3.53-3.81`, `last10 ~12.20-14.84`.
+- Manifest added: `results/rollouts/manifest_cartpole_v2.json`.
 
-### Still Planned
+### Cartpole Figure 1 — COMPLETE
 
-- Cartpole rollout extraction and diagnostics.
-- Cross-task comparison (Cheetah vs Cartpole drift patterns).
-- Month 2 summary + Finding A final judgment.
-- Tag: `v0.2-month2-figure1`.
+- `src/analysis/figure1_cartpole.py` generates 4 PDFs
+  (latent/obs x linear/log).
+- Latent-space band ranking:
+  `dc_trend (97.0%) > very_low > high > low > mid`.
+- Obs-space dominant share:
+  `dc_trend = 99.0%` of total mean MSE.
+- Interpretation: Cartpole shows an even more extreme trend-dominated drift
+  profile than Cheetah.
+
+### Cross-Task Comparison — COMPLETE
+
+- `dc_trend` is dominant in both tasks in latent and obs space.
+- High-frequency error is strongly suppressed in latent space for both tasks.
+- Full band ranking is not identical across tasks.
+- Cartpole's non-`dc_trend` bands are all near zero, so their relative ranking
+  is weakly informative compared with the shared trend-dominance result.
+- Conclusion: Finding A generalizes across both tested DreamerV3 RSSM tasks.
+
+### Month 2 Final Judgment
+
+- Finding A status: **SUPPORTED**.
+- Final framing: **frequency-asymmetric drift with trend dominance**.
+- Release tag: `v0.2-month2-figure1`.
 
 ## Key Decisions Made in Month 2
 
@@ -140,14 +165,14 @@ Key results:
 ## Compute Budget
 
 - Month 1: ~9.5 GPU-hours (`$6.65`) — Cheetah training.
-- Month 2: ~9-12 GPU-hours (`~$7`) — Cartpole training (in progress).
-- Local MPS: about 1 hour total for rollout extraction and analysis.
-- Total spent: about `$13-14`.
-- Remaining: about `180` GPU-hours.
+- Month 2: ~10 GPU-hours (`$7.00`) — Cartpole training complete.
+- Local MPS: about 2 hours total for rollout extraction and analysis.
+- Total spent: about `$13.65`.
+- Remaining: about `178.5` GPU-hours.
 
 ## Risk Assessment
 
 - Finding A is supported, but not as strong as "monotonic growth everywhere."
-- Single task (Cheetah) until Cartpole completes.
+- Only two DMC proprio tasks have been tested so far.
 - Boundary effects in bandpass require trimming steps `0-10` and `190-199`.
 - Latent vs obs discrepancy (plateau vs growth) needs careful framing.

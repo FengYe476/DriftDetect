@@ -1,42 +1,22 @@
 {
   "checkpoints": [
     {
-      "name": "cheetah_run_500k",
       "task": "dmc_cheetah_run",
+      "file": "results/checkpoints/cheetah_run_500k.pt",
       "steps": 505000,
-      "target_steps": 500000,
-      "filename": "cheetah_run_500k.pt",
-      "location": "results/checkpoints/cheetah_run_500k.pt",
-      "date": "2026-04-29",
-      "status": "ready_for_week_4_rollout_extraction",
-      "hardware": {
-        "provider": "RunPod",
-        "gpu": "RTX 4090"
-      },
-      "training": {
-        "batch_size": 32,
-        "parallel_envs": 8,
-        "duration_hours": 9.5,
-        "cost_usd": 6.65
-      },
-      "performance": {
-        "eval_return_peak": 791.1,
-        "eval_return_stable": "730-750",
-        "eval_return_timeline": {
-          "365k": 727.0,
-          "465k": 735.5,
-          "485k": 791.1,
-          "495k": 753.7,
-          "505k": 655.2
-        },
-        "train_return": {
-          "488k_avg": 701.0,
-          "496k_avg": 709.0,
-          "504k_avg": 718.0,
-          "504k_max": 774.9
-        }
-      },
-      "sha256": "TODO: compute after download"
+      "peak_eval_return": 791.1,
+      "stable_eval_return": "730-750",
+      "training_cost": "$6.65",
+      "date": "2026-04-29"
+    },
+    {
+      "task": "dmc_cartpole_swingup",
+      "file": "results/checkpoints/cartpole_swingup_500k.pt",
+      "steps": 500000,
+      "peak_eval_return": 854,
+      "stable_eval_return": "820-850",
+      "training_cost": "$7.00",
+      "date": "2026-04-30"
     }
   ]
 }

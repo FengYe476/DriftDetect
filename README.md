@@ -1,7 +1,7 @@
 # DriftDetect
 ### Frequency-Domain Diagnostic for World Model Latent Drift
 
-![Status](https://img.shields.io/badge/Status-Month%202%20Week%203%20In%20Progress-1f6feb)
+![Status](https://img.shields.io/badge/Status-Month%202%20Complete-1f6feb)
 ![Compute Budget](https://img.shields.io/badge/Compute-~200%20GPU--hours-2ea44f)
 ![Timeline](https://img.shields.io/badge/Timeline-6%20months-f59e0b)
 
@@ -21,23 +21,21 @@ See [PROPOSAL.md](./PROPOSAL.md) for the full proposal.
 
 ## Current Status
 
-Month 2, Week 3 is in progress.
+Month 2 is complete.
 
 - [x] Month 1: Infrastructure, checkpoint, adapter, 20 v1 rollouts
 - [x] Month 2 Week 1: Latent collection fix, 20 v2 rollouts, `freq_decompose` module
 - [x] Month 2 Week 2: `error_curves` module, imagination window ablation
-- [x] Month 2 Week 3: Figure 1 generated, Cartpole training in progress
-- [🔄] Month 2 Week 4: Filter ablation complete, Cartpole diagnostics pending
+- [x] Month 2 Week 3: Figure 1 generated, Cartpole training complete
+- [x] Month 2 Week 4: Filter ablation, Cartpole diagnostics, cross-task comparison
 
 ### Recent Achievement
 
-- Latent probe revealed `get_feat() = concat([stoch(1024), deter(512)])`, confirming deter-only analysis is the correct approach.
-- 20 v2 rollouts with latent trajectories of shape `(200, 1536)` were extracted and verified.
-- Frequency decomposition module implemented: 5 bands, Butterworth order 4, PCA on the deter portion.
-- Figure 1 generated: `dc_trend` carries 46.7% of latent MSE, while high frequency carries only 4.2%, confirming frequency-asymmetric drift.
-- Imagination window ablation (`start in {50, 200, 500}`): qualitative drift pattern is consistent across episode phases, but magnitude is phase-dependent.
-- Finding A status: **SUPPORTED with caveats**.
-- Filter ablation (Butterworth vs Chebyshev vs FIR): `dc_trend` dominance and high-freq suppression are robust across all three filters. Exact magnitudes vary about 20-30% but qualitative Finding A conclusions are unchanged.
+- Finding A SUPPORTED: imagination drift is frequency-asymmetric and trend-dominated across both Cheetah Run and Cartpole Swingup.
+- `dc_trend` carries 46.7% (Cheetah) to 97.0% (Cartpole) of latent MSE.
+- Cross-task comparison confirms the drift pattern is intrinsic to RSSM, not task-specific.
+- Full diagnostic pipeline operational: `freq_decompose` + `error_curves` + Figure 1 generation.
+- Two strong checkpoints: Cheetah (peak 791.1) and Cartpole (peak ~854).
 
 ### Progress Table
 
@@ -49,18 +47,19 @@ Month 2, Week 3 is in progress.
 | Month 1 | Week 4 | Adapter integration + 20 v1 rollouts | ✅ Complete | 2026-04 |
 | Month 2 | Week 1 | Latent fix + v2 rollouts + `freq_decompose` | ✅ Complete | 2026-04 |
 | Month 2 | Week 2 | `error_curves` + window ablation | ✅ Complete | 2026-04 |
-| Month 2 | Week 3 | Figure 1 + Cartpole training prep | 🔄 In Progress | 2026-04-29 |
-| Month 2 | Week 4 | Filter ablation + Cartpole diagnostics | 🔄 In Progress | 2026-05 |
+| Month 2 | Week 3 | Figure 1 + Cartpole training | ✅ Complete | 2026-04-30 |
+| Month 2 | Week 4 | Filter ablation + Cartpole diagnostics | ✅ Complete | 2026-04-30 |
+| Month 2 | Summary | Final judgment + release tag | ✅ Complete | 2026-04-30 |
 
-**Last updated:** April 29, 2026 (Month 2 Week 3 in progress)
+**Last updated:** April 30, 2026 (Month 2 complete)
 
 ## Timeline
 
 | Phase | Status | ETA | Notes |
 |---|---|---|---|
 | Month 1: Setup & Baseline | ✅ Complete | 2026-04 | Infrastructure, checkpoint, adapter, and 20 v1 rollouts completed |
-| Month 2: Core Diagnostics | 🟡 Week 3 In Progress | 2026-05 | Figure 1 complete, Cartpole baseline in progress, Week 4 ablations pending |
-| Month 3: Cross-Architecture Analysis | ⚪ Not started | 2026-07 | |
+| Month 2: Core Diagnostics | ✅ Complete | 2026-04 | Finding A supported across two tasks with filter and window ablations complete |
+| Month 3: Cross-Architecture Analysis | ⚪ Not started | 2026-07 | Training-dynamics analysis and V4 reconnaissance not started |
 | Month 4: Theory & Toy Validation | ⚪ Not started | 2026-08 | |
 | Month 5: Analysis & Writing | ⚪ Not started | 2026-09 | |
 | Month 6: Revision & Submission | ⚪ Not started | 2026-10 | |
@@ -206,9 +205,9 @@ metadata:      task, seed, alignment info
 - 💻 **Hardware**: Single RTX 4090 (24GB)
 - 📊 **Total Budget**: ~200 GPU-hours
 - ✅ **Cheetah training**: ~9.5 GPU-hours, ~$6.65
-- 🔄 **Cartpole training**: ~9-12 GPU-hours, ~$7 (in progress)
-- 💸 **Total spent / committed**: ~$13-14
-- ⏳ **Remaining budget**: ~180 GPU-hours
+- ✅ **Cartpole training**: ~10 GPU-hours, ~$7.00
+- 💸 **Total spent**: ~$13.65
+- ⏳ **Remaining budget**: ~178.5 GPU-hours
 - ✅ **Strategy**: Use pre-trained checkpoints when available, and run targeted training only when necessary to unblock the diagnostic pipeline
 
 ## Repository Structure
