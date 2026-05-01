@@ -1,7 +1,7 @@
 # DriftDetect
 ### Frequency-Domain Diagnostic for World Model Latent Drift
 
-![Status](https://img.shields.io/badge/Status-Month%203%20In%20Progress-1f6feb)
+![Status](https://img.shields.io/badge/Status-Month%203%20Complete-238636)
 ![Compute Budget](https://img.shields.io/badge/Compute-~200%20GPU--hours-2ea44f)
 ![Timeline](https://img.shields.io/badge/Timeline-6%20months-f59e0b)
 
@@ -21,7 +21,7 @@ See [PROPOSAL.md](./PROPOSAL.md) for the full proposal.
 
 ## Current Status
 
-Month 3 is in progress.
+Month 3 is complete. Month 4 is ready to begin the conditional DreamerV4 cross-architecture comparison.
 
 - [x] Month 1: Infrastructure, checkpoint, adapter, 20 v1 rollouts
 - [x] Month 2 Week 1: Latent collection fix, 20 v2 rollouts, `freq_decompose` module
@@ -30,8 +30,8 @@ Month 3 is in progress.
 - [x] Month 2 Week 4: Filter ablation, Cartpole diagnostics, cross-task comparison
 - [x] Month 3 Week 1: D1 decoder amplification + high-frequency checkpoint training launched
 - [x] Month 3 Week 2: D2 Lipschitz probe + D3 linear/nonlinear separation
-- [ ] Month 3 Week 3: Training dynamics pipeline + Figure 3
-- [ ] Month 3 Week 4: V4 deep recon + Finding E verdict + Month 3 summary
+- [x] Month 3 Week 3: Training dynamics pipeline + Figure 3
+- [x] Month 3 Week 4: V4 deep recon + Finding E verdict + Month 3 summary
 
 ### Recent Achievement
 
@@ -42,6 +42,18 @@ Month 3 is in progress.
 - Two strong checkpoints: Cheetah (peak 791.1) and Cartpole (peak ~854).
 - Decoder amplification experiments D1-D3 complete: trained decoder amplifies drift overall, but not preferentially along `dc_trend`.
 - Finding E not supported as an independent finding; trend dominance appears latent-intrinsic.
+- Finding C SUPPORTED: Cheetah training dynamics across 102 checkpoints show `dc_trend` dominance from step 5000.
+- Figure 3 complete: curves, heatmap, and `dc_trend` share over training.
+- V4 deep recon complete and Month 4 V4 work is GO (conditional, inference-only).
+
+### Finding Status
+
+| Finding | Status | Evidence |
+|---|---|---|
+| Finding A: frequency-asymmetric drift with trend dominance | SUPPORTED | Month 2 Cheetah + Cartpole diagnostics |
+| Finding B: cross-architecture comparison | PENDING Month 4 | V4 recon and GO decision complete |
+| Finding C: training dynamics | SUPPORTED | `dc_trend` dominant from step 5000 across 102 Cheetah checkpoints |
+| Finding E: decoder amplification | NOT SUPPORTED as independent finding | D1-D3 show uniform OOD amplification, not directional `dc_trend` amplification |
 
 ### Progress Table
 
@@ -58,10 +70,11 @@ Month 3 is in progress.
 | Month 2 | Summary | Final judgment + release tag | ✅ Complete | 2026-04-30 |
 | Month 3 | Week 1 | D1 decoder amplification + high-freq checkpoint training launched | ✅ Complete | 2026-04-30 |
 | Month 3 | Week 2 | D2 Lipschitz probe + D3 linear/nonlinear separation | ✅ Complete | 2026-04-30 |
-| Month 3 | Week 3 | Training dynamics pipeline + Figure 3 | ⏳ In Progress |  |
-| Month 3 | Week 4 | V4 deep recon + Finding E verdict + Month 3 summary | ⚪ Not started |  |
+| Month 3 | Week 3 | Training dynamics pipeline + Figure 3 | ✅ Complete | 2026-05-01 |
+| Month 3 | Week 4 | V4 deep recon + Finding E verdict + Month 3 summary | ✅ Complete | 2026-05-01 |
+| Month 3 | Summary | Training dynamics + decoder verdict + V4 decision | ✅ Complete | 2026-05-01 |
 
-**Last updated:** April 30, 2026 (Month 3 in progress)
+**Last updated:** May 1, 2026 (Month 3 complete)
 
 ## Timeline
 
@@ -69,8 +82,8 @@ Month 3 is in progress.
 |---|---|---|---|
 | Month 1: Setup & Baseline | ✅ Complete | 2026-04 | Infrastructure, checkpoint, adapter, and 20 v1 rollouts completed |
 | Month 2: Core Diagnostics | ✅ Complete | 2026-04 | Finding A supported across two tasks with filter and window ablations complete |
-| Month 3: Cross-Architecture Analysis | 🔄 In Progress | 2026-07 | Decoder amplification D1-D3 complete; training-dynamics analysis pending checkpoint completion |
-| Month 4: Theory & Toy Validation | ⚪ Not started | 2026-08 | |
+| Month 3: Decoder & Training Dynamics | ✅ Complete | 2026-05 | D1-D3 complete, Finding E revised, Finding C supported with Figure 3 |
+| Month 4: Cross-Architecture Analysis | ⚪ Not started | 2026-05 | Conditional V4 adapter and inference-only comparison |
 | Month 5: Analysis & Writing | ⚪ Not started | 2026-09 | |
 | Month 6: Revision & Submission | ⚪ Not started | 2026-10 | |
 
@@ -205,27 +218,33 @@ metadata:      task, seed, alignment info
 
 ---
 
-## Month 3 Summary (April 30, 2026)
+## Month 3 Summary (May 1, 2026)
 
-**Decoder Amplification & Training Dynamics - IN PROGRESS 🔄**
+**Decoder Amplification & Training Dynamics - COMPLETE ✅**
 
-### Decoder amplification experiments:
+See [`docs/month3_summary.md`](./docs/month3_summary.md) for the full Month 3 record.
+
+Release tag: `v0.3-month3-dynamics-decoder`
+
+### Decoder amplification:
 - ✅ D1 random decoder control complete: trained decoder amplifies drift by ~48% relative to a random decoder.
 - ✅ D2 Lipschitz probe complete: amplification is **not** directional toward `dc_trend`; `dc_trend` has the smallest effective Lipschitz constant.
 - ✅ D3 linear/nonlinear separation complete: decoder nonlinearity appears as constant OOD noise, not a horizon-growing amplification mechanism.
-
-### Finding E verdict:
-- Finding E is **not supported** as an independent finding in its original form.
-- The trained decoder amplifies OOD latent drift, but it does not change the frequency structure of drift.
-- Trend dominance is best interpreted as latent-intrinsic, arising from RSSM open-loop dynamics rather than decoder-specific `dc_trend` amplification.
-- D1-D3 will be used as a supplementary falsification record and discussion clarification.
+- ✅ Finding E verdict: **not supported** as an independent finding. Decoder amplification is uniform OOD instability, while trend dominance is latent-intrinsic.
 
 ### Training dynamics:
-- High-frequency Cheetah checkpoint training launched on RunPod.
-- Hardware: RTX 4090.
-- Training target: 500k steps.
-- Checkpoint cadence: `eval_every=5000`, producing approximately 100 archived checkpoints.
-- Training dynamics analysis is pending checkpoint completion.
+- ✅ High-frequency Cheetah checkpoint archive complete: 102 checkpoints from step 5k to 510k.
+- ✅ Peak `eval_return`: 791.3 at step 485k, matching the Month 1 peak of 791.1.
+- ✅ Training dynamics pipeline complete: 102 checkpoints x 5 bands, horizon 200, trim `[25, 175]`.
+- ✅ Figure 3 complete: curves, heatmap, and fractional share plots.
+- ✅ Finding C supported: `dc_trend` dominance is present from step 5000 and remains the top band throughout training.
+- Key interpretation: training does not create trend dominance; it slightly alleviates it from 79% share at step 5k to about 33% by step 500k.
+
+### V4 Month 4 readiness:
+- ✅ `docs/v4_hf_deep_recon.md` complete.
+- ✅ `docs/v4_decision.md` complete.
+- ✅ Month 4 V4 comparison is GO (conditional), limited to inference-only RunPod CUDA work using HF checkpoints.
+- Fallback if V4 adapter fails by Month 4 Week 2: PlaNet or additional DreamerV3 tasks.
 
 ## Key References
 
@@ -240,9 +259,9 @@ metadata:      task, seed, alignment info
 - 📊 **Total Budget**: ~200 GPU-hours
 - ✅ **Cheetah training**: ~9.5 GPU-hours, ~$6.65
 - ✅ **Cartpole training**: ~10 GPU-hours, ~$7.00
-- 🔄 **Month 3 high-frequency Cheetah training**: ~10 GPU-hours, ~$7.00
-- 💸 **Total spent**: ~$20.65
-- ⏳ **Remaining budget**: ~168.5 GPU-hours
+- ✅ **Month 3 high-frequency Cheetah training**: ~20 GPU-hours, ~$14.00 (two runs)
+- 💸 **Total spent**: ~39.5 GPU-hours, ~$27.65
+- ⏳ **Remaining budget**: ~160.5 GPU-hours, ~$112
 - ✅ **Strategy**: Use pre-trained checkpoints when available, and run targeted training only when necessary to unblock the diagnostic pipeline
 
 ## Repository Structure
