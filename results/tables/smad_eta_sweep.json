@@ -1,0 +1,580 @@
+{
+  "analysis": "smad_eta_sweep",
+  "task": "cheetah_run",
+  "approximation": "Post-hoc linear damping of cumulative drift along U_drift; does not re-run RSSM img_step and is not the real SMAD intervention.",
+  "rollout_dir": "results/rollouts",
+  "rollout_files": [
+    "results/rollouts/cheetah_v3_seed0_v2.npz",
+    "results/rollouts/cheetah_v3_seed1_v2.npz",
+    "results/rollouts/cheetah_v3_seed2_v2.npz",
+    "results/rollouts/cheetah_v3_seed3_v2.npz",
+    "results/rollouts/cheetah_v3_seed4_v2.npz",
+    "results/rollouts/cheetah_v3_seed5_v2.npz",
+    "results/rollouts/cheetah_v3_seed6_v2.npz",
+    "results/rollouts/cheetah_v3_seed7_v2.npz",
+    "results/rollouts/cheetah_v3_seed8_v2.npz",
+    "results/rollouts/cheetah_v3_seed9_v2.npz",
+    "results/rollouts/cheetah_v3_seed10_v2.npz",
+    "results/rollouts/cheetah_v3_seed11_v2.npz",
+    "results/rollouts/cheetah_v3_seed12_v2.npz",
+    "results/rollouts/cheetah_v3_seed13_v2.npz",
+    "results/rollouts/cheetah_v3_seed14_v2.npz",
+    "results/rollouts/cheetah_v3_seed15_v2.npz",
+    "results/rollouts/cheetah_v3_seed16_v2.npz",
+    "results/rollouts/cheetah_v3_seed17_v2.npz",
+    "results/rollouts/cheetah_v3_seed18_v2.npz",
+    "results/rollouts/cheetah_v3_seed19_v2.npz"
+  ],
+  "n_seeds": 20,
+  "horizon": 200,
+  "latent_dim": 1536,
+  "deter_dim": 512,
+  "deter_slice": [
+    1024,
+    1536
+  ],
+  "trim_window": [
+    25,
+    175
+  ],
+  "drift_pool_shape": [
+    3000,
+    512
+  ],
+  "bands": {
+    "dc_trend": [
+      0.0,
+      0.02
+    ],
+    "very_low": [
+      0.02,
+      0.05
+    ],
+    "low": [
+      0.05,
+      0.1
+    ],
+    "mid": [
+      0.1,
+      0.2
+    ],
+    "high": [
+      0.2,
+      0.5
+    ]
+  },
+  "filter": {
+    "type": "butterworth",
+    "order": 4,
+    "fs": 1.0
+  },
+  "frequency_eval_pca": {
+    "var_threshold": 0.95,
+    "retained_components": 38,
+    "retained_variance_explained": 0.9504360611578495
+  },
+  "ranks": [
+    3,
+    5,
+    10
+  ],
+  "etas": [
+    0.0,
+    0.05,
+    0.1,
+    0.15,
+    0.2,
+    0.3,
+    0.4,
+    0.5
+  ],
+  "rank_results": {
+    "3": {
+      "r": 3,
+      "u_drift_explained_variance_ratio": [
+        0.15528164460958607,
+        0.1523461919260102,
+        0.12998435987206702
+      ],
+      "u_drift_cumulative_explained_variance": 0.4376121964076633,
+      "eta_results": [
+        {
+          "eta": 0.0,
+          "band_mse": {
+            "dc_trend": 0.23408132763229506,
+            "very_low": 0.052167791753366735,
+            "low": 0.14232654248621504,
+            "mid": 0.051805215526140445,
+            "high": 0.02103133806769545
+          },
+          "dc_trend_mse": 0.23408132763229506,
+          "total_mse": 0.11340991077930584,
+          "total_band_mse": 0.5014122154657127,
+          "dc_trend_change_pct": 0.0,
+          "dc_trend_reduction_pct": -0.0,
+          "total_change_pct": 0.0,
+          "passes_total_guardrail": true
+        },
+        {
+          "eta": 0.05,
+          "band_mse": {
+            "dc_trend": 0.22749171451473796,
+            "very_low": 0.05117469828507724,
+            "low": 0.13202147976649148,
+            "mid": 0.0513810318211009,
+            "high": 0.02094681903121928
+          },
+          "dc_trend_mse": 0.22749171451473796,
+          "total_mse": 0.10900561772162776,
+          "total_band_mse": 0.4830157434186268,
+          "dc_trend_change_pct": -2.8150955841759195,
+          "dc_trend_reduction_pct": 2.8150955841759195,
+          "total_change_pct": -3.8835169055452146,
+          "passes_total_guardrail": true
+        },
+        {
+          "eta": 0.1,
+          "band_mse": {
+            "dc_trend": 0.2213597037573512,
+            "very_low": 0.050214243387544336,
+            "low": 0.12227450428857511,
+            "mid": 0.05097078969542889,
+            "high": 0.020864740843679053
+          },
+          "dc_trend_mse": 0.2213597037573512,
+          "total_mse": 0.10482718584639472,
+          "total_band_mse": 0.4656839819725786,
+          "dc_trend_change_pct": -5.434702547025672,
+          "dc_trend_reduction_pct": 5.434702547025672,
+          "total_change_pct": -7.56787909798553,
+          "passes_total_guardrail": true
+        },
+        {
+          "eta": 0.15,
+          "band_mse": {
+            "dc_trend": 0.21568529536013434,
+            "very_low": 0.04928642706076805,
+            "low": 0.113085616052466,
+            "mid": 0.050574489149124435,
+            "high": 0.02078510350507477
+          },
+          "dc_trend_mse": 0.21568529536013434,
+          "total_mse": 0.10087461515360671,
+          "total_band_mse": 0.44941693112756764,
+          "dc_trend_change_pct": -7.858820888549467,
+          "dc_trend_reduction_pct": 7.858820888549467,
+          "total_change_pct": -11.053086577320958,
+          "passes_total_guardrail": true
+        },
+        {
+          "eta": 0.2,
+          "band_mse": {
+            "dc_trend": 0.21046848932308732,
+            "very_low": 0.04839124930474837,
+            "low": 0.1044548150581641,
+            "mid": 0.05019213018218752,
+            "high": 0.020707907015406427
+          },
+          "dc_trend_mse": 0.21046848932308732,
+          "total_mse": 0.09714790564326371,
+          "total_band_mse": 0.43421459088359377,
+          "dc_trend_change_pct": -10.087450608747318,
+          "dc_trend_reduction_pct": 10.087450608747318,
+          "total_change_pct": -14.339139343551533,
+          "passes_total_guardrail": true
+        },
+        {
+          "eta": 0.3,
+          "band_mse": {
+            "dc_trend": 0.20140768432950298,
+            "very_low": 0.04669880950497873,
+            "low": 0.08886747479498207,
+            "mid": 0.04946923698641634,
+            "high": 0.020560836582877568
+          },
+          "dc_trend_mse": 0.20140768432950298,
+          "total_mse": 0.09037207016991283,
+          "total_band_mse": 0.40700404219875763,
+          "dc_trend_change_pct": -13.958244185165093,
+          "dc_trend_reduction_pct": 13.958244185165093,
+          "total_change_pct": -20.313780736697996,
+          "passes_total_guardrail": true
+        },
+        {
+          "eta": 0.4,
+          "band_mse": {
+            "dc_trend": 0.19417728877659854,
+            "very_low": 0.045136923988235475,
+            "low": 0.07551248349902898,
+            "mid": 0.04880211010811533,
+            "high": 0.020423529546092476
+          },
+          "dc_trend_mse": 0.19417728877659854,
+          "total_mse": 0.08449967942634207,
+          "total_band_mse": 0.38405233591807075,
+          "dc_trend_change_pct": -17.047083276278872,
+          "dc_trend_reduction_pct": 17.047083276278872,
+          "total_change_pct": -25.49180327742493,
+          "passes_total_guardrail": true
+        },
+        {
+          "eta": 0.5,
+          "band_mse": {
+            "dc_trend": 0.18877730266437381,
+            "very_low": 0.04370559275451859,
+            "low": 0.06438984117030483,
+            "mid": 0.04819074954728452,
+            "high": 0.020295985905051148
+          },
+          "dc_trend_mse": 0.18877730266437381,
+          "total_mse": 0.07953073341255142,
+          "total_band_mse": 0.3653594720415329,
+          "dc_trend_change_pct": -19.353967882088718,
+          "dc_trend_reduction_pct": 19.353967882088718,
+          "total_change_pct": -29.873206965732347,
+          "passes_total_guardrail": true
+        }
+      ],
+      "eta_candidate": {
+        "eta": 0.5,
+        "dc_trend_reduction_pct": 19.353967882088718,
+        "total_change_pct": -29.873206965732347,
+        "dc_trend_mse": 0.18877730266437381,
+        "total_mse": 0.07953073341255142
+      }
+    },
+    "5": {
+      "r": 5,
+      "u_drift_explained_variance_ratio": [
+        0.15528164460958607,
+        0.1523461919260102,
+        0.12998435987206702,
+        0.057555006987327906,
+        0.04860412656060144
+      ],
+      "u_drift_cumulative_explained_variance": 0.5437713299555926,
+      "eta_results": [
+        {
+          "eta": 0.0,
+          "band_mse": {
+            "dc_trend": 0.23408132763229506,
+            "very_low": 0.052167791753366735,
+            "low": 0.14232654248621504,
+            "mid": 0.051805215526140445,
+            "high": 0.02103133806769545
+          },
+          "dc_trend_mse": 0.23408132763229506,
+          "total_mse": 0.11340991077930584,
+          "total_band_mse": 0.5014122154657127,
+          "dc_trend_change_pct": 0.0,
+          "dc_trend_reduction_pct": -0.0,
+          "total_change_pct": 0.0,
+          "passes_total_guardrail": true
+        },
+        {
+          "eta": 0.05,
+          "band_mse": {
+            "dc_trend": 0.22780200480505663,
+            "very_low": 0.04990139567700602,
+            "low": 0.1314962139272343,
+            "mid": 0.0507546389330949,
+            "high": 0.020830699070125778
+          },
+          "dc_trend_mse": 0.22780200480505663,
+          "total_mse": 0.10771902543584781,
+          "total_band_mse": 0.4807849524125177,
+          "dc_trend_change_pct": -2.682538966586112,
+          "dc_trend_reduction_pct": 2.682538966586112,
+          "total_change_pct": -5.017978855950622,
+          "passes_total_guardrail": true
+        },
+        {
+          "eta": 0.1,
+          "band_mse": {
+            "dc_trend": 0.221999449008482,
+            "very_low": 0.04775140039551155,
+            "low": 0.12123078796015452,
+            "mid": 0.04975217448488809,
+            "high": 0.020637544681478267
+          },
+          "dc_trend_mse": 0.221999449008482,
+          "total_mse": 0.10231998036641327,
+          "total_band_mse": 0.4613713565305145,
+          "dc_trend_change_pct": -5.1614021272093025,
+          "dc_trend_reduction_pct": 5.1614021272093025,
+          "total_change_pct": -9.778625462878132,
+          "passes_total_guardrail": true
+        },
+        {
+          "eta": 0.15,
+          "band_mse": {
+            "dc_trend": 0.21667366024257104,
+            "very_low": 0.045717805908883254,
+            "low": 0.11153026458497568,
+            "mid": 0.048797822181520005,
+            "high": 0.020451874901752917
+          },
+          "dc_trend_mse": 0.21667366024257104,
+          "total_mse": 0.09721277557100222,
+          "total_band_mse": 0.4431714278197029,
+          "dc_trend_change_pct": -7.436589481869616,
+          "dc_trend_reduction_pct": 7.436589481869616,
+          "total_change_pct": -14.28193982078253,
+          "passes_total_guardrail": true
+        },
+        {
+          "eta": 0.2,
+          "band_mse": {
+            "dc_trend": 0.21182463850732403,
+            "very_low": 0.043800612217121136,
+            "low": 0.1023946438016978,
+            "mid": 0.04789158202299066,
+            "high": 0.020273689730949725
+          },
+          "dc_trend_mse": 0.21182463850732403,
+          "total_mse": 0.09239741104961466,
+          "total_band_mse": 0.4261851662800833,
+          "dc_trend_change_pct": -9.508101030566941,
+          "dc_trend_reduction_pct": 9.508101030566941,
+          "total_change_pct": -18.527921929663826,
+          "passes_total_guardrail": true
+        },
+        {
+          "eta": 0.3,
+          "band_mse": {
+            "dc_trend": 0.2035568961288209,
+            "very_low": 0.04031542721819546,
+            "low": 0.08581811001084491,
+            "mid": 0.046223438140448166,
+            "high": 0.019939773216109825
+          },
+          "dc_trend_mse": 0.2035568961288209,
+          "total_mse": 0.08364220282891,
+          "total_band_mse": 0.3958536447144193,
+          "dc_trend_change_pct": -13.040096710073012,
+          "dc_trend_reduction_pct": 13.040096710073012,
+          "total_change_pct": -26.24788940035708,
+          "passes_total_guardrail": true
+        },
+        {
+          "eta": 0.4,
+          "band_mse": {
+            "dc_trend": 0.19719622187297275,
+            "very_low": 0.03729584539873455,
+            "low": 0.07150118658759583,
+            "mid": 0.044747742837260615,
+            "high": 0.019635795136958567
+          },
+          "dc_trend_mse": 0.19719622187297275,
+          "total_mse": 0.07605435570429929,
+          "total_band_mse": 0.3703767918335223,
+          "dc_trend_change_pct": -15.757389165727476,
+          "dc_trend_reduction_pct": 15.757389165727476,
+          "total_change_pct": -32.93852787495791,
+          "passes_total_guardrail": true
+        },
+        {
+          "eta": 0.5,
+          "band_mse": {
+            "dc_trend": 0.19274261573977958,
+            "very_low": 0.034741866758738374,
+            "low": 0.05944387353195056,
+            "mid": 0.043464496113427994,
+            "high": 0.019361755493495943
+          },
+          "dc_trend_mse": 0.19274261573977958,
+          "total_mse": 0.06963386967578253,
+          "total_band_mse": 0.34975460763739247,
+          "dc_trend_change_pct": -17.659978397530317,
+          "dc_trend_reduction_pct": 17.659978397530317,
+          "total_change_pct": -38.59983735346631,
+          "passes_total_guardrail": true
+        }
+      ],
+      "eta_candidate": {
+        "eta": 0.5,
+        "dc_trend_reduction_pct": 17.659978397530317,
+        "total_change_pct": -38.59983735346631,
+        "dc_trend_mse": 0.19274261573977958,
+        "total_mse": 0.06963386967578253
+      }
+    },
+    "10": {
+      "r": 10,
+      "u_drift_explained_variance_ratio": [
+        0.15528164460958607,
+        0.1523461919260102,
+        0.12998435987206702,
+        0.057555006987327906,
+        0.04860412656060144,
+        0.03866354195672574,
+        0.02883379818483975,
+        0.02623769960902683,
+        0.0227628367123391,
+        0.02221642277878411
+      ],
+      "u_drift_cumulative_explained_variance": 0.6824856291973082,
+      "eta_results": [
+        {
+          "eta": 0.0,
+          "band_mse": {
+            "dc_trend": 0.23408132763229506,
+            "very_low": 0.052167791753366735,
+            "low": 0.14232654248621504,
+            "mid": 0.051805215526140445,
+            "high": 0.02103133806769545
+          },
+          "dc_trend_mse": 0.23408132763229506,
+          "total_mse": 0.11340991077930584,
+          "total_band_mse": 0.5014122154657127,
+          "dc_trend_change_pct": 0.0,
+          "dc_trend_reduction_pct": -0.0,
+          "total_change_pct": 0.0,
+          "passes_total_guardrail": true
+        },
+        {
+          "eta": 0.05,
+          "band_mse": {
+            "dc_trend": 0.21930639867678914,
+            "very_low": 0.04876440375393491,
+            "low": 0.130413772194246,
+            "mid": 0.048194333752055625,
+            "high": 0.02052635307692944
+          },
+          "dc_trend_mse": 0.21930639867678914,
+          "total_mse": 0.10589303578608197,
+          "total_band_mse": 0.46720526145395513,
+          "dc_trend_change_pct": -6.311878484692723,
+          "dc_trend_reduction_pct": 6.311878484692723,
+          "total_change_pct": -6.628058290118588,
+          "passes_total_guardrail": true
+        },
+        {
+          "eta": 0.1,
+          "band_mse": {
+            "dc_trend": 0.2053309820417147,
+            "very_low": 0.04553453019099122,
+            "low": 0.11911430417936744,
+            "mid": 0.044774182152305705,
+            "high": 0.020042762835144074
+          },
+          "dc_trend_mse": 0.2053309820417147,
+          "total_mse": 0.09876164156174135,
+          "total_band_mse": 0.4347967613995231,
+          "dc_trend_change_pct": -12.2822037457608,
+          "dc_trend_reduction_pct": 12.2822037457608,
+          "total_change_pct": -12.91621615510291,
+          "passes_total_guardrail": true
+        },
+        {
+          "eta": 0.15,
+          "band_mse": {
+            "dc_trend": 0.1921550777270717,
+            "very_low": 0.04247817106453566,
+            "low": 0.10842813844157942,
+            "mid": 0.04154476072689068,
+            "high": 0.019580567342339355
+          },
+          "dc_trend_mse": 0.1921550777270717,
+          "total_mse": 0.09201572810628401,
+          "total_band_mse": 0.40418671530241684,
+          "dc_trend_change_pct": -17.910975783204254,
+          "dc_trend_reduction_pct": 17.910975783204254,
+          "total_change_pct": -18.864473594952933,
+          "passes_total_guardrail": true
+        },
+        {
+          "eta": 0.2,
+          "band_mse": {
+            "dc_trend": 0.1797786857328603,
+            "very_low": 0.03959532637456822,
+            "low": 0.09835527498088194,
+            "mid": 0.03850606947581055,
+            "high": 0.019139766598515285
+          },
+          "dc_trend_mse": 0.1797786857328603,
+          "total_mse": 0.08565529541970997,
+          "total_band_mse": 0.37537512316263627,
+          "dc_trend_change_pct": -23.19819459702299,
+          "dc_trend_reduction_pct": 23.19819459702299,
+          "total_change_pct": -24.472830609668662,
+          "passes_total_guardrail": true
+        },
+        {
+          "eta": 0.3,
+          "band_mse": {
+            "dc_trend": 0.1574244387057314,
+            "very_low": 0.0343501803040977,
+            "low": 0.08004945489075849,
+            "mid": 0.033000877496654965,
+            "high": 0.01832234935780908
+          },
+          "dc_trend_mse": 0.1574244387057314,
+          "total_mse": 0.0740908723532117,
+          "total_band_mse": 0.32314730075505166,
+          "dc_trend_change_pct": -32.74797255378677,
+          "dc_trend_reduction_pct": 32.74797255378677,
+          "total_change_pct": -34.66984336369726,
+          "passes_total_guardrail": true
+        },
+        {
+          "eta": 0.4,
+          "band_mse": {
+            "dc_trend": 0.13826824096032808,
+            "very_low": 0.02979909197957969,
+            "low": 0.06419684390899712,
+            "mid": 0.028258606214838954,
+            "high": 0.017590511113025467
+          },
+          "dc_trend_mse": 0.13826824096032808,
+          "total_mse": 0.06406837236224652,
+          "total_band_mse": 0.2781132941767693,
+          "dc_trend_change_pct": -40.93153761605208,
+          "dc_trend_reduction_pct": 40.93153761605208,
+          "total_change_pct": -43.50725441718871,
+          "passes_total_guardrail": true
+        },
+        {
+          "eta": 0.5,
+          "band_mse": {
+            "dc_trend": 0.12231009249665047,
+            "very_low": 0.025942061401014193,
+            "low": 0.050797442035597835,
+            "mid": 0.024279255630362536,
+            "high": 0.01694425186416444
+          },
+          "dc_trend_mse": 0.12231009249665047,
+          "total_mse": 0.05558779544681446,
+          "total_band_mse": 0.24027310342778946,
+          "dc_trend_change_pct": -47.7488897838189,
+          "dc_trend_reduction_pct": 47.7488897838189,
+          "total_change_pct": -50.985063770143014,
+          "passes_total_guardrail": true
+        }
+      ],
+      "eta_candidate": {
+        "eta": 0.5,
+        "dc_trend_reduction_pct": 47.7488897838189,
+        "total_change_pct": -50.985063770143014,
+        "dc_trend_mse": 0.12231009249665047,
+        "total_mse": 0.05558779544681446
+      }
+    }
+  },
+  "eta_star": {
+    "r": 10,
+    "eta": 0.5,
+    "dc_trend_reduction_pct": 47.7488897838189,
+    "total_change_pct": -50.985063770143014,
+    "dc_trend_mse": 0.12231009249665047,
+    "total_mse": 0.05558779544681446
+  },
+  "phase2_go": true,
+  "phase2_verdict": "SMAD Phase 2 GO with U_drift basis at r=10, eta=0.50. Scope: 1 configuration, damping+anchor combined.",
+  "selection_rule": {
+    "candidate": "Maximize dc_trend reduction relative to eta=0 subject to total_mse not increasing by more than 10%.",
+    "go_threshold": "dc_trend reduction >= 20% and total guardrail passes",
+    "max_total_increase_pct": 10.0,
+    "go_dc_reduction_pct": 20.0
+  }
+}
