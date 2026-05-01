@@ -1,7 +1,7 @@
 # DriftDetect
 ### Frequency-Domain Diagnostic for World Model Latent Drift
 
-![Status](https://img.shields.io/badge/Status-Month%203%20Complete-238636)
+![Status](https://img.shields.io/badge/Status-Month%204%20Complete-238636)
 ![Compute Budget](https://img.shields.io/badge/Compute-~200%20GPU--hours-2ea44f)
 ![Timeline](https://img.shields.io/badge/Timeline-6%20months-f59e0b)
 
@@ -21,7 +21,8 @@ See [PROPOSAL.md](./PROPOSAL.md) for the full proposal.
 
 ## Current Status
 
-Month 3 is complete. Month 4 is ready to begin the conditional DreamerV4 cross-architecture comparison.
+Month 4 is complete. DriftDetect now has cross-architecture evidence for
+trend-dominated imagination drift and a scoped Month 5 SMAD Phase 2 path.
 
 - [x] Month 1: Infrastructure, checkpoint, adapter, 20 v1 rollouts
 - [x] Month 2 Week 1: Latent collection fix, 20 v2 rollouts, `freq_decompose` module
@@ -32,6 +33,10 @@ Month 3 is complete. Month 4 is ready to begin the conditional DreamerV4 cross-a
 - [x] Month 3 Week 2: D2 Lipschitz probe + D3 linear/nonlinear separation
 - [x] Month 3 Week 3: Training dynamics pipeline + Figure 3
 - [x] Month 3 Week 4: V4 deep recon + Finding E verdict + Month 3 summary
+- [x] Month 4 Week 1: DreamerV4 adapter design + implementation
+- [x] Month 4 Week 2: V4 rollout collection + frequency decomposition
+- [x] Month 4 Week 3: Figure 2 + Finding B evidence
+- [x] Month 4 Week 4: SMAD pre-checks + Phase 1 verdict + Month 4 summary
 
 ### Recent Achievement
 
@@ -44,15 +49,19 @@ Month 3 is complete. Month 4 is ready to begin the conditional DreamerV4 cross-a
 - Finding E not supported as an independent finding; trend dominance appears latent-intrinsic.
 - Finding C SUPPORTED: Cheetah training dynamics across 102 checkpoints show `dc_trend` dominance from step 5000.
 - Figure 3 complete: curves, heatmap, and `dc_trend` share over training.
-- V4 deep recon complete and Month 4 V4 work is GO (conditional, inference-only).
+- Finding B SUPPORTED: DreamerV4 latent drift is also trend-dominated, with `dc_trend` carrying 63.9% of V4 latent MSE.
+- Figure 2 complete: V3 solid curves vs V4 dashed curves for cross-architecture frequency-band error.
+- SMAD Phase 1 complete: `U_posterior` is NO GO, Path B with `U_drift` is WEAK GO for Month 5.
+- V4 adapter infrastructure complete: adapter, smoke tests, batch extractor, and RunPod CUDA environment.
 
 ### Finding Status
 
 | Finding | Status | Evidence |
 |---|---|---|
 | Finding A: frequency-asymmetric drift with trend dominance | SUPPORTED | Month 2 Cheetah + Cartpole diagnostics |
-| Finding B: cross-architecture comparison | PENDING Month 4 | V4 recon and GO decision complete |
+| Finding B: cross-architecture trend-dominated drift | SUPPORTED | Month 4 V4 latent `dc_trend` share 63.9%; Figure 2 |
 | Finding C: training dynamics | SUPPORTED | `dc_trend` dominant from step 5000 across 102 Cheetah checkpoints |
+| Finding D: SMAD intervention | PENDING Month 5 | Phase 2 Path B with `U_drift` basis |
 | Finding E: decoder amplification | NOT SUPPORTED as independent finding | D1-D3 show uniform OOD amplification, not directional `dc_trend` amplification |
 
 ### Progress Table
@@ -73,8 +82,13 @@ Month 3 is complete. Month 4 is ready to begin the conditional DreamerV4 cross-a
 | Month 3 | Week 3 | Training dynamics pipeline + Figure 3 | ✅ Complete | 2026-05-01 |
 | Month 3 | Week 4 | V4 deep recon + Finding E verdict + Month 3 summary | ✅ Complete | 2026-05-01 |
 | Month 3 | Summary | Training dynamics + decoder verdict + V4 decision | ✅ Complete | 2026-05-01 |
+| Month 4 | Week 1 | V4 adapter design + implementation | ✅ Complete | 2026-05-01 |
+| Month 4 | Week 2 | V4 rollout collection + frequency decomposition | ✅ Complete | 2026-05-01 |
+| Month 4 | Week 3 | Figure 2 + cross-architecture evidence | ✅ Complete | 2026-05-01 |
+| Month 4 | Week 4 | SMAD pre-checks + Phase 1 verdict | ✅ Complete | 2026-05-01 |
+| Month 4 | Summary | Finding B supported + SMAD Path B selected | ✅ Complete | 2026-05-01 |
 
-**Last updated:** May 1, 2026 (Month 3 complete)
+**Last updated:** May 1, 2026 (Month 4 complete)
 
 ## Timeline
 
@@ -83,9 +97,9 @@ Month 3 is complete. Month 4 is ready to begin the conditional DreamerV4 cross-a
 | Month 1: Setup & Baseline | ✅ Complete | 2026-04 | Infrastructure, checkpoint, adapter, and 20 v1 rollouts completed |
 | Month 2: Core Diagnostics | ✅ Complete | 2026-04 | Finding A supported across two tasks with filter and window ablations complete |
 | Month 3: Decoder & Training Dynamics | ✅ Complete | 2026-05 | D1-D3 complete, Finding E revised, Finding C supported with Figure 3 |
-| Month 4: Cross-Architecture Analysis | ⚪ Not started | 2026-05 | Conditional V4 adapter and inference-only comparison |
-| Month 5: Analysis & Writing | ⚪ Not started | 2026-09 | |
-| Month 6: Revision & Submission | ⚪ Not started | 2026-10 | |
+| Month 4: Cross-Architecture + SMAD Phase 1 | ✅ Complete | 2026-05 | Finding B supported with V4; SMAD Path B selected |
+| Month 5: SMAD Phase 2 + Theory | ⚪ Pending | 2026-05 | Real intervention test with `U_drift` basis |
+| Month 6: Revision & Submission | ⚪ Pending | 2026-06 | Consolidate findings, theorem, and paper draft |
 
 ---
 
@@ -246,6 +260,28 @@ Release tag: `v0.3-month3-dynamics-decoder`
 - ✅ Month 4 V4 comparison is GO (conditional), limited to inference-only RunPod CUDA work using HF checkpoints.
 - Fallback if V4 adapter fails by Month 4 Week 2: PlaNet or additional DreamerV3 tasks.
 
+## Month 4 Summary (May 1, 2026)
+
+**DreamerV4 Cross-Architecture + SMAD Phase 1 - COMPLETE ✅**
+
+See [`docs/month4_summary.md`](./docs/month4_summary.md) for the full Month 4 record.
+
+Release tag: `v0.4-month4-v4-smad-precheck`
+
+### DreamerV4 cross-architecture comparison:
+- ✅ V4 adapter infrastructure complete: CUDA-only adapter, smoke tests, batch extractor, and RunPod environment.
+- ✅ V4 rollout collection complete: 20 Cheetah seeds, 200 imagination steps, image observations and 512-dimensional packed tokenizer latents.
+- ✅ V4 frequency decomposition complete: latent, channel-mean image, and image-PCA diagnostics.
+- ✅ Figure 2 complete: V3 solid lines vs V4 dashed lines across five frequency bands.
+- ✅ Finding B supported: V4 latent `dc_trend` share is 63.9%, higher than the V3 Cheetah baseline of 46.7%.
+- Key interpretation: trend-dominated imagination drift survives the shift from GRU-RSSM proprioception to transformer-denoising image-token dynamics.
+
+### SMAD Phase 1:
+- ✅ Pre-check 1 complete: `U_posterior` is NO GO, with overlap only 0.132 to 0.283 for ranks 3 to 10.
+- ✅ Pre-check 2 complete: `U_drift` post-hoc damping reaches 47.75% `dc_trend` reduction at `r=10, eta=0.50`.
+- ✅ Phase 1 verdict complete: Path B is WEAK GO with `U_drift`, conservative `eta=0.20`, and a narrow Month 5 scope.
+- Key interpretation: posterior slow modes are not aligned enough for intervention, but empirical drift directions are a plausible Phase 2 basis.
+
 ## Key References
 
 - Hafner et al. (2023), **DreamerV3**
@@ -260,8 +296,9 @@ Release tag: `v0.3-month3-dynamics-decoder`
 - ✅ **Cheetah training**: ~9.5 GPU-hours, ~$6.65
 - ✅ **Cartpole training**: ~10 GPU-hours, ~$7.00
 - ✅ **Month 3 high-frequency Cheetah training**: ~20 GPU-hours, ~$14.00 (two runs)
-- 💸 **Total spent**: ~39.5 GPU-hours, ~$27.65
-- ⏳ **Remaining budget**: ~160.5 GPU-hours, ~$112
+- ✅ **Month 4 V4 work**: ~0.7 GPU-hours, ~$0.50
+- 💸 **Total spent**: ~40.2 GPU-hours, ~$28.15
+- ⏳ **Remaining budget**: ~159.8 GPU-hours, ~$112
 - ✅ **Strategy**: Use pre-trained checkpoints when available, and run targeted training only when necessary to unblock the diagnostic pipeline
 
 ## Repository Structure
