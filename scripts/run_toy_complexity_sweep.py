@@ -27,7 +27,12 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from src.toy.minimal_rssm import MinimalRSSM  # noqa: E402
-from src.toy.smad_intervention import analyze_drift, collect_rollouts, sample_episode  # noqa: E402
+from src.toy.smad_intervention import (  # noqa: E402
+    analyze_drift,
+    apply_damping,
+    collect_rollouts,
+    sample_episode,
+)
 
 
 DEFAULT_OUTPUT = REPO_ROOT / "results" / "tables" / "toy_complexity_sweep.json"
@@ -124,6 +129,7 @@ def main() -> None:
     print(f"Train steps per level: {args.train_steps}", flush=True)
     print(f"Horizon: {args.horizon}", flush=True)
     print(f"Eval episodes: {args.eval_episodes}", flush=True)
+    print(f"SMAD eta: {args.smad_eta}", flush=True)
     print("", flush=True)
 
     for spec in specs:
@@ -142,6 +148,7 @@ def main() -> None:
         "horizon": int(args.horizon),
         "eval_episodes": int(args.eval_episodes),
         "trim_window_inclusive": [int(args.trim[0]), int(args.trim[1])],
+        "smad_eta": float(args.smad_eta),
         "rssm": {
             "deter_dim": 64,
             "stoch_dim": 8,
@@ -165,6 +172,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--lr", type=float, default=3e-4)
     parser.add_argument("--free_bits", type=float, default=0.0)
     parser.add_argument("--kl_scale", type=float, default=0.1)
+    parser.add_argument("--smad_eta", type=float, default=0.20)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     args = parser.parse_args()
@@ -178,6 +186,8 @@ def parse_args() -> argparse.Namespace:
         raise ValueError("--eval_episodes must be positive.")
     if not 0 <= args.trim[0] <= args.trim[1] < args.horizon:
         raise ValueError("--trim must be inside horizon.")
+    if args.smad_eta < 0:
+        raise ValueError("--smad_eta must be non-negative.")
     return args
 
 
@@ -264,6 +274,18 @@ def run_level(spec: ComplexitySpec, args: argparse.Namespace) -> dict[str, Any]:
         trim=args.trim,
     )
     frequency = analysis["frequency"]
+    rank = min(10, rollouts["true_deter"].shape[-1])
+    U_drift = analysis["bases"]["U_drift"][:, :rank]
+    damping = apply_damping(
+        rssm,
+        U_drift,
+        eta=args.smad_eta,
+        env=env,
+        n_episodes=args.eval_episodes,
+        horizon=args.horizon,
+        baseline_rollouts=rollouts,
+        trim=args.trim,
+    )
     result = {
         "complexity": spec.name,
         "obs_dim": int(env.obs_dim),
@@ -282,11 +304,21 @@ def run_level(spec: ComplexitySpec, args: argparse.Namespace) -> dict[str, Any]:
         },
         "overlaps": analysis["overlaps"],
         "drift_pca": analysis["drift_pca"],
+        "smad": {
+            "eta": float(args.smad_eta),
+            "rank": int(rank),
+            "J_slow_reduction_pct": damping["J_slow_reduction_pct"],
+            "J_total_reduction_pct": damping["J_total_reduction_pct"],
+            "per_band_reduction_pct": damping["per_band_reduction_pct"],
+            "damped_frequency": damping["damped_frequency"],
+        },
     }
     print(
         f"  [{spec.name}] dc_trend share="
         f"{100.0 * frequency['band_share']['dc_trend']:.1f}% "
-        f"J_total={frequency['J_total']:.6f}",
+        f"J_total={frequency['J_total']:.6f} "
+        f"SMAD J_slow reduction={damping['J_slow_reduction_pct']:.1f}% "
+        f"J_total reduction={damping['J_total_reduction_pct']:.1f}%",
         flush=True,
     )
     print("", flush=True)
@@ -314,26 +346,24 @@ def sample_batch(
 
 
 def print_comparison_table(results: list[dict[str, Any]]) -> None:
-    print("Complexity sweep: dc_trend share vs environment complexity", flush=True)
+    print("Complexity sweep: dc_trend share and SMAD effect vs environment complexity", flush=True)
     print("", flush=True)
     print(
-        "Complexity   obs_dim   n_osc   dc_trend%   very_low%   "
-        "low%     mid%     high%    recon_loss",
+        "Complexity   obs_dim   dc_trend%   recon_loss   "
+        "J_slow_reduction%   J_total_reduction%",
         flush=True,
     )
     for result in results:
         shares = result["frequency"]["band_share"]
         recon = result["final_train_metrics"]["recon_loss"]
+        smad = result["smad"]
         print(
             f"{result['complexity']:<12}"
             f"{result['obs_dim']:>7}   "
-            f"{result['n_osc']:>5}   "
             f"{100.0 * shares['dc_trend']:>8.1f}%   "
-            f"{100.0 * shares['very_low']:>8.1f}%   "
-            f"{100.0 * shares['low']:>5.1f}%   "
-            f"{100.0 * shares['mid']:>5.1f}%   "
-            f"{100.0 * shares['high']:>6.1f}%   "
-            f"{recon:>10.4f}",
+            f"{recon:>10.4f}   "
+            f"{smad['J_slow_reduction_pct']:>17.1f}%   "
+            f"{smad['J_total_reduction_pct']:>17.1f}%",
             flush=True,
         )
 

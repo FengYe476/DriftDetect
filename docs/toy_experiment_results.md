@@ -37,3 +37,27 @@ SMAD is most effective when the task falls in the medium-complexity regime where
 ### Paper Impact
 
 This result provides a mechanistic explanation for WHY dc_trend dominates in DreamerV3/V4 Cheetah experiments: the model is in a capacity-complexity regime where slow-trend bias accumulation exceeds fast-frequency prediction error. This replaces the vague "architecture-intrinsic" explanation with a testable capacity-complexity hypothesis.
+
+### SMAD Damping Across Complexity Levels
+
+SMAD damping (eta=0.20, U_drift estimated per level, r=10) was applied at each complexity:
+
+| Complexity | dc_trend% | J_slow reduction | J_total reduction |
+|---|---|---|---|
+| simple | 24.1% | -1.2% (no effect) | -149.8% (harmful) |
+| medium | 46.6% | +15.6% | +21.9% |
+| hard | 31.1% | +14.1% | +30.5% |
+
+Key findings:
+
+1. On the simple task, SMAD is harmful: the model is already well-fitted, and damping introduces systematic bias that increases total error by 150%.
+
+2. On the medium task (dc_trend=46.6%, matching Cheetah), SMAD provides the best dc_trend-specific improvement (15.6%), confirming the method works best when drift is trend-concentrated.
+
+3. On the hard task, SMAD provides the best total error reduction (30.5%) despite lower dc_trend concentration. This suggests that damping along drift PCA directions acts as a generic drift reducer even when drift is not frequency-concentrated.
+
+4. The inverted pattern (J_total reduction highest on hard, J_slow reduction highest on medium) reveals that SMAD has two operating modes:
+   - **Targeted mode** (medium complexity): drift is dc_trend concentrated, damping reduces slow-subspace error specifically.
+   - **Generic mode** (hard complexity): drift is broadband, damping along top drift PCs reduces overall error regardless of frequency structure.
+
+5. The simple-task failure is an important safety check: SMAD should NOT be applied to well-fitted models where imagination drift is small and unstructured.
