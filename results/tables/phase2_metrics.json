@@ -1,0 +1,934 @@
+{
+  "analysis": "smad_phase2_eval",
+  "baseline_dir": "results/smad_phase2/baseline",
+  "smad_dir": "results/smad_phase2/smad_eta020",
+  "n_seeds_requested": 20,
+  "horizon": 200,
+  "trim_window_inclusive": [
+    25,
+    175
+  ],
+  "frequency_eval": {
+    "bands": {
+      "dc_trend": [
+        0.0,
+        0.02
+      ],
+      "very_low": [
+        0.02,
+        0.05
+      ],
+      "low": [
+        0.05,
+        0.1
+      ],
+      "mid": [
+        0.1,
+        0.2
+      ],
+      "high": [
+        0.2,
+        0.5
+      ]
+    },
+    "var_threshold": 0.95,
+    "filter_type": "butterworth",
+    "pca_fit_scope": "pooled true deter latents within each run",
+    "metric": "per-band MSE averaged over trim window"
+  },
+  "smad_runtime": {
+    "eta": 0.2,
+    "U_path": "results/smad/U_drift_cheetah_r10.npy",
+    "rollout_extraction_status": "placeholder only; this script consumes pre-extracted rollouts"
+  },
+  "runs": {
+    "baseline": {
+      "run_name": "baseline",
+      "run_dir": "results/smad_phase2/baseline",
+      "checkpoint_path": "results/smad_phase2/baseline/latest.pt",
+      "checkpoint_exists": false,
+      "eval_return": {
+        "metrics_path": "results/smad_phase2/baseline/metrics.jsonl",
+        "metrics_exists": true,
+        "key": "eval_return",
+        "history": [
+          {
+            "step": 5000,
+            "value": 8.178539538245968,
+            "key": "eval_return"
+          },
+          {
+            "step": 15000,
+            "value": 131.51111016990617,
+            "key": "eval_return"
+          },
+          {
+            "step": 25000,
+            "value": 80.78785827007377,
+            "key": "eval_return"
+          },
+          {
+            "step": 35000,
+            "value": 198.21243450634356,
+            "key": "eval_return"
+          },
+          {
+            "step": 45000,
+            "value": 276.6422912597656,
+            "key": "eval_return"
+          },
+          {
+            "step": 55000,
+            "value": 219.65226534822722,
+            "key": "eval_return"
+          },
+          {
+            "step": 65000,
+            "value": 312.29043375197796,
+            "key": "eval_return"
+          },
+          {
+            "step": 75000,
+            "value": 344.27710201790035,
+            "key": "eval_return"
+          },
+          {
+            "step": 85000,
+            "value": 358.917458214151,
+            "key": "eval_return"
+          },
+          {
+            "step": 95000,
+            "value": 354.39147751179115,
+            "key": "eval_return"
+          },
+          {
+            "step": 105000,
+            "value": 327.6826693686795,
+            "key": "eval_return"
+          },
+          {
+            "step": 115000,
+            "value": 187.23131790458282,
+            "key": "eval_return"
+          },
+          {
+            "step": 125000,
+            "value": 454.6403941761702,
+            "key": "eval_return"
+          },
+          {
+            "step": 135000,
+            "value": 434.09964458113535,
+            "key": "eval_return"
+          },
+          {
+            "step": 145000,
+            "value": 441.9071931368526,
+            "key": "eval_return"
+          },
+          {
+            "step": 155000,
+            "value": 384.81142119239956,
+            "key": "eval_return"
+          },
+          {
+            "step": 165000,
+            "value": 506.3842978228844,
+            "key": "eval_return"
+          },
+          {
+            "step": 175000,
+            "value": 145.50834892058555,
+            "key": "eval_return"
+          },
+          {
+            "step": 185000,
+            "value": 291.9490842123487,
+            "key": "eval_return"
+          },
+          {
+            "step": 195000,
+            "value": 283.055000467267,
+            "key": "eval_return"
+          },
+          {
+            "step": 205000,
+            "value": 472.70592204565185,
+            "key": "eval_return"
+          },
+          {
+            "step": 215000,
+            "value": 338.5205207346495,
+            "key": "eval_return"
+          },
+          {
+            "step": 225000,
+            "value": 390.67886357210807,
+            "key": "eval_return"
+          },
+          {
+            "step": 235000,
+            "value": 569.7757033580216,
+            "key": "eval_return"
+          },
+          {
+            "step": 245000,
+            "value": 579.944595402226,
+            "key": "eval_return"
+          },
+          {
+            "step": 255000,
+            "value": 619.1663587542541,
+            "key": "eval_return"
+          },
+          {
+            "step": 265000,
+            "value": 601.2379585265065,
+            "key": "eval_return"
+          },
+          {
+            "step": 275000,
+            "value": 562.5385461204656,
+            "key": "eval_return"
+          },
+          {
+            "step": 285000,
+            "value": 412.02399005721674,
+            "key": "eval_return"
+          },
+          {
+            "step": 295000,
+            "value": 565.2289039248426,
+            "key": "eval_return"
+          },
+          {
+            "step": 305000,
+            "value": 582.5162237024488,
+            "key": "eval_return"
+          },
+          {
+            "step": 315000,
+            "value": 645.4094057972077,
+            "key": "eval_return"
+          },
+          {
+            "step": 325000,
+            "value": 670.0705211168882,
+            "key": "eval_return"
+          },
+          {
+            "step": 335000,
+            "value": 686.9650102675369,
+            "key": "eval_return"
+          },
+          {
+            "step": 345000,
+            "value": 685.1342975717969,
+            "key": "eval_return"
+          },
+          {
+            "step": 355000,
+            "value": 689.102107892814,
+            "key": "eval_return"
+          },
+          {
+            "step": 365000,
+            "value": 642.2536897852085,
+            "key": "eval_return"
+          },
+          {
+            "step": 375000,
+            "value": 639.0123434063047,
+            "key": "eval_return"
+          },
+          {
+            "step": 385000,
+            "value": 491.6523952392642,
+            "key": "eval_return"
+          },
+          {
+            "step": 395000,
+            "value": 521.9246156710666,
+            "key": "eval_return"
+          },
+          {
+            "step": 405000,
+            "value": 532.0694370190147,
+            "key": "eval_return"
+          },
+          {
+            "step": 415000,
+            "value": 548.1266849729407,
+            "key": "eval_return"
+          },
+          {
+            "step": 425000,
+            "value": 541.6402610940088,
+            "key": "eval_return"
+          },
+          {
+            "step": 435000,
+            "value": 682.9886196518434,
+            "key": "eval_return"
+          },
+          {
+            "step": 445000,
+            "value": 645.3676393830334,
+            "key": "eval_return"
+          },
+          {
+            "step": 455000,
+            "value": 728.4995423759101,
+            "key": "eval_return"
+          },
+          {
+            "step": 465000,
+            "value": 700.5760022796218,
+            "key": "eval_return"
+          },
+          {
+            "step": 475000,
+            "value": 735.8211777801043,
+            "key": "eval_return"
+          },
+          {
+            "step": 485000,
+            "value": 746.7273132324219,
+            "key": "eval_return"
+          },
+          {
+            "step": 495000,
+            "value": 675.5835526879731,
+            "key": "eval_return"
+          },
+          {
+            "step": 505000,
+            "value": 663.1823337825539,
+            "key": "eval_return"
+          }
+        ],
+        "peak": {
+          "step": 485000,
+          "value": 746.7273132324219
+        },
+        "final": {
+          "step": 505000,
+          "value": 663.1823337825539
+        },
+        "at_steps": {
+          "100000": {
+            "target_step": 100000,
+            "nearest_step": 95000,
+            "value": 354.39147751179115
+          },
+          "200000": {
+            "target_step": 200000,
+            "nearest_step": 195000,
+            "value": 283.055000467267
+          },
+          "300000": {
+            "target_step": 300000,
+            "nearest_step": 295000,
+            "value": 565.2289039248426
+          },
+          "400000": {
+            "target_step": 400000,
+            "nearest_step": 395000,
+            "value": 521.9246156710666
+          },
+          "500000": {
+            "target_step": 500000,
+            "nearest_step": 495000,
+            "value": 675.5835526879731
+          }
+        }
+      },
+      "rollouts": {
+        "rollout_dir": "results/smad_phase2/baseline/rollouts",
+        "expected_count": 20,
+        "found_count": 20,
+        "complete": true,
+        "missing_seeds": [],
+        "paths": [
+          "results/smad_phase2/baseline/rollouts/cheetah_v3_seed0_v2.npz",
+          "results/smad_phase2/baseline/rollouts/cheetah_v3_seed1_v2.npz",
+          "results/smad_phase2/baseline/rollouts/cheetah_v3_seed2_v2.npz",
+          "results/smad_phase2/baseline/rollouts/cheetah_v3_seed3_v2.npz",
+          "results/smad_phase2/baseline/rollouts/cheetah_v3_seed4_v2.npz",
+          "results/smad_phase2/baseline/rollouts/cheetah_v3_seed5_v2.npz",
+          "results/smad_phase2/baseline/rollouts/cheetah_v3_seed6_v2.npz",
+          "results/smad_phase2/baseline/rollouts/cheetah_v3_seed7_v2.npz",
+          "results/smad_phase2/baseline/rollouts/cheetah_v3_seed8_v2.npz",
+          "results/smad_phase2/baseline/rollouts/cheetah_v3_seed9_v2.npz",
+          "results/smad_phase2/baseline/rollouts/cheetah_v3_seed10_v2.npz",
+          "results/smad_phase2/baseline/rollouts/cheetah_v3_seed11_v2.npz",
+          "results/smad_phase2/baseline/rollouts/cheetah_v3_seed12_v2.npz",
+          "results/smad_phase2/baseline/rollouts/cheetah_v3_seed13_v2.npz",
+          "results/smad_phase2/baseline/rollouts/cheetah_v3_seed14_v2.npz",
+          "results/smad_phase2/baseline/rollouts/cheetah_v3_seed15_v2.npz",
+          "results/smad_phase2/baseline/rollouts/cheetah_v3_seed16_v2.npz",
+          "results/smad_phase2/baseline/rollouts/cheetah_v3_seed17_v2.npz",
+          "results/smad_phase2/baseline/rollouts/cheetah_v3_seed18_v2.npz",
+          "results/smad_phase2/baseline/rollouts/cheetah_v3_seed19_v2.npz"
+        ],
+        "paths_abs": [
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/baseline/rollouts/cheetah_v3_seed0_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/baseline/rollouts/cheetah_v3_seed1_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/baseline/rollouts/cheetah_v3_seed2_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/baseline/rollouts/cheetah_v3_seed3_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/baseline/rollouts/cheetah_v3_seed4_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/baseline/rollouts/cheetah_v3_seed5_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/baseline/rollouts/cheetah_v3_seed6_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/baseline/rollouts/cheetah_v3_seed7_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/baseline/rollouts/cheetah_v3_seed8_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/baseline/rollouts/cheetah_v3_seed9_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/baseline/rollouts/cheetah_v3_seed10_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/baseline/rollouts/cheetah_v3_seed11_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/baseline/rollouts/cheetah_v3_seed12_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/baseline/rollouts/cheetah_v3_seed13_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/baseline/rollouts/cheetah_v3_seed14_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/baseline/rollouts/cheetah_v3_seed15_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/baseline/rollouts/cheetah_v3_seed16_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/baseline/rollouts/cheetah_v3_seed17_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/baseline/rollouts/cheetah_v3_seed18_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/baseline/rollouts/cheetah_v3_seed19_v2.npz"
+        ]
+      },
+      "frequency": {
+        "band_mse": {
+          "dc_trend": 0.18355251848697662,
+          "very_low": 0.05685616657137871,
+          "low": 0.07592273503541946,
+          "mid": 0.03634529188275337,
+          "high": 0.01929531618952751
+        },
+        "band_share": {
+          "dc_trend": 0.4934578532475973,
+          "very_low": 0.1528506507645166,
+          "low": 0.204108721319029,
+          "mid": 0.09770974463307794,
+          "high": 0.0518730300357792
+        },
+        "J_slow": 0.18355251848697662,
+        "J_total": 0.3719720281660557,
+        "trim_window_inclusive": [
+          25,
+          175
+        ],
+        "pca": {
+          "n_components": 53,
+          "var_explained": 0.9505434290138844
+        },
+        "curve_summary": {
+          "dc_trend": {
+            "mean_step25": 0.15476050972938538,
+            "mean_step100": 0.18079565465450287,
+            "mean_step175": 0.18565633893013
+          },
+          "very_low": {
+            "mean_step25": 0.08406080305576324,
+            "mean_step100": 0.05066313222050667,
+            "mean_step175": 0.051461219787597656
+          },
+          "low": {
+            "mean_step25": 0.10257399082183838,
+            "mean_step100": 0.06672021001577377,
+            "mean_step175": 0.06640742719173431
+          },
+          "mid": {
+            "mean_step25": 0.04958896338939667,
+            "mean_step100": 0.03650365769863129,
+            "mean_step175": 0.03229783475399017
+          },
+          "high": {
+            "mean_step25": 0.028195848688483238,
+            "mean_step100": 0.02046918496489525,
+            "mean_step175": 0.016085777431726456
+          }
+        }
+      },
+      "representation_health": {
+        "dc_trend_direction_variance": 0.9595372041328052,
+        "dc_trend_direction_variance_std": 0.40937530642126096,
+        "total_deter_variance": 30.026785168160856,
+        "n_dc_variance_samples": 60,
+        "skipped_dc_variance_samples": 0,
+        "direction_method": "For each seed and anchor step, lowpass-filter true deter in the dc_trend band, use filtered[anchor] - filtered.mean as a unit direction, then compute var(true_deter @ direction).",
+        "anchor_steps": [
+          50,
+          100,
+          150
+        ]
+      }
+    },
+    "smad": {
+      "run_name": "smad",
+      "run_dir": "results/smad_phase2/smad_eta020",
+      "checkpoint_path": "results/smad_phase2/smad_eta020/latest.pt",
+      "checkpoint_exists": false,
+      "eval_return": {
+        "metrics_path": "results/smad_phase2/smad_eta020/metrics.jsonl",
+        "metrics_exists": true,
+        "key": "eval_return",
+        "history": [
+          {
+            "step": 5000,
+            "value": 9.763162130809425,
+            "key": "eval_return"
+          },
+          {
+            "step": 15000,
+            "value": 70.737831602195,
+            "key": "eval_return"
+          },
+          {
+            "step": 25000,
+            "value": 223.69432330036597,
+            "key": "eval_return"
+          },
+          {
+            "step": 35000,
+            "value": 316.47251549192003,
+            "key": "eval_return"
+          },
+          {
+            "step": 45000,
+            "value": 318.27210279631583,
+            "key": "eval_return"
+          },
+          {
+            "step": 55000,
+            "value": 290.05534810539865,
+            "key": "eval_return"
+          },
+          {
+            "step": 65000,
+            "value": 489.124587111827,
+            "key": "eval_return"
+          },
+          {
+            "step": 75000,
+            "value": 348.97645997281506,
+            "key": "eval_return"
+          },
+          {
+            "step": 85000,
+            "value": 476.96105002048427,
+            "key": "eval_return"
+          },
+          {
+            "step": 95000,
+            "value": 437.2990449991856,
+            "key": "eval_return"
+          },
+          {
+            "step": 105000,
+            "value": 380.5147610195039,
+            "key": "eval_return"
+          },
+          {
+            "step": 115000,
+            "value": 522.0696167616709,
+            "key": "eval_return"
+          },
+          {
+            "step": 125000,
+            "value": 410.69227405648564,
+            "key": "eval_return"
+          },
+          {
+            "step": 135000,
+            "value": 470.53259586985075,
+            "key": "eval_return"
+          },
+          {
+            "step": 145000,
+            "value": 532.7721824774286,
+            "key": "eval_return"
+          },
+          {
+            "step": 155000,
+            "value": 423.1745933458151,
+            "key": "eval_return"
+          },
+          {
+            "step": 165000,
+            "value": 436.5290351583375,
+            "key": "eval_return"
+          },
+          {
+            "step": 175000,
+            "value": 495.5097172084519,
+            "key": "eval_return"
+          },
+          {
+            "step": 185000,
+            "value": 584.1684977317739,
+            "key": "eval_return"
+          },
+          {
+            "step": 195000,
+            "value": 486.56036506056773,
+            "key": "eval_return"
+          },
+          {
+            "step": 205000,
+            "value": 577.5961648581084,
+            "key": "eval_return"
+          },
+          {
+            "step": 215000,
+            "value": 560.4760934837802,
+            "key": "eval_return"
+          },
+          {
+            "step": 225000,
+            "value": 505.49039774196206,
+            "key": "eval_return"
+          },
+          {
+            "step": 235000,
+            "value": 574.1268167215865,
+            "key": "eval_return"
+          },
+          {
+            "step": 245000,
+            "value": 436.6392687155603,
+            "key": "eval_return"
+          },
+          {
+            "step": 255000,
+            "value": 605.1633272973165,
+            "key": "eval_return"
+          },
+          {
+            "step": 265000,
+            "value": 467.13554059236776,
+            "key": "eval_return"
+          },
+          {
+            "step": 275000,
+            "value": 498.12752227438693,
+            "key": "eval_return"
+          },
+          {
+            "step": 285000,
+            "value": 569.1402564687538,
+            "key": "eval_return"
+          },
+          {
+            "step": 295000,
+            "value": 538.8224043860558,
+            "key": "eval_return"
+          },
+          {
+            "step": 305000,
+            "value": 628.383647529874,
+            "key": "eval_return"
+          },
+          {
+            "step": 315000,
+            "value": 546.7184484716505,
+            "key": "eval_return"
+          },
+          {
+            "step": 325000,
+            "value": 515.8139090439751,
+            "key": "eval_return"
+          },
+          {
+            "step": 335000,
+            "value": 553.3685476568614,
+            "key": "eval_return"
+          },
+          {
+            "step": 345000,
+            "value": 602.0044787242775,
+            "key": "eval_return"
+          },
+          {
+            "step": 355000,
+            "value": 608.5930342988461,
+            "key": "eval_return"
+          },
+          {
+            "step": 365000,
+            "value": 488.3620432786993,
+            "key": "eval_return"
+          },
+          {
+            "step": 375000,
+            "value": 676.7503435144259,
+            "key": "eval_return"
+          },
+          {
+            "step": 385000,
+            "value": 688.860138675617,
+            "key": "eval_return"
+          },
+          {
+            "step": 395000,
+            "value": 618.8402989505964,
+            "key": "eval_return"
+          },
+          {
+            "step": 405000,
+            "value": 650.0229422463569,
+            "key": "eval_return"
+          },
+          {
+            "step": 415000,
+            "value": 393.7316980714073,
+            "key": "eval_return"
+          },
+          {
+            "step": 425000,
+            "value": 742.2225343609229,
+            "key": "eval_return"
+          },
+          {
+            "step": 435000,
+            "value": 655.2419758259945,
+            "key": "eval_return"
+          },
+          {
+            "step": 445000,
+            "value": 712.9892508337565,
+            "key": "eval_return"
+          },
+          {
+            "step": 455000,
+            "value": 687.1388496019296,
+            "key": "eval_return"
+          },
+          {
+            "step": 465000,
+            "value": 730.8886785033625,
+            "key": "eval_return"
+          },
+          {
+            "step": 475000,
+            "value": 614.4380042481771,
+            "key": "eval_return"
+          },
+          {
+            "step": 485000,
+            "value": 665.7913942170562,
+            "key": "eval_return"
+          },
+          {
+            "step": 495000,
+            "value": 601.0693373633687,
+            "key": "eval_return"
+          },
+          {
+            "step": 505000,
+            "value": 746.0284768125857,
+            "key": "eval_return"
+          }
+        ],
+        "peak": {
+          "step": 505000,
+          "value": 746.0284768125857
+        },
+        "final": {
+          "step": 505000,
+          "value": 746.0284768125857
+        },
+        "at_steps": {
+          "100000": {
+            "target_step": 100000,
+            "nearest_step": 95000,
+            "value": 437.2990449991856
+          },
+          "200000": {
+            "target_step": 200000,
+            "nearest_step": 195000,
+            "value": 486.56036506056773
+          },
+          "300000": {
+            "target_step": 300000,
+            "nearest_step": 295000,
+            "value": 538.8224043860558
+          },
+          "400000": {
+            "target_step": 400000,
+            "nearest_step": 395000,
+            "value": 618.8402989505964
+          },
+          "500000": {
+            "target_step": 500000,
+            "nearest_step": 495000,
+            "value": 601.0693373633687
+          }
+        }
+      },
+      "rollouts": {
+        "rollout_dir": "results/smad_phase2/smad_eta020/rollouts",
+        "expected_count": 20,
+        "found_count": 20,
+        "complete": true,
+        "missing_seeds": [],
+        "paths": [
+          "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed0_v2.npz",
+          "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed1_v2.npz",
+          "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed2_v2.npz",
+          "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed3_v2.npz",
+          "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed4_v2.npz",
+          "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed5_v2.npz",
+          "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed6_v2.npz",
+          "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed7_v2.npz",
+          "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed8_v2.npz",
+          "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed9_v2.npz",
+          "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed10_v2.npz",
+          "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed11_v2.npz",
+          "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed12_v2.npz",
+          "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed13_v2.npz",
+          "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed14_v2.npz",
+          "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed15_v2.npz",
+          "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed16_v2.npz",
+          "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed17_v2.npz",
+          "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed18_v2.npz",
+          "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed19_v2.npz"
+        ],
+        "paths_abs": [
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed0_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed1_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed2_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed3_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed4_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed5_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed6_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed7_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed8_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed9_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed10_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed11_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed12_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed13_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed14_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed15_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed16_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed17_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed18_v2.npz",
+          "/Users/fengye/Desktop/Project/DriftDetect 2/DriftDetect/DriftDetect/results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed19_v2.npz"
+        ]
+      },
+      "frequency": {
+        "band_mse": {
+          "dc_trend": 0.17478927969932556,
+          "very_low": 0.04536588117480278,
+          "low": 0.06363677978515625,
+          "mid": 0.05076618865132332,
+          "high": 0.021784350275993347
+        },
+        "band_share": {
+          "dc_trend": 0.49050924240663496,
+          "very_low": 0.12730977577366717,
+          "low": 0.1785831985537686,
+          "mid": 0.14246459953418408,
+          "high": 0.06113318373174517
+        },
+        "J_slow": 0.17478927969932556,
+        "J_total": 0.35634247958660126,
+        "trim_window_inclusive": [
+          25,
+          175
+        ],
+        "pca": {
+          "n_components": 37,
+          "var_explained": 0.9500594598720656
+        },
+        "curve_summary": {
+          "dc_trend": {
+            "mean_step25": 0.2922668159008026,
+            "mean_step100": 0.1544090360403061,
+            "mean_step175": 0.15799672901630402
+          },
+          "very_low": {
+            "mean_step25": 0.1401969939470291,
+            "mean_step100": 0.03602539002895355,
+            "mean_step175": 0.03134394437074661
+          },
+          "low": {
+            "mean_step25": 0.09424526244401932,
+            "mean_step100": 0.058183688670396805,
+            "mean_step175": 0.05075348541140556
+          },
+          "mid": {
+            "mean_step25": 0.07262609153985977,
+            "mean_step100": 0.04955487698316574,
+            "mean_step175": 0.05151481181383133
+          },
+          "high": {
+            "mean_step25": 0.029186293482780457,
+            "mean_step100": 0.02215234935283661,
+            "mean_step175": 0.024270011112093925
+          }
+        }
+      },
+      "representation_health": {
+        "dc_trend_direction_variance": 1.0356106466584671,
+        "dc_trend_direction_variance_std": 0.5538132783888473,
+        "total_deter_variance": 27.477860987200994,
+        "n_dc_variance_samples": 60,
+        "skipped_dc_variance_samples": 0,
+        "direction_method": "For each seed and anchor step, lowpass-filter true deter in the dc_trend band, use filtered[anchor] - filtered.mean as a unit direction, then compute var(true_deter @ direction).",
+        "anchor_steps": [
+          50,
+          100,
+          150
+        ]
+      }
+    }
+  },
+  "comparison": {
+    "eval_return_change_pct": -0.09358656198218936,
+    "J_slow_reduction_pct": 4.774240560623432,
+    "J_total_reduction_pct": 4.2018075005567574,
+    "per_band": {
+      "dc_trend": {
+        "baseline": 0.18355251848697662,
+        "smad": 0.17478927969932556,
+        "change_pct": -4.774240560623432,
+        "reduction_pct": 4.774240560623432
+      },
+      "very_low": {
+        "baseline": 0.05685616657137871,
+        "smad": 0.04536588117480278,
+        "change_pct": -20.20939167988177,
+        "reduction_pct": 20.20939167988177
+      },
+      "low": {
+        "baseline": 0.07592273503541946,
+        "smad": 0.06363677978515625,
+        "change_pct": -16.18218211518799,
+        "reduction_pct": 16.18218211518799
+      },
+      "mid": {
+        "baseline": 0.03634529188275337,
+        "smad": 0.05076618865132332,
+        "change_pct": 39.67748234101533,
+        "reduction_pct": -39.67748234101533
+      },
+      "high": {
+        "baseline": 0.01929531618952751,
+        "smad": 0.021784350275993347,
+        "change_pct": 12.899680223000196,
+        "reduction_pct": -12.899680223000196
+      }
+    },
+    "representation_health": {
+      "dc_trend_variance_ratio": 1.079281389192631,
+      "total_deter_variance_ratio": 0.9151116522569778,
+      "collapse_warning": false,
+      "collapse_rule": "Warning if SMAD dc_trend variance drops more than 30%."
+    },
+    "verdict": {
+      "J_slow_reduction_ge_20pct": "NO",
+      "eval_return_drop_le_5pct": "YES",
+      "overall": "MIXED"
+    }
+  }
+}
