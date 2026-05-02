@@ -93,7 +93,8 @@ def parse_dreamer_config(
     config_args, remaining = configs_parser.parse_known_args(dreamer_args)
 
     configs_path = DREAMERV3_ROOT / "configs.yaml"
-    configs = dreamer_module.yaml.safe_load(configs_path.read_text())
+    yaml_loader = dreamer_module.yaml.YAML(typ="safe", pure=True)
+    configs = yaml_loader.load(configs_path.read_text())
 
     defaults = {}
     config_names = ["defaults", *(config_args.configs or [])]
