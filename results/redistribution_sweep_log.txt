@@ -1,0 +1,320 @@
+Toy SMAD frequency redistribution sweep
+Complexities: ['simple', 'medium', 'hard']
+Seeds per complexity: [0, 1, 2, 3, 4]
+Ranks: [3, 5, 10]
+Etas: [0.1, 0.2, 0.3, 0.5]
+Train steps per model: 2000
+Eval episodes per baseline/config: 10
+Model trainings: 15
+Expected result rows: 180
+Parallel: True
+
+Running 15 model tasks with 5 workers
+[simple_seed0] train obs_dim=4 n_osc=2
+[simple_seed1] train obs_dim=4 n_osc=2
+[simple_seed3] train obs_dim=4 n_osc=2
+[simple_seed2] train obs_dim=4 n_osc=2
+[simple_seed4] train obs_dim=4 n_osc=2
+  [simple_seed0] step 1/2000 loss=1545.4972 recon=32.2474 kl=1.0307
+  [simple_seed1] step 1/2000 loss=1537.5651 recon=32.1965 kl=2.2347
+  [simple_seed2] step 1/2000 loss=1545.6978 recon=32.3439 kl=1.0503
+  [simple_seed4] step 1/2000 loss=1543.3759 recon=32.4032 kl=1.7674
+  [simple_seed3] step 1/2000 loss=1552.5529 recon=32.3171 kl=1.2973
+  [simple_seed0] step 500/2000 loss=8.5504 recon=1.6322 kl=21.1718
+  [simple_seed3] step 500/2000 loss=9.0055 recon=1.6484 kl=21.8227
+  [simple_seed4] step 500/2000 loss=7.2011 recon=1.5835 kl=19.8258
+  [simple_seed2] step 500/2000 loss=9.2049 recon=1.6233 kl=18.8852
+  [simple_seed1] step 500/2000 loss=8.1919 recon=1.4865 kl=23.4006
+  [simple_seed0] step 1000/2000 loss=5.0808 recon=0.8614 kl=13.9383
+  [simple_seed4] step 1000/2000 loss=4.9296 recon=0.3205 kl=13.8125
+  [simple_seed2] step 1000/2000 loss=4.3760 recon=0.4458 kl=13.6978
+  [simple_seed1] step 1000/2000 loss=5.5492 recon=0.5093 kl=17.9098
+  [simple_seed3] step 1000/2000 loss=5.4405 recon=0.3973 kl=15.5372
+  [simple_seed0] step 1500/2000 loss=2.7225 recon=0.2840 kl=10.2350
+  [simple_seed4] step 1500/2000 loss=2.9657 recon=0.2690 kl=9.4291
+  [simple_seed2] step 1500/2000 loss=2.9038 recon=0.3005 kl=9.3775
+  [simple_seed3] step 1500/2000 loss=3.1280 recon=0.3183 kl=10.1246
+  [simple_seed1] step 1500/2000 loss=3.1506 recon=0.3306 kl=14.1570
+  [simple_seed0] step 2000/2000 loss=1.8907 recon=0.2503 kl=7.3040
+  [simple_seed0] r=3 eta=0.10 low=+558.6% mid=+217.1% high=+37.8% total=+199.8%
+  [simple_seed0] r=3 eta=0.20 low=+585.9% mid=+162.2% high=+20.0% total=+183.0%
+  [simple_seed0] r=3 eta=0.30 low=+349.1% mid=+167.8% high=+15.3% total=+145.0%
+  [simple_seed4] step 2000/2000 loss=1.7809 recon=0.2264 kl=7.1793
+  [simple_seed0] r=3 eta=0.50 low=+244.7% mid=+178.5% high=+10.1% total=+132.6%
+  [simple_seed0] r=5 eta=0.10 low=+674.6% mid=+227.8% high=+33.3% total=+228.1%
+  [simple_seed2] step 2000/2000 loss=1.9888 recon=0.2564 kl=6.9301
+  [simple_seed4] r=3 eta=0.10 low=+181.8% mid=+94.9% high=-11.1% total=+101.8%
+  [simple_seed0] r=5 eta=0.20 low=+611.3% mid=+174.3% high=+16.4% total=+186.4%
+  [simple_seed3] step 2000/2000 loss=2.1349 recon=0.2525 kl=8.0318
+  [simple_seed1] step 2000/2000 loss=2.2344 recon=0.2890 kl=11.4787
+  [simple_seed0] r=5 eta=0.30 low=+420.0% mid=+180.8% high=+15.3% total=+163.4%
+  [simple_seed4] r=3 eta=0.20 low=+426.0% mid=+99.8% high=-30.4% total=+187.8%
+  [simple_seed2] r=3 eta=0.10 low=+355.6% mid=+201.7% high=+25.5% total=+158.5%
+  [simple_seed0] r=5 eta=0.50 low=+247.0% mid=+168.6% high=+9.7% total=+130.3%
+  [simple_seed4] r=3 eta=0.30 low=+263.8% mid=+73.1% high=-36.4% total=+120.9%
+  [simple_seed1] r=3 eta=0.10 low=+198.1% mid=+162.7% high=+17.3% total=+113.2%
+  [simple_seed2] r=3 eta=0.20 low=+578.5% mid=+161.3% high=-2.0% total=+202.0%
+  [simple_seed0] r=10 eta=0.10 low=+694.6% mid=+223.2% high=+31.4% total=+231.6%
+  [simple_seed4] r=3 eta=0.50 low=+140.2% mid=+77.7% high=-38.5% total=+88.6%
+  [simple_seed3] r=3 eta=0.10 low=+341.2% mid=+140.2% high=+15.4% total=+144.6%
+  [simple_seed1] r=3 eta=0.20 low=+408.8% mid=+180.0% high=-9.5% total=+186.5%
+  [simple_seed0] r=10 eta=0.20 low=+594.8% mid=+173.7% high=+17.3% total=+183.2%
+  [simple_seed2] r=3 eta=0.30 low=+304.0% mid=+132.6% high=-18.0% total=+124.4%
+  [simple_seed4] r=5 eta=0.10 low=+193.6% mid=+96.7% high=-13.2% total=+106.4%
+  [simple_seed3] r=3 eta=0.20 low=+380.4% mid=+113.9% high=-1.7% total=+140.0%
+  [simple_seed1] r=3 eta=0.30 low=+199.4% mid=+149.0% high=-16.2% total=+121.9%
+  [simple_seed0] r=10 eta=0.30 low=+449.7% mid=+183.1% high=+15.1% total=+173.8%
+  [simple_seed4] r=5 eta=0.20 low=+438.1% mid=+98.2% high=-32.3% total=+187.9%
+  [simple_seed2] r=3 eta=0.50 low=+154.3% mid=+123.1% high=-19.7% total=+93.1%
+  [simple_seed1] r=3 eta=0.50 low=+94.5% mid=+147.3% high=-14.9% total=+109.2%
+  [simple_seed3] r=3 eta=0.30 low=+250.1% mid=+104.7% high=-11.4% total=+99.0%
+  [simple_seed0] r=10 eta=0.50 low=+220.8% mid=+169.1% high=+10.2% total=+131.6%
+[simple_seed0] completed 12 redistribution rows
+[medium_seed0] train obs_dim=10 n_osc=5
+  [medium_seed0] step 1/2000 loss=5582.5029 recon=66.1642 kl=2.4232
+  [simple_seed4] r=5 eta=0.30 low=+271.5% mid=+72.9% high=-38.2% total=+120.7%
+  [simple_seed1] r=5 eta=0.10 low=+217.1% mid=+171.0% high=+15.0% total=+121.4%
+  [simple_seed2] r=5 eta=0.10 low=+373.9% mid=+203.6% high=+21.8% total=+163.4%
+  [simple_seed3] r=3 eta=0.50 low=+174.0% mid=+107.5% high=-15.8% total=+83.0%
+  [simple_seed1] r=5 eta=0.20 low=+397.9% mid=+173.9% high=-11.3% total=+179.6%
+  [simple_seed4] r=5 eta=0.50 low=+142.5% mid=+78.1% high=-38.9% total=+85.5%
+  [simple_seed2] r=5 eta=0.20 low=+580.6% mid=+157.7% high=-5.3% total=+198.0%
+  [simple_seed1] r=5 eta=0.30 low=+177.5% mid=+148.5% high=-14.4% total=+118.7%
+  [simple_seed4] r=10 eta=0.10 low=+192.2% mid=+95.5% high=-13.8% total=+105.6%
+  [simple_seed3] r=5 eta=0.10 low=+382.2% mid=+141.9% high=+13.6% total=+156.3%
+  [simple_seed1] r=5 eta=0.50 low=+79.7% mid=+142.7% high=-14.1% total=+109.2%
+  [simple_seed2] r=5 eta=0.30 low=+296.9% mid=+131.9% high=-20.8% total=+121.7%
+  [simple_seed4] r=10 eta=0.20 low=+440.3% mid=+96.1% high=-33.1% total=+187.9%
+  [simple_seed3] r=5 eta=0.20 low=+366.5% mid=+111.0% high=-4.5% total=+133.1%
+  [simple_seed1] r=10 eta=0.10 low=+221.5% mid=+174.6% high=+14.0% total=+123.7%
+  [simple_seed2] r=5 eta=0.50 low=+140.4% mid=+123.7% high=-20.0% total=+88.9%
+  [simple_seed4] r=10 eta=0.30 low=+258.7% mid=+70.1% high=-39.1% total=+116.5%
+  [simple_seed1] r=10 eta=0.20 low=+354.1% mid=+167.2% high=-12.9% total=+165.9%
+  [simple_seed3] r=5 eta=0.30 low=+235.2% mid=+106.0% high=-16.5% total=+97.9%
+  [simple_seed2] r=10 eta=0.10 low=+364.8% mid=+199.7% high=+20.5% total=+159.9%
+  [simple_seed4] r=10 eta=0.50 low=+128.9% mid=+75.2% high=-39.1% total=+82.8%
+[simple_seed4] completed 12 redistribution rows
+[medium_seed1] train obs_dim=10 n_osc=5
+  [medium_seed1] step 1/2000 loss=5577.8286 recon=65.5963 kl=3.7793
+  [simple_seed1] r=10 eta=0.30 low=+153.3% mid=+156.7% high=-9.6% total=+118.5%
+  [simple_seed3] r=5 eta=0.50 low=+110.8% mid=+101.9% high=-17.8% total=+66.8%
+  [simple_seed1] r=10 eta=0.50 low=+71.7% mid=+140.8% high=-13.9% total=+106.7%
+[simple_seed1] completed 12 redistribution rows
+[medium_seed2] train obs_dim=10 n_osc=5
+  [simple_seed2] r=10 eta=0.20 low=+583.5% mid=+157.2% high=-6.2% total=+198.8%
+  [medium_seed2] step 1/2000 loss=5558.8110 recon=65.8970 kl=3.5789
+  [simple_seed2] r=10 eta=0.30 low=+293.8% mid=+131.3% high=-21.2% total=+120.4%
+  [simple_seed3] r=10 eta=0.10 low=+403.9% mid=+140.5% high=+10.6% total=+161.8%
+  [simple_seed2] r=10 eta=0.50 low=+140.3% mid=+121.4% high=-20.0% total=+85.4%
+[simple_seed2] completed 12 redistribution rows
+[medium_seed3] train obs_dim=10 n_osc=5
+  [simple_seed3] r=10 eta=0.20 low=+372.9% mid=+108.5% high=-6.2% total=+132.0%
+  [medium_seed3] step 1/2000 loss=5582.0620 recon=65.8482 kl=3.4460
+  [simple_seed3] r=10 eta=0.30 low=+258.9% mid=+109.9% high=-19.6% total=+107.1%
+  [simple_seed3] r=10 eta=0.50 low=+85.1% mid=+90.3% high=-19.0% total=+61.7%
+[simple_seed3] completed 12 redistribution rows
+[medium_seed4] train obs_dim=10 n_osc=5
+  [medium_seed4] step 1/2000 loss=5574.0752 recon=66.0376 kl=3.3488
+  [medium_seed0] step 500/2000 loss=862.8900 recon=2.2295 kl=16.8701
+  [medium_seed1] step 500/2000 loss=983.1863 recon=1.8259 kl=19.4908
+  [medium_seed2] step 500/2000 loss=964.1194 recon=1.7961 kl=19.0448
+  [medium_seed3] step 500/2000 loss=759.8139 recon=2.2708 kl=20.0654
+  [medium_seed4] step 500/2000 loss=920.1881 recon=2.4932 kl=18.2015
+  [medium_seed0] step 1000/2000 loss=259.0580 recon=2.0871 kl=24.2342
+  [medium_seed1] step 1000/2000 loss=222.8924 recon=2.1022 kl=25.1512
+  [medium_seed2] step 1000/2000 loss=298.5655 recon=2.1780 kl=23.6164
+  [medium_seed3] step 1000/2000 loss=268.9353 recon=2.2468 kl=26.5108
+  [medium_seed4] step 1000/2000 loss=248.5638 recon=3.1219 kl=23.5858
+  [medium_seed0] step 1500/2000 loss=141.1531 recon=1.7736 kl=27.6365
+  [medium_seed1] step 1500/2000 loss=94.0304 recon=1.7515 kl=28.6150
+  [medium_seed3] step 1500/2000 loss=166.1777 recon=1.8450 kl=28.6375
+  [medium_seed2] step 1500/2000 loss=76.6436 recon=1.6392 kl=28.4027
+  [medium_seed4] step 1500/2000 loss=60.1703 recon=1.5602 kl=28.9252
+  [medium_seed0] step 2000/2000 loss=56.5463 recon=1.5505 kl=29.0581
+  [medium_seed0] r=3 eta=0.10 low=-0.7% mid=-0.1% high=-0.0% total=-0.3%
+  [medium_seed0] r=3 eta=0.20 low=-1.4% mid=-0.1% high=-0.0% total=-0.5%
+  [medium_seed0] r=3 eta=0.30 low=-2.1% mid=-0.1% high=-0.0% total=-0.8%
+  [medium_seed0] r=3 eta=0.50 low=-3.4% mid=-0.0% high=-0.1% total=-1.3%
+  [medium_seed0] r=5 eta=0.10 low=-1.5% mid=-0.1% high=-0.0% total=-0.7%
+  [medium_seed0] r=5 eta=0.20 low=-2.8% mid=-0.1% high=-0.0% total=-1.3%
+  [medium_seed1] step 2000/2000 loss=28.3064 recon=1.4675 kl=29.9058
+  [medium_seed0] r=5 eta=0.30 low=-4.0% mid=-0.2% high=-0.0% total=-1.9%
+  [medium_seed0] r=5 eta=0.50 low=-5.8% mid=-0.1% high=-0.1% total=-3.2%
+  [medium_seed0] r=10 eta=0.10 low=-2.7% mid=-0.2% high=-0.0% total=-1.1%
+  [medium_seed1] r=3 eta=0.10 low=-1.2% mid=-0.4% high=-0.0% total=-0.7%
+  [medium_seed3] step 2000/2000 loss=51.4066 recon=1.5857 kl=29.8093
+  [medium_seed0] r=10 eta=0.20 low=-5.2% mid=-0.4% high=-0.0% total=-2.1%
+  [medium_seed2] step 2000/2000 loss=35.2462 recon=1.4396 kl=29.7342
+  [medium_seed1] r=3 eta=0.20 low=-2.3% mid=-0.9% high=-0.0% total=-1.3%
+  [medium_seed0] r=10 eta=0.30 low=-7.5% mid=-0.6% high=-0.1% total=-3.1%
+  [medium_seed1] r=3 eta=0.30 low=-3.5% mid=-1.4% high=-0.1% total=-1.9%
+  [medium_seed0] r=10 eta=0.50 low=-11.3% mid=-0.7% high=-0.1% total=-5.1%
+[medium_seed0] completed 12 redistribution rows
+[hard_seed0] train obs_dim=20 n_osc=10
+  [hard_seed0] step 1/2000 loss=10142.8125 recon=94.7543 kl=5.8098
+  [medium_seed4] step 2000/2000 loss=24.4366 recon=1.2442 kl=29.0464
+  [medium_seed3] r=3 eta=0.10 low=-2.8% mid=-0.5% high=-0.0% total=-1.1%
+  [medium_seed2] r=3 eta=0.10 low=-0.7% mid=-0.0% high=-0.0% total=-0.2%
+  [medium_seed1] r=3 eta=0.50 low=-5.8% mid=-2.4% high=-0.1% total=-3.2%
+  [medium_seed3] r=3 eta=0.20 low=-5.5% mid=-1.1% high=-0.0% total=-2.1%
+  [medium_seed2] r=3 eta=0.20 low=-1.5% mid=-0.0% high=-0.1% total=-0.4%
+  [medium_seed3] r=3 eta=0.30 low=-8.2% mid=-1.6% high=-0.1% total=-3.1%
+  [medium_seed1] r=5 eta=0.10 low=-2.1% mid=-0.5% high=-0.0% total=-0.9%
+  [medium_seed2] r=3 eta=0.30 low=-2.4% mid=-0.1% high=-0.1% total=-0.7%
+  [medium_seed3] r=3 eta=0.50 low=-13.1% mid=-2.5% high=-0.1% total=-5.4%
+  [medium_seed4] r=3 eta=0.10 low=-1.7% mid=-0.5% high=-0.1% total=-1.0%
+  [medium_seed1] r=5 eta=0.20 low=-4.2% mid=-1.1% high=-0.1% total=-1.7%
+  [medium_seed2] r=3 eta=0.50 low=-4.9% mid=-0.3% high=-0.1% total=-1.5%
+  [medium_seed3] r=5 eta=0.10 low=-3.4% mid=-0.6% high=-0.0% total=-1.2%
+  [medium_seed4] r=3 eta=0.20 low=-3.2% mid=-1.0% high=-0.1% total=-1.8%
+  [medium_seed1] r=5 eta=0.30 low=-6.2% mid=-1.6% high=-0.1% total=-2.5%
+  [medium_seed2] r=5 eta=0.10 low=-1.2% mid=-0.0% high=-0.1% total=-0.4%
+  [medium_seed3] r=5 eta=0.20 low=-6.8% mid=-1.2% high=-0.1% total=-2.3%
+  [medium_seed2] r=5 eta=0.20 low=-2.6% mid=-0.1% high=-0.1% total=-0.7%
+  [medium_seed1] r=5 eta=0.50 low=-10.2% mid=-2.8% high=-0.1% total=-4.1%
+  [medium_seed4] r=3 eta=0.30 low=-4.6% mid=-1.2% high=-0.1% total=-2.6%
+  [medium_seed3] r=5 eta=0.30 low=-10.2% mid=-1.7% high=-0.1% total=-3.4%
+  [medium_seed2] r=5 eta=0.30 low=-4.0% mid=-0.1% high=-0.1% total=-1.1%
+  [medium_seed3] r=5 eta=0.50 low=-16.5% mid=-2.7% high=-0.1% total=-5.8%
+  [medium_seed1] r=10 eta=0.10 low=-2.8% mid=-0.7% high=-0.0% total=-1.2%
+  [medium_seed4] r=3 eta=0.50 low=-7.5% mid=-1.5% high=-0.2% total=-4.2%
+  [medium_seed2] r=5 eta=0.50 low=-7.3% mid=-0.5% high=-0.1% total=-2.1%
+  [medium_seed3] r=10 eta=0.10 low=-3.9% mid=-0.7% high=-0.0% total=-1.4%
+  [medium_seed1] r=10 eta=0.20 low=-5.5% mid=-1.4% high=-0.1% total=-2.4%
+  [medium_seed4] r=5 eta=0.10 low=-1.8% mid=-0.5% high=-0.1% total=-1.0%
+  [medium_seed2] r=10 eta=0.10 low=-3.2% mid=-0.3% high=-0.1% total=-1.3%
+  [medium_seed3] r=10 eta=0.20 low=-7.7% mid=-1.3% high=-0.1% total=-2.7%
+  [medium_seed1] r=10 eta=0.30 low=-8.2% mid=-2.1% high=-0.1% total=-3.4%
+  [medium_seed2] r=10 eta=0.20 low=-6.4% mid=-0.6% high=-0.1% total=-2.5%
+  [medium_seed3] r=10 eta=0.30 low=-11.3% mid=-2.0% high=-0.1% total=-4.0%
+  [medium_seed4] r=5 eta=0.20 low=-3.4% mid=-0.9% high=-0.1% total=-2.0%
+  [medium_seed1] r=10 eta=0.50 low=-13.3% mid=-3.4% high=-0.1% total=-5.4%
+[medium_seed1] completed 12 redistribution rows
+[hard_seed1] train obs_dim=20 n_osc=10
+  [hard_seed1] step 1/2000 loss=10125.3760 recon=94.9224 kl=4.6697
+  [medium_seed3] r=10 eta=0.50 low=-18.0% mid=-3.1% high=-0.1% total=-6.7%
+[medium_seed3] completed 12 redistribution rows
+[hard_seed2] train obs_dim=20 n_osc=10
+  [medium_seed2] r=10 eta=0.30 low=-9.6% mid=-1.0% high=-0.2% total=-3.6%
+  [hard_seed2] step 1/2000 loss=10138.7227 recon=94.5884 kl=4.5845
+  [medium_seed4] r=5 eta=0.30 low=-4.9% mid=-1.2% high=-0.2% total=-2.8%
+  [medium_seed2] r=10 eta=0.50 low=-16.3% mid=-1.7% high=-0.2% total=-6.0%
+[medium_seed2] completed 12 redistribution rows
+[hard_seed3] train obs_dim=20 n_osc=10
+  [hard_seed3] step 1/2000 loss=10147.6094 recon=94.8095 kl=4.6831
+  [medium_seed4] r=5 eta=0.50 low=-8.0% mid=-1.5% high=-0.2% total=-4.4%
+  [medium_seed4] r=10 eta=0.10 low=-2.8% mid=-0.6% high=-0.1% total=-1.4%
+  [medium_seed4] r=10 eta=0.20 low=-5.2% mid=-1.1% high=-0.2% total=-2.7%
+  [medium_seed4] r=10 eta=0.30 low=-7.5% mid=-1.5% high=-0.2% total=-3.8%
+  [medium_seed4] r=10 eta=0.50 low=-11.7% mid=-1.9% high=-0.3% total=-6.0%
+[medium_seed4] completed 12 redistribution rows
+[hard_seed4] train obs_dim=20 n_osc=10
+  [hard_seed4] step 1/2000 loss=10142.4756 recon=94.8306 kl=4.1014
+  [hard_seed0] step 500/2000 loss=721.6859 recon=22.2762 kl=26.7900
+  [hard_seed1] step 500/2000 loss=733.0978 recon=11.1840 kl=30.1633
+  [hard_seed2] step 500/2000 loss=708.4263 recon=10.8762 kl=27.9228
+  [hard_seed3] step 500/2000 loss=720.3057 recon=6.2884 kl=29.4850
+  [hard_seed4] step 500/2000 loss=687.9573 recon=13.2924 kl=29.1728
+  [hard_seed0] step 1000/2000 loss=120.0679 recon=9.9938 kl=34.0241
+  [hard_seed1] step 1000/2000 loss=630.8468 recon=5.0937 kl=30.2467
+  [hard_seed2] step 1000/2000 loss=648.4232 recon=8.7012 kl=27.9328
+  [hard_seed3] step 1000/2000 loss=653.5551 recon=4.0514 kl=29.5447
+  [hard_seed4] step 1000/2000 loss=96.7219 recon=9.5716 kl=33.7372
+  [hard_seed0] step 1500/2000 loss=62.2123 recon=4.0397 kl=33.2058
+  [hard_seed1] step 1500/2000 loss=491.1859 recon=4.1103 kl=30.0027
+  [hard_seed2] step 1500/2000 loss=530.8065 recon=4.2386 kl=29.3753
+  [hard_seed3] step 1500/2000 loss=107.0799 recon=3.9717 kl=33.0182
+  [hard_seed4] step 1500/2000 loss=67.9573 recon=9.1408 kl=32.9234
+  [hard_seed0] step 2000/2000 loss=47.8319 recon=3.7533 kl=32.8293
+  [hard_seed0] r=3 eta=0.10 low=-2.3% mid=-0.7% high=-0.0% total=-1.4%
+  [hard_seed0] r=3 eta=0.20 low=-4.4% mid=-1.4% high=-0.0% total=-2.7%
+  [hard_seed0] r=3 eta=0.30 low=-6.3% mid=-1.9% high=-0.0% total=-3.8%
+  [hard_seed0] r=3 eta=0.50 low=-9.3% mid=-2.7% high=-0.0% total=-5.7%
+  [hard_seed0] r=5 eta=0.10 low=-2.7% mid=-0.8% high=-0.0% total=-1.6%
+  [hard_seed0] r=5 eta=0.20 low=-5.1% mid=-1.5% high=-0.0% total=-3.0%
+  [hard_seed0] r=5 eta=0.30 low=-7.4% mid=-2.1% high=-0.0% total=-4.3%
+  [hard_seed0] r=5 eta=0.50 low=-11.3% mid=-3.0% high=-0.1% total=-6.5%
+  [hard_seed0] r=10 eta=0.10 low=-3.2% mid=-0.9% high=-0.0% total=-1.9%
+  [hard_seed0] r=10 eta=0.20 low=-6.1% mid=-1.7% high=-0.1% total=-3.6%
+  [hard_seed0] r=10 eta=0.30 low=-8.8% mid=-2.4% high=-0.1% total=-5.2%
+  [hard_seed0] r=10 eta=0.50 low=-13.0% mid=-3.3% high=-0.1% total=-7.8%
+[hard_seed0] completed 12 redistribution rows
+  [hard_seed1] step 2000/2000 loss=335.2661 recon=4.0058 kl=30.5971
+  [hard_seed1] r=3 eta=0.10 low=-10.5% mid=-9.5% high=-2.7% total=-5.4%
+  [hard_seed1] r=3 eta=0.20 low=-19.8% mid=-16.8% high=-4.2% total=-10.3%
+  [hard_seed1] r=3 eta=0.30 low=-27.6% mid=-21.5% high=-4.7% total=-14.6%
+  [hard_seed1] r=3 eta=0.50 low=-36.7% mid=-22.3% high=-3.5% total=-21.2%
+  [hard_seed1] r=5 eta=0.10 low=-11.2% mid=-10.1% high=-2.9% total=-5.8%
+  [hard_seed1] r=5 eta=0.20 low=-21.1% mid=-17.9% high=-4.5% total=-11.1%
+  [hard_seed1] r=5 eta=0.30 low=-29.4% mid=-23.0% high=-5.0% total=-15.7%
+  [hard_seed1] r=5 eta=0.50 low=-39.0% mid=-23.8% high=-3.8% total=-22.8%
+  [hard_seed2] step 2000/2000 loss=367.0762 recon=4.2138 kl=30.7297
+  [hard_seed1] r=10 eta=0.10 low=-12.4% mid=-11.2% high=-3.2% total=-6.6%
+  [hard_seed1] r=10 eta=0.20 low=-23.3% mid=-19.8% high=-5.0% total=-12.4%
+  [hard_seed2] r=3 eta=0.10 low=-11.7% mid=-11.2% high=-10.1% total=-11.9%
+  [hard_seed2] r=3 eta=0.20 low=-22.1% mid=-19.8% high=-15.9% total=-22.9%
+  [hard_seed1] r=10 eta=0.30 low=-32.3% mid=-25.3% high=-5.5% total=-17.6%
+  [hard_seed2] r=3 eta=0.30 low=-30.8% mid=-25.3% high=-17.7% total=-32.8%
+  [hard_seed2] r=3 eta=0.50 low=-40.8% mid=-26.2% high=-13.3% total=-48.9%
+  [hard_seed1] r=10 eta=0.50 low=-42.6% mid=-26.2% high=-4.2% total=-25.3%
+[hard_seed1] completed 12 redistribution rows
+  [hard_seed2] r=5 eta=0.10 low=-12.2% mid=-11.6% high=-10.6% total=-12.4%
+  [hard_seed2] r=5 eta=0.20 low=-22.9% mid=-20.5% high=-16.5% total=-23.7%
+  [hard_seed2] r=5 eta=0.30 low=-31.9% mid=-26.3% high=-18.4% total=-34.0%
+  [hard_seed2] r=5 eta=0.50 low=-42.3% mid=-27.2% high=-13.8% total=-50.6%
+  [hard_seed2] r=10 eta=0.10 low=-12.9% mid=-12.3% high=-11.2% total=-13.1%
+  [hard_seed2] r=10 eta=0.20 low=-24.3% mid=-21.7% high=-17.5% total=-25.1%
+  [hard_seed2] r=10 eta=0.30 low=-33.7% mid=-27.8% high=-19.4% total=-35.9%
+  [hard_seed3] step 2000/2000 loss=66.5959 recon=3.6723 kl=33.2525
+  [hard_seed2] r=10 eta=0.50 low=-44.5% mid=-28.7% high=-14.6% total=-53.1%
+[hard_seed2] completed 12 redistribution rows
+  [hard_seed3] r=3 eta=0.10 low=-5.2% mid=-1.5% high=-0.1% total=-3.1%
+  [hard_seed3] r=3 eta=0.20 low=-9.8% mid=-2.8% high=-0.2% total=-5.8%
+  [hard_seed3] r=3 eta=0.30 low=-13.9% mid=-3.9% high=-0.2% total=-8.3%
+  [hard_seed3] r=3 eta=0.50 low=-20.0% mid=-5.3% high=-0.2% total=-12.3%
+  [hard_seed3] r=5 eta=0.10 low=-6.3% mid=-1.8% high=-0.2% total=-3.6%
+  [hard_seed3] r=5 eta=0.20 low=-11.9% mid=-3.4% high=-0.2% total=-6.8%
+  [hard_seed4] step 2000/2000 loss=43.8078 recon=7.6567 kl=31.9607
+  [hard_seed3] r=5 eta=0.30 low=-16.8% mid=-4.7% high=-0.2% total=-9.7%
+  [hard_seed3] r=5 eta=0.50 low=-24.2% mid=-6.3% high=-0.2% total=-14.3%
+  [hard_seed3] r=10 eta=0.10 low=-7.5% mid=-2.2% high=-0.2% total=-4.3%
+  [hard_seed4] r=3 eta=0.10 low=-2.6% mid=-0.5% high=-0.1% total=-1.6%
+  [hard_seed3] r=10 eta=0.20 low=-14.3% mid=-4.1% high=-0.2% total=-8.1%
+  [hard_seed4] r=3 eta=0.20 low=-4.8% mid=-0.9% high=-0.2% total=-3.1%
+  [hard_seed3] r=10 eta=0.30 low=-20.2% mid=-5.6% high=-0.3% total=-11.5%
+  [hard_seed4] r=3 eta=0.30 low=-6.7% mid=-1.3% high=-0.2% total=-4.3%
+  [hard_seed3] r=10 eta=0.50 low=-28.8% mid=-7.1% high=-0.3% total=-17.0%
+[hard_seed3] completed 12 redistribution rows
+  [hard_seed4] r=3 eta=0.50 low=-9.1% mid=-1.8% high=-0.2% total=-6.3%
+  [hard_seed4] r=5 eta=0.10 low=-3.5% mid=-0.7% high=-0.1% total=-2.5%
+  [hard_seed4] r=5 eta=0.20 low=-6.4% mid=-1.3% high=-0.2% total=-4.6%
+  [hard_seed4] r=5 eta=0.30 low=-8.7% mid=-1.7% high=-0.2% total=-6.4%
+  [hard_seed4] r=5 eta=0.50 low=-11.3% mid=-2.1% high=-0.2% total=-9.2%
+  [hard_seed4] r=10 eta=0.10 low=-4.0% mid=-0.8% high=-0.1% total=-2.8%
+  [hard_seed4] r=10 eta=0.20 low=-7.3% mid=-1.6% high=-0.2% total=-5.2%
+  [hard_seed4] r=10 eta=0.30 low=-10.0% mid=-2.1% high=-0.2% total=-7.3%
+  [hard_seed4] r=10 eta=0.50 low=-13.2% mid=-2.7% high=-0.2% total=-10.4%
+[hard_seed4] completed 12 redistribution rows
+Parquet output unavailable; writing JSON fallback instead: results/tables/toy_redistribution_sweep.json (No module named 'pandas')
+
+Summary by complexity: signed band MSE change %
+Complexity   n   dc_trend       very_low       low            mid            high           total
+hard         60  -11.5 +/- 12.8  -20.3 +/- 14.0  -16.4 +/- 11.9  -9.6 +/- 9.7  -3.9 +/- 5.9  -12.5 +/- 12.2
+medium       60  -1.9 +/- 1.3  -8.8 +/- 6.5  -5.7 +/- 4.1  -1.0 +/- 0.9  -0.1 +/- 0.1  -2.4 +/- 1.7
+simple       60  +60.1 +/- 65.2  +32.6 +/- 22.8  +313.8 +/- 161.8  +139.8 +/- 40.9  -5.7 +/- 20.4  +137.6 +/- 40.9
+
+Conservation test:
+  total_mse_change_pct mean=+40.9 +/- 72.9; fraction within +/-10.0% = 0.522 (94/180)
+  unweighted sum_band_change_pct mean=+153.9 +/- 295.4
+
+Consistency test:
+  very_low_down=0.689 low_down=0.667 mid_up=0.333 high_up=0.117 phase2_pattern=0.000
+
+Eta scaling:
+  eta=0.10 redistribution_strength=-35.9 +/- 67.4
+  eta=0.20 redistribution_strength=-56.1 +/- 93.2
+  eta=0.30 redistribution_strength=-24.7 +/- 55.3
+  eta=0.50 redistribution_strength=-0.5 +/- 29.7
+  classification=superlinear_descriptive linear_r2=0.675 quadratic_r2=0.788
+
+Saved: results/tables/toy_redistribution_sweep.json
