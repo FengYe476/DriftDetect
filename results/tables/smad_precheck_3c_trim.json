@@ -1,0 +1,315 @@
+{
+  "analysis": "smad_precheck_3c_trim",
+  "task": "cheetah_run",
+  "rollout_dir": "results/rollouts",
+  "rollout_files": [
+    "results/rollouts/cheetah_v3_seed0_v2.npz",
+    "results/rollouts/cheetah_v3_seed1_v2.npz",
+    "results/rollouts/cheetah_v3_seed2_v2.npz",
+    "results/rollouts/cheetah_v3_seed3_v2.npz",
+    "results/rollouts/cheetah_v3_seed4_v2.npz",
+    "results/rollouts/cheetah_v3_seed5_v2.npz",
+    "results/rollouts/cheetah_v3_seed6_v2.npz",
+    "results/rollouts/cheetah_v3_seed7_v2.npz",
+    "results/rollouts/cheetah_v3_seed8_v2.npz",
+    "results/rollouts/cheetah_v3_seed9_v2.npz",
+    "results/rollouts/cheetah_v3_seed10_v2.npz",
+    "results/rollouts/cheetah_v3_seed11_v2.npz",
+    "results/rollouts/cheetah_v3_seed12_v2.npz",
+    "results/rollouts/cheetah_v3_seed13_v2.npz",
+    "results/rollouts/cheetah_v3_seed14_v2.npz",
+    "results/rollouts/cheetah_v3_seed15_v2.npz",
+    "results/rollouts/cheetah_v3_seed16_v2.npz",
+    "results/rollouts/cheetah_v3_seed17_v2.npz",
+    "results/rollouts/cheetah_v3_seed18_v2.npz",
+    "results/rollouts/cheetah_v3_seed19_v2.npz"
+  ],
+  "n_seeds": 20,
+  "horizon": 200,
+  "latent_dim": 1536,
+  "deter_dim": 512,
+  "deter_slice": [
+    1024,
+    1536
+  ],
+  "ranks": [
+    3,
+    5,
+    10
+  ],
+  "trim_windows_inclusive": [
+    [
+      10,
+      190
+    ],
+    [
+      25,
+      175
+    ],
+    [
+      50,
+      150
+    ]
+  ],
+  "var_threshold": 0.95,
+  "basis_estimation_scope": {
+    "sfa": "Estimated once from full true posterior deter trajectories.",
+    "posterior": "Estimated once from full true posterior deter trajectories.",
+    "drift": "Re-estimated separately inside each trim window."
+  },
+  "sfa": {
+    "whitened_dimensions": 62,
+    "retained_variance_explained": 0.9504940202125615
+  },
+  "posterior": {
+    "retained_components": 38,
+    "retained_variance_explained": 0.9504360611578493,
+    "selected_pc_indices_by_rank": {
+      "3": [
+        0,
+        1,
+        7
+      ],
+      "5": [
+        0,
+        1,
+        7,
+        4,
+        6
+      ],
+      "10": [
+        0,
+        1,
+        7,
+        4,
+        6,
+        10,
+        5,
+        15,
+        16,
+        2
+      ]
+    }
+  },
+  "invariance_check": {
+    "sfa_vs_posterior_max_abs_deviation": 0.0,
+    "sfa_vs_posterior_by_rank": {
+      "3": {
+        "values": [
+          0.00331571340559577,
+          0.00331571340559577,
+          0.00331571340559577
+        ],
+        "max_abs_deviation": 0.0
+      },
+      "5": {
+        "values": [
+          0.10127773898132916,
+          0.10127773898132916,
+          0.10127773898132916
+        ],
+        "max_abs_deviation": 0.0
+      },
+      "10": {
+        "values": [
+          0.13683215192227102,
+          0.13683215192227102,
+          0.13683215192227102
+        ],
+        "max_abs_deviation": 0.0
+      }
+    },
+    "passes": true
+  },
+  "windows": {
+    "[10,190]": {
+      "trim_window_inclusive": [
+        10,
+        190
+      ],
+      "trimmed_steps_per_seed": 181,
+      "drift_pool_shape": [
+        3620,
+        512
+      ],
+      "drift_explained_variance_by_rank": {
+        "3": {
+          "top_r_ratios": [
+            0.1655227320483305,
+            0.14855409215123733,
+            0.12724370252640618
+          ],
+          "cumulative": 0.441320526725974
+        },
+        "5": {
+          "top_r_ratios": [
+            0.1655227320483305,
+            0.14855409215123733,
+            0.12724370252640618,
+            0.0594069240451418,
+            0.04871257856070344
+          ],
+          "cumulative": 0.5494400293318192
+        },
+        "10": {
+          "top_r_ratios": [
+            0.1655227320483305,
+            0.14855409215123733,
+            0.12724370252640618,
+            0.0594069240451418,
+            0.04871257856070344,
+            0.03839191671404572,
+            0.03126482838588851,
+            0.027894151100155112,
+            0.021477791473642645,
+            0.021217866328348083
+          ],
+          "cumulative": 0.6896865833338993
+        }
+      },
+      "overlaps": {
+        "3": {
+          "sfa_vs_posterior": 0.00331571340559577,
+          "sfa_vs_drift": 0.019828002057931927,
+          "posterior_vs_drift": 0.12789985337519766
+        },
+        "5": {
+          "sfa_vs_posterior": 0.10127773898132916,
+          "sfa_vs_drift": 0.05031132311864146,
+          "posterior_vs_drift": 0.15898589293474455
+        },
+        "10": {
+          "sfa_vs_posterior": 0.13683215192227102,
+          "sfa_vs_drift": 0.10309358313029442,
+          "posterior_vs_drift": 0.2882878689571673
+        }
+      }
+    },
+    "[25,175]": {
+      "trim_window_inclusive": [
+        25,
+        175
+      ],
+      "trimmed_steps_per_seed": 151,
+      "drift_pool_shape": [
+        3020,
+        512
+      ],
+      "drift_explained_variance_by_rank": {
+        "3": {
+          "top_r_ratios": [
+            0.1553909563668537,
+            0.15250529750120406,
+            0.1299183850358311
+          ],
+          "cumulative": 0.43781463890388883
+        },
+        "5": {
+          "top_r_ratios": [
+            0.1553909563668537,
+            0.15250529750120406,
+            0.1299183850358311,
+            0.05745537587050163,
+            0.04868441812748124
+          ],
+          "cumulative": 0.5439544329018717
+        },
+        "10": {
+          "top_r_ratios": [
+            0.1553909563668537,
+            0.15250529750120406,
+            0.1299183850358311,
+            0.05745537587050163,
+            0.04868441812748124,
+            0.03860485842552189,
+            0.02889052772649235,
+            0.02618224125019866,
+            0.022691593928697712,
+            0.022297574586833832
+          ],
+          "cumulative": 0.6826212288196161
+        }
+      },
+      "overlaps": {
+        "3": {
+          "sfa_vs_posterior": 0.00331571340559577,
+          "sfa_vs_drift": 0.016585342596595044,
+          "posterior_vs_drift": 0.13197727114233385
+        },
+        "5": {
+          "sfa_vs_posterior": 0.10127773898132916,
+          "sfa_vs_drift": 0.06104056119968384,
+          "posterior_vs_drift": 0.1670548503517332
+        },
+        "10": {
+          "sfa_vs_posterior": 0.13683215192227102,
+          "sfa_vs_drift": 0.0904544052804005,
+          "posterior_vs_drift": 0.2828532738706168
+        }
+      }
+    },
+    "[50,150]": {
+      "trim_window_inclusive": [
+        50,
+        150
+      ],
+      "trimmed_steps_per_seed": 101,
+      "drift_pool_shape": [
+        2020,
+        512
+      ],
+      "drift_explained_variance_by_rank": {
+        "3": {
+          "top_r_ratios": [
+            0.17985515630874646,
+            0.16235337698141958,
+            0.09822036174135416
+          ],
+          "cumulative": 0.4404288950315202
+        },
+        "5": {
+          "top_r_ratios": [
+            0.17985515630874646,
+            0.16235337698141958,
+            0.09822036174135416,
+            0.05303018981765799,
+            0.048222764682543
+          ],
+          "cumulative": 0.5416818495317213
+        },
+        "10": {
+          "top_r_ratios": [
+            0.17985515630874646,
+            0.16235337698141958,
+            0.09822036174135416,
+            0.05303018981765799,
+            0.048222764682543,
+            0.04339378026962697,
+            0.03218835505566183,
+            0.02670705198234997,
+            0.024178708592591965,
+            0.022487301572364515
+          ],
+          "cumulative": 0.6906370470043165
+        }
+      },
+      "overlaps": {
+        "3": {
+          "sfa_vs_posterior": 0.00331571340559577,
+          "sfa_vs_drift": 0.01070632944219191,
+          "posterior_vs_drift": 0.12668281400172418
+        },
+        "5": {
+          "sfa_vs_posterior": 0.10127773898132916,
+          "sfa_vs_drift": 0.062476966949741065,
+          "posterior_vs_drift": 0.1427518129098885
+        },
+        "10": {
+          "sfa_vs_posterior": 0.13683215192227102,
+          "sfa_vs_drift": 0.08543263154288429,
+          "posterior_vs_drift": 0.2728543813786525
+        }
+      }
+    }
+  }
+}

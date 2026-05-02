@@ -1,0 +1,13 @@
+# SMAD Phase 2 Main Configuration
+# Invoke: python scripts/train_smad_phase2.py --run_name smad_eta020 --smad_eta 0.20 --smad_r 10 --smad_U_path results/smad/U_drift_cheetah_r10.npy --configs dmc_proprio --task dmc_cheetah_run --steps 500000 --batch_size 32 --envs 8 --seed 42
+smad:
+  eta: 0.20
+  r: 10
+  U_path: results/smad/U_drift_cheetah_r10.npy
+dreamerv3:
+  configs: dmc_proprio
+  task: dmc_cheetah_run
+  steps: 500000
+  batch_size: 32
+  envs: 8
+  seed: 42

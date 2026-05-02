@@ -1,0 +1,13 @@
+# SMAD Phase 2 Baseline Configuration
+# Invoke: python scripts/train_smad_phase2.py --run_name baseline --smad_eta 0.0 --configs dmc_proprio --task dmc_cheetah_run --steps 500000 --batch_size 32 --envs 8 --seed 42
+smad:
+  eta: 0.0
+  r: 10
+  U_path: null
+dreamerv3:
+  configs: dmc_proprio
+  task: dmc_cheetah_run
+  steps: 500000
+  batch_size: 32
+  envs: 8
+  seed: 42

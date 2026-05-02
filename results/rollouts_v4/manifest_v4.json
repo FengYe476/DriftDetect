@@ -1,0 +1,952 @@
+{
+  "version": "v1",
+  "generated_at": "2026-05-01T20:13:48.607359+00:00",
+  "task": "cheetah-run",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+  ],
+  "context_length": 8,
+  "horizon": 200,
+  "checkpoint_revision": "local",
+  "checkpoint": {
+    "checkpoint_dir": "/root/DriftDetect/results/checkpoints/v4",
+    "tokenizer_path": "/root/DriftDetect/results/checkpoints/v4/tokenizer.pt",
+    "dynamics_path": "/root/DriftDetect/results/checkpoints/v4/dynamics.pt",
+    "tokenizer_args": {
+      "data_dirs": [
+        "/data/nihansen/data/newt/frames128",
+        "/data/nihansen/data/newt/frames128-expl",
+        "/data/nihansen/data/newt/shards200"
+      ],
+      "seq_len": 8,
+      "num_workers": 8,
+      "batch_size": 8,
+      "H": 128,
+      "W": 128,
+      "C": 3,
+      "patch": 4,
+      "d_model": 256,
+      "n_heads": 4,
+      "depth": 8,
+      "n_latents": 16,
+      "d_bottleneck": 32,
+      "dropout": 0.05,
+      "mlp_ratio": 4.0,
+      "time_every": 1,
+      "mae_p_min": 0.0,
+      "mae_p_max": 0.9,
+      "lr": 0.0001,
+      "weight_decay": 0.01,
+      "max_steps": 10000000,
+      "grad_accum": 1,
+      "lpips_weight": 0.2,
+      "lpips_frac": 0.5,
+      "lpips_net": "alex",
+      "log_every": 100,
+      "print_every": 100,
+      "viz_every": 500,
+      "viz_max_items": 4,
+      "viz_max_T": 8,
+      "wandb_project": "dreamer4-tokenizer",
+      "wandb_run_name": "0112-dmc",
+      "wandb_entity": null,
+      "ckpt_dir": "./logs/tokenizer_ckpts",
+      "save_every": 5000,
+      "resume": null,
+      "seed": 0,
+      "compile": false
+    },
+    "dynamics_args": {
+      "data_dirs": [
+        "/data/nihansen/data/newt/data",
+        "/data/nihansen/data/newt/data-expl",
+        "/data/nihansen/data/newt/data200"
+      ],
+      "frame_dirs": [
+        "/data/nihansen/data/newt/frames128",
+        "/data/nihansen/data/newt/frames128-expl",
+        "/data/nihansen/data/newt/shards200"
+      ],
+      "tasks_json": "../tasks.json",
+      "seq_len": 32,
+      "num_workers": 8,
+      "batch_size": 24,
+      "tokenizer_ckpt": "./logs/tokenizer_ckpts/latest.pt",
+      "H": null,
+      "W": null,
+      "C": null,
+      "patch": null,
+      "d_model_dyn": 512,
+      "dyn_depth": 8,
+      "n_heads": 4,
+      "dropout": 0.0,
+      "mlp_ratio": 4.0,
+      "time_every": 1,
+      "packing_factor": 2,
+      "n_register": 4,
+      "n_agent": 1,
+      "space_mode": "wm_agent_isolated",
+      "k_max": 8,
+      "bootstrap_start": 5000,
+      "self_fraction": 0.25,
+      "use_actions": true,
+      "lr": 0.0001,
+      "weight_decay": 0.01,
+      "max_steps": 10000000,
+      "grad_accum": 1,
+      "grad_clip": 1.0,
+      "eval_every": 1000,
+      "eval_batch_size": 4,
+      "eval_max_items": 4,
+      "eval_ctx": 8,
+      "eval_horizon": 16,
+      "eval_schedule": "shortcut",
+      "eval_d": 0.25,
+      "log_every": 200,
+      "wandb_project": "dreamer4-dynamics",
+      "wandb_run_name": "0112-dmc-again",
+      "wandb_entity": null,
+      "ckpt_dir": "./logs/dynamics_ckpts",
+      "save_every": 5000,
+      "resume": "./logs/dynamics_ckpts/latest.pt",
+      "seed": 0,
+      "compile": false
+    },
+    "config": {
+      "k_max": 8,
+      "packing_factor": 2,
+      "n_latents": 16,
+      "d_bottleneck": 32,
+      "n_spatial": 8,
+      "d_spatial": 64,
+      "H": 128,
+      "W": 128,
+      "C": 3,
+      "patch": 4,
+      "schedule": "shortcut",
+      "schedule_d": 0.25,
+      "use_amp": true
+    },
+    "schedule": {
+      "K": 4,
+      "e": 2,
+      "dt": 0.25,
+      "tau": [
+        0.0,
+        0.25,
+        0.5,
+        0.75
+      ],
+      "tau_idx": [
+        0,
+        2,
+        4,
+        6
+      ]
+    }
+  },
+  "schedule": "shortcut",
+  "schedule_d": 0.25,
+  "files": [
+    {
+      "file": "results/rollouts_v4/cheetah-run_v4_seed0_v1.npz",
+      "seed": 0,
+      "sha256": "1fd136643f4ec373a8ad3a9f3103a3cabdf0d2a56b359d14b119d7ee44bbd037",
+      "elapsed_s": 4.095765591016971,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts_v4/cheetah-run_v4_seed1_v1.npz",
+      "seed": 1,
+      "sha256": "22b14baee6f835ee15a9c3e81f09385ceea60f45ee589f6273b0498cdc06b715",
+      "elapsed_s": 3.351840857998468,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts_v4/cheetah-run_v4_seed2_v1.npz",
+      "seed": 2,
+      "sha256": "2f1a8a9de0db92e0906fe74ecb7d69c3d5eb1dd58c345d562b6e42b3b8abb60c",
+      "elapsed_s": 3.3665386659558862,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts_v4/cheetah-run_v4_seed3_v1.npz",
+      "seed": 3,
+      "sha256": "e26cecc78a6b74c1fbfb2260a62032981e03b76e3edc1d2c73a23e6c6781a6ea",
+      "elapsed_s": 3.422995695960708,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts_v4/cheetah-run_v4_seed4_v1.npz",
+      "seed": 4,
+      "sha256": "71bf784141df0d492c7e5538101092f08a729a2a5b267474a73372814e6fcaba",
+      "elapsed_s": 3.4776216950267553,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts_v4/cheetah-run_v4_seed5_v1.npz",
+      "seed": 5,
+      "sha256": "9faf46ddf6a87c5dfc79b4e9de6c76b1fe1f9a56a40439b910f8b7147d6e6797",
+      "elapsed_s": 3.3465534650022164,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts_v4/cheetah-run_v4_seed6_v1.npz",
+      "seed": 6,
+      "sha256": "bc339c799d2ae5b111e8fd4eb084501a00d318cf5a461de8ff9666ce93c00250",
+      "elapsed_s": 3.3254654289921746,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts_v4/cheetah-run_v4_seed7_v1.npz",
+      "seed": 7,
+      "sha256": "2cbd8b703fc97df923d7c7e064ac1fc743d8a38d2c8feb69a3b9fc12075da6bf",
+      "elapsed_s": 3.3394515439867973,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts_v4/cheetah-run_v4_seed8_v1.npz",
+      "seed": 8,
+      "sha256": "a9227297cd971a24cd22780e9db9a6db289f63d4c27cf4e3895ed3d3a5f8e6dd",
+      "elapsed_s": 3.3809175360947847,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts_v4/cheetah-run_v4_seed9_v1.npz",
+      "seed": 9,
+      "sha256": "d92f0001a34a995751a8c669de89379fff86411e08a4779f158bc00f8419f62c",
+      "elapsed_s": 3.466040003928356,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts_v4/cheetah-run_v4_seed10_v1.npz",
+      "seed": 10,
+      "sha256": "977921a03650c60b3ad11d29b142b3c4dc87d5caafb550fbba16b3af189349e0",
+      "elapsed_s": 3.4202201468870044,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts_v4/cheetah-run_v4_seed11_v1.npz",
+      "seed": 11,
+      "sha256": "a072191b33766bad493baee0e388f10277bfd00da9e40eec71eb67a095703c80",
+      "elapsed_s": 3.3713664079550654,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts_v4/cheetah-run_v4_seed12_v1.npz",
+      "seed": 12,
+      "sha256": "94a4e679396f46b265b87e2aaa92ea3c1318c8899d33ab11843c13e308cd9d71",
+      "elapsed_s": 3.4170391800580546,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts_v4/cheetah-run_v4_seed13_v1.npz",
+      "seed": 13,
+      "sha256": "7cdb6f697246e57f9882cf3dcad04ca85923375002c84227e2c8262b12128637",
+      "elapsed_s": 3.3871420240029693,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts_v4/cheetah-run_v4_seed14_v1.npz",
+      "seed": 14,
+      "sha256": "0e622a2212bade745a862a55291cd8aac1ca66ccec1a6bde779f279e84594d31",
+      "elapsed_s": 3.39358157501556,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts_v4/cheetah-run_v4_seed15_v1.npz",
+      "seed": 15,
+      "sha256": "2ee3a780973bacf7cb256e23f255d19cacec472f6c6a86bb37e6590874d84690",
+      "elapsed_s": 3.359676653984934,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts_v4/cheetah-run_v4_seed16_v1.npz",
+      "seed": 16,
+      "sha256": "1d8a4e25322cb3e54b89bc42b72559e3fccf1ac10b1cc29801bf368a5396eba8",
+      "elapsed_s": 3.3884749399730936,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts_v4/cheetah-run_v4_seed17_v1.npz",
+      "seed": 17,
+      "sha256": "ca37cf3e69f7b71a417b1964f62a3b72d629d2cbdaaa0ae509bee4a3bb1999ff",
+      "elapsed_s": 3.356117717921734,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts_v4/cheetah-run_v4_seed18_v1.npz",
+      "seed": 18,
+      "sha256": "d8f866760e08206320cd360186886d441da3d84013c4c0b11a492d471ea6635f",
+      "elapsed_s": 3.3546255229739472,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/rollouts_v4/cheetah-run_v4_seed19_v1.npz",
+      "seed": 19,
+      "sha256": "2b37488ebee79e653b42b46f8a39d7b8152e13a4e47b73c19ef7dae66036287a",
+      "elapsed_s": 3.3569325540447608,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    }
+  ],
+  "errors": []
+}
