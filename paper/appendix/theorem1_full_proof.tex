@@ -1,0 +1,184 @@
+% Required preamble commands/packages:
+% \usepackage{amsmath,amssymb,amsthm}
+% \newtheorem{theorem}{Theorem}
+% \newcommand{\E}{\mathbb{E}}
+% \newcommand{\R}{\mathbb{R}}
+% \newcommand{\diag}{\operatorname{diag}}
+% \newcommand{\argmin}{\operatorname*{arg\,min}}
+
+\section{Full Proof of Theorem 1}
+\label{app:theorem1_full_proof}
+
+\begin{theorem}[Slow subspace identifiability]
+Consider the stable linear-Gaussian dynamics
+\begin{equation}
+    x_{t+1}=Ax_t+w_t,
+    \qquad
+    w_t \sim \mathcal{N}(0,Q),
+\end{equation}
+with stationary covariance $\Sigma_x=\E[x_t x_t^\top]\succ 0$. Assume that
+$A$ is diagonalizable and admits a slow-fast spectral gap such that the $r$
+slow modes have strictly smaller derivative variance than the remaining modes.
+Then any population minimizer of
+\begin{equation}
+    \min_{U \in \R^{d \times r}}
+    \E\left[\|U^\top(x_{t+1}-x_t)\|_2^2\right]
+    \quad
+    \text{subject to}
+    \quad
+    U^\top \Sigma_x U = I_r
+\end{equation}
+spans the true slow subspace up to rotation.
+\end{theorem}
+
+\begin{proof}
+Let
+\begin{equation}
+    \dot{x}_t = x_{t+1}-x_t.
+\end{equation}
+In discrete time, this is the finite-difference version of the temporal
+derivative used by the slow-feature objective. Substituting the dynamics gives
+\begin{equation}
+    \dot{x}_t = (A-I)x_t+w_t.
+\end{equation}
+The derivative covariance is therefore
+\begin{align}
+    \Sigma_{\dot{x}}
+    &=
+    \E[\dot{x}_t\dot{x}_t^\top] \\
+    &=
+    (A-I)\Sigma_x(A-I)^\top
+    + Q
+    + \E[(A-I)x_t w_t^\top]
+    + \E[w_t x_t^\top(A-I)^\top].
+\end{align}
+Under the usual state-space assumption that $w_t$ is independent of $x_t$, the
+cross terms vanish, so
+\begin{equation}
+    \Sigma_{\dot{x}} = (A-I)\Sigma_x(A-I)^\top + Q.
+    \label{eq:derivative_covariance}
+\end{equation}
+
+The constrained slow-feature objective can be written as
+\begin{equation}
+    J(U) = \operatorname{tr}(U^\top \Sigma_{\dot{x}} U)
+    \quad
+    \text{subject to}
+    \quad
+    U^\top \Sigma_x U = I_r.
+    \label{eq:sfa_trace_objective}
+\end{equation}
+This is a generalized Rayleigh-Ritz problem. Introduce whitened coordinates
+\begin{equation}
+    z_t = \Sigma_x^{-1/2} x_t,
+    \qquad
+    V = \Sigma_x^{1/2} U.
+\end{equation}
+The constraint becomes
+\begin{equation}
+    V^\top V = I_r,
+\end{equation}
+and the objective becomes
+\begin{equation}
+    J(V)
+    =
+    \operatorname{tr}\left(
+        V^\top
+        \Sigma_x^{-1/2}\Sigma_{\dot{x}}\Sigma_x^{-1/2}
+        V
+    \right).
+\end{equation}
+Define the whitened derivative covariance
+\begin{equation}
+    M = \Sigma_x^{-1/2}\Sigma_{\dot{x}}\Sigma_x^{-1/2}.
+\end{equation}
+By the Rayleigh-Ritz theorem, the global minimizers are the $r$ eigenvectors of
+$M$ with smallest eigenvalues, up to an orthogonal rotation when eigenvalues
+are tied.
+
+We now relate these eigenvectors to the slow eigenspace of $A$. Assume first
+the clean case where $A$ is normal in the $\Sigma_x$-whitened inner product and
+where $Q$ is isotropic after whitening. Then there exists an orthonormal basis
+$Q_A=[q_1,\ldots,q_d]$ such that
+\begin{equation}
+    A q_i = \lambda_i q_i.
+\end{equation}
+Equivalently, after ordering modes from slow to fast,
+\begin{equation}
+    Q_A^{-1} A Q_A
+    =
+    \begin{bmatrix}
+        \Lambda_s & 0 \\
+        0 & \Lambda_f
+    \end{bmatrix},
+    \qquad
+    \tilde{x}_t = Q_A^{-1}x_t
+    =
+    \begin{bmatrix}
+        x_t^{(s)} \\
+        x_t^{(f)}
+    \end{bmatrix},
+\end{equation}
+where $\Lambda_s=\diag(\lambda_1,\ldots,\lambda_r)$ contains the slow modes
+and $\Lambda_f$ contains the remaining fast modes. In these coordinates,
+\begin{equation}
+    \dot{\tilde{x}}_t
+    =
+    \begin{bmatrix}
+        \Lambda_s-I & 0 \\
+        0 & \Lambda_f-I
+    \end{bmatrix}
+    \tilde{x}_t
+    +
+    \tilde{w}_t.
+\end{equation}
+In this basis, the deterministic contribution to derivative variance along
+mode $q_i$ is
+\begin{equation}
+    \|(A-I)q_i\|_2^2
+    =
+    |\lambda_i-1|^2.
+\end{equation}
+With isotropic whitened process noise, the noise contribution adds the same
+constant to every mode. Thus the derivative covariance eigenvalue associated
+with $q_i$ has the form
+\begin{equation}
+    \mu_i = |\lambda_i-1|^2 + \sigma_w^2.
+    \label{eq:mode_derivative_variance}
+\end{equation}
+TODO: Replace this simplified isotropic-noise expression with the exact
+generalized eigenvalue formula for non-isotropic $Q$.
+
+The slow-fast spectral gap assumption states that there is an index set
+$\mathcal{I}_s$ with $|\mathcal{I}_s|=r$ such that
+\begin{equation}
+    |\lambda_i-1|^2 < |\lambda_j-1|^2
+    \qquad
+    \text{for all } i \in \mathcal{I}_s,\; j \notin \mathcal{I}_s.
+\end{equation}
+Equivalently, the $r$ smallest derivative variances $\mu_i$ correspond exactly
+to the slow modes. Hence the $r$-dimensional minimizing eigenspace of $M$ is
+\begin{equation}
+    \operatorname{span}\{q_i : i \in \mathcal{I}_s\}
+    =
+    \mathcal{S}_{\mathrm{true}}.
+\end{equation}
+
+Returning to the original coordinates, $U=\Sigma_x^{-1/2}V$. This change of
+coordinates preserves the identified generalized eigenspace in the
+$\Sigma_x$-inner product. Therefore any population minimizer $U_\star$ spans
+the same slow subspace as the true slow latent component, up to an invertible
+rotation within that subspace.
+
+It remains to connect the population statement to the empirical objective. With
+sufficient data from the stationary process, the empirical covariance
+$\widehat{\Sigma}_x$ and empirical derivative covariance
+$\widehat{\Sigma}_{\dot{x}}$ converge to their population values. Standard
+perturbation results for eigenspaces, such as Davis-Kahan, imply that if the
+spectral gap is nonzero then the empirical minimizing subspace converges to
+the population slow subspace.
+
+TODO: Add the explicit finite-sample perturbation bound and state whether the
+desired result is consistency in probability or an asymptotic almost-sure
+statement.
+\end{proof}

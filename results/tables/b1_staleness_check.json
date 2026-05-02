@@ -1,0 +1,243 @@
+{
+  "analysis": "b1_post_smad_drift",
+  "generated_at": "2026-05-02T16:31:46.604219+00:00",
+  "task": "dmc_cheetah_run",
+  "purpose": "Test whether the Phase 2 post-hoc/training-time effectiveness gap is better explained by U_drift basis staleness or model adaptation.",
+  "checkpoint": {
+    "path": null,
+    "status": "no SMAD Phase 2 checkpoint found under results/smad_phase2/smad_eta020",
+    "instructions_if_missing": "Run on RunPod with the Phase 2 SMAD checkpoint, for example:\n  python scripts/run_b1_post_smad_drift.py --mode collect --checkpoint /path/to/smad_eta020/latest.pt --device cuda\nThe script will collect eta=0 inference rollouts into results/b1_post_smad_rollouts/ and then run the staleness analysis."
+  },
+  "rollouts": {
+    "mode": "auto",
+    "collection_status": "analyzed existing rollout directory because checkpoint was unavailable (no SMAD Phase 2 checkpoint found under results/smad_phase2/smad_eta020)",
+    "rollout_dir": "results/smad_phase2/smad_eta020/rollouts",
+    "rollout_files": [
+      "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed0_v2.npz",
+      "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed10_v2.npz",
+      "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed11_v2.npz",
+      "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed12_v2.npz",
+      "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed13_v2.npz",
+      "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed14_v2.npz",
+      "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed15_v2.npz",
+      "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed16_v2.npz",
+      "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed17_v2.npz",
+      "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed18_v2.npz",
+      "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed19_v2.npz",
+      "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed1_v2.npz",
+      "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed2_v2.npz",
+      "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed3_v2.npz",
+      "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed4_v2.npz",
+      "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed5_v2.npz",
+      "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed6_v2.npz",
+      "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed7_v2.npz",
+      "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed8_v2.npz",
+      "results/smad_phase2/smad_eta020/rollouts/cheetah_v3_seed9_v2.npz"
+    ],
+    "n_rollouts": 20,
+    "horizon": 200,
+    "total_steps": 1000,
+    "imagination_start": 200,
+    "inference_eta": 0.0
+  },
+  "latent": {
+    "latent_dim": 1536,
+    "deter_dim": 512,
+    "deter_slice": [
+      1024,
+      1536
+    ]
+  },
+  "drift_estimation": {
+    "rank": 10,
+    "trim_window_inclusive": [
+      25,
+      175
+    ],
+    "post_smad_drift_pool_shape": [
+      3020,
+      512
+    ],
+    "post_smad_explained_variance_ratio_top10": [
+      0.17450290257134854,
+      0.1429359409829824,
+      0.12304675107116701,
+      0.06130702542181213,
+      0.0440553938672559,
+      0.03769565125357889,
+      0.03196485425858843,
+      0.026870577960691863,
+      0.023439650239331065,
+      0.021749734492713044
+    ],
+    "post_smad_cumulative_explained_variance_top10": 0.6875684821194692,
+    "baseline_u_path": "results/smad/U_drift_cheetah_r10.npy"
+  },
+  "overlaps": {
+    "3": {
+      "baseline_vs_post_smad": 0.00679008699830166
+    },
+    "5": {
+      "baseline_vs_post_smad": 0.01160718763168735
+    },
+    "10": {
+      "baseline_vs_post_smad": 0.024186789754264394
+    }
+  },
+  "posthoc_damping": {
+    "eta": 0.2,
+    "frequency_bands": {
+      "dc_trend": [
+        0.0,
+        0.02
+      ],
+      "very_low": [
+        0.02,
+        0.05
+      ],
+      "low": [
+        0.05,
+        0.1
+      ],
+      "mid": [
+        0.1,
+        0.2
+      ],
+      "high": [
+        0.2,
+        0.5
+      ]
+    },
+    "old_basis": {
+      "frequency_pca": {
+        "retained_components": 37,
+        "retained_variance_explained": 0.9500594598720661,
+        "explained_variance_ratio_top20": [
+          0.31251188579866845,
+          0.24747091674112337,
+          0.07076920886186677,
+          0.06370668440484957,
+          0.03113812432101171,
+          0.02819074729188499,
+          0.022159088488130186,
+          0.01874765031743929,
+          0.015518286738614134,
+          0.013839880851160086,
+          0.012715826054993785,
+          0.011212317320633063,
+          0.010219726851343737,
+          0.00851871316529503,
+          0.008245004957532125,
+          0.007317335082753691,
+          0.006413308137883233,
+          0.005689089880565687,
+          0.0055406791530621035,
+          0.005182736854981778
+        ]
+      },
+      "band_mse_original": {
+        "dc_trend": 0.17478926159428101,
+        "very_low": 0.04536587871810992,
+        "low": 0.0636367837556347,
+        "mid": 0.050766182193410725,
+        "high": 0.021784347579273503
+      },
+      "band_mse_damped": {
+        "dc_trend": 0.17304705856805688,
+        "very_low": 0.04493959332733159,
+        "low": 0.06311205984382197,
+        "mid": 0.05022533308086528,
+        "high": 0.021661538030434916
+      },
+      "dc_trend_mse_original": 0.17478926159428101,
+      "dc_trend_mse_damped": 0.17304705856805688,
+      "dc_trend_reduction_pct": 0.9967448860034176,
+      "total_mse_original": 0.35634245384070984,
+      "total_mse_damped": 0.3529855828505106,
+      "total_reduction_pct": 0.9420350996684165,
+      "raw_deter_mse_original": 0.10289688204361708,
+      "raw_deter_mse_damped": 0.10202831252086114,
+      "raw_deter_reduction_pct": 0.844116464469503
+    },
+    "new_basis": {
+      "frequency_pca": {
+        "retained_components": 37,
+        "retained_variance_explained": 0.9500594598720661,
+        "explained_variance_ratio_top20": [
+          0.31251188579866845,
+          0.24747091674112337,
+          0.07076920886186677,
+          0.06370668440484957,
+          0.03113812432101171,
+          0.02819074729188499,
+          0.022159088488130186,
+          0.01874765031743929,
+          0.015518286738614134,
+          0.013839880851160086,
+          0.012715826054993785,
+          0.011212317320633063,
+          0.010219726851343737,
+          0.00851871316529503,
+          0.008245004957532125,
+          0.007317335082753691,
+          0.006413308137883233,
+          0.005689089880565687,
+          0.0055406791530621035,
+          0.005182736854981778
+        ]
+      },
+      "band_mse_original": {
+        "dc_trend": 0.17478926159428101,
+        "very_low": 0.04536587871810992,
+        "low": 0.0636367837556347,
+        "mid": 0.050766182193410725,
+        "high": 0.021784347579273503
+      },
+      "band_mse_damped": {
+        "dc_trend": 0.14193468132976828,
+        "very_low": 0.03429825186222735,
+        "low": 0.04625325352074837,
+        "mid": 0.038932537918972214,
+        "high": 0.019909786562085755
+      },
+      "dc_trend_mse_original": 0.17478926159428101,
+      "dc_trend_mse_damped": 0.14193468132976828,
+      "dc_trend_reduction_pct": 18.79668119473749,
+      "total_mse_original": 0.35634245384070984,
+      "total_mse_damped": 0.281328511193802,
+      "total_reduction_pct": 21.051082136971576,
+      "raw_deter_mse_original": 0.10289688204361708,
+      "raw_deter_mse_damped": 0.07974260368468358,
+      "raw_deter_reduction_pct": 22.50241008189014
+    }
+  },
+  "diagnostic_table": [
+    {
+      "metric": "baseline/post_smad overlap r=3",
+      "value": 0.00679008699830166
+    },
+    {
+      "metric": "baseline/post_smad overlap r=5",
+      "value": 0.01160718763168735
+    },
+    {
+      "metric": "baseline/post_smad overlap r=10",
+      "value": 0.024186789754264394
+    },
+    {
+      "metric": "Post-hoc damping with NEW basis: dc_trend reduction",
+      "value": 18.79668119473749
+    },
+    {
+      "metric": "Post-hoc damping with OLD basis: dc_trend reduction",
+      "value": 0.9967448860034176
+    }
+  ],
+  "interpretation": {
+    "rank10_overlap": 0.024186789754264394,
+    "new_minus_old_dc_reduction_pct_points": 17.799936308734075,
+    "approx_equal_pct_points": 2.0,
+    "rule": "r10 overlap < 0.5 and new-basis reduction > old-basis reduction by tolerance => staleness; r10 overlap > 0.7 and reductions approximately equal => adaptation; otherwise mixed.",
+    "verdict": "STALENESS is primary cause; Adaptive-SMAD should work."
+  }
+}

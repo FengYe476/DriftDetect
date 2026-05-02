@@ -1,0 +1,209 @@
+{
+  "analysis": "figure5_mismatch_master",
+  "figure_path": "results/figures/figure5_mismatch_master_v1.pdf",
+  "panel_a_order": [
+    "V3 Cartpole",
+    "V3 Cheetah",
+    "Toy hard",
+    "V4 Cheetah",
+    "Toy medium",
+    "Toy simple"
+  ],
+  "ranks": [
+    3,
+    5,
+    10
+  ],
+  "mismatch_threshold": 0.4,
+  "color_groups": {
+    "V3": "#2563eb",
+    "V4": "#f97316",
+    "Toy": "#16a34a"
+  },
+  "settings": [
+    {
+      "setting": "V3 Cartpole",
+      "group": "V3",
+      "color": "#60a5fa",
+      "marker": "o",
+      "line_style": "-",
+      "source_path": "results/tables/cartpole_mismatch_check.json",
+      "source_detail": {
+        "used_fallback": false,
+        "json_key": "overlaps[*].posterior_vs_drift"
+      },
+      "overlap": {
+        "3": 0.061884632111497556,
+        "5": 0.08311614382913586,
+        "10": 0.11821835857814778
+      },
+      "overlap_std": {
+        "3": null,
+        "5": null,
+        "10": null
+      },
+      "r10_overlap": 0.11821835857814778,
+      "r10_overlap_std": null,
+      "dc_trend_pct": 97.0,
+      "dc_trend_source": {
+        "used_fallback": true,
+        "reason": "dc_trend share is documented but not stored in overlap JSON"
+      },
+      "uses_fallback": false
+    },
+    {
+      "setting": "V3 Cheetah",
+      "group": "V3",
+      "color": "#2563eb",
+      "marker": "s",
+      "line_style": "-",
+      "source_path": "results/tables/smad_alignment_check.json",
+      "source_detail": {
+        "used_fallback": false,
+        "json_key": "rank_results[*].overlap"
+      },
+      "overlap": {
+        "3": 0.13226411396636534,
+        "5": 0.1674721367245057,
+        "10": 0.2827199884234227
+      },
+      "overlap_std": {
+        "3": null,
+        "5": null,
+        "10": null
+      },
+      "r10_overlap": 0.2827199884234227,
+      "r10_overlap_std": null,
+      "dc_trend_pct": 46.7,
+      "dc_trend_source": {
+        "used_fallback": true,
+        "reason": "dc_trend share is documented but not stored in overlap JSON"
+      },
+      "uses_fallback": false
+    },
+    {
+      "setting": "Toy hard",
+      "group": "Toy",
+      "color": "#166534",
+      "marker": "^",
+      "line_style": "--",
+      "source_path": "results/tables/toy_mismatch_complexity.json",
+      "source_detail": {
+        "used_fallback": false,
+        "json_key": "summary_by_complexity[hard].overlaps.posterior_drift"
+      },
+      "overlap": {
+        "3": 0.3784109374939722,
+        "5": 0.49584051990624606,
+        "10": 0.7432015525351414
+      },
+      "overlap_std": {
+        "3": 0.04202128195662756,
+        "5": 0.10339276541249373,
+        "10": 0.1832277733224967
+      },
+      "r10_overlap": 0.7432015525351414,
+      "r10_overlap_std": 0.1832277733224967,
+      "dc_trend_pct": 38.34726505256962,
+      "dc_trend_source": {
+        "used_fallback": false,
+        "path": "results/tables/toy_mismatch_complexity.json",
+        "json_key": "summary_by_complexity[hard].metrics.dc_trend_pct.mean"
+      },
+      "uses_fallback": false
+    },
+    {
+      "setting": "V4 Cheetah",
+      "group": "V4",
+      "color": "#f97316",
+      "marker": "D",
+      "line_style": "-",
+      "source_path": "results/tables/v4_mismatch_check.json",
+      "source_detail": {
+        "used_fallback": false,
+        "json_key": "overlaps[*].posterior_vs_drift"
+      },
+      "overlap": {
+        "3": 0.641357483564669,
+        "5": 0.40653711802456166,
+        "10": 0.4284043269477448
+      },
+      "overlap_std": {
+        "3": null,
+        "5": null,
+        "10": null
+      },
+      "r10_overlap": 0.4284043269477448,
+      "r10_overlap_std": null,
+      "dc_trend_pct": 63.857158475091694,
+      "dc_trend_source": {
+        "used_fallback": false,
+        "path": "results/tables/v4_band_errors.json",
+        "json_key": "latent-space.bands.dc_trend.share"
+      },
+      "uses_fallback": false
+    },
+    {
+      "setting": "Toy medium",
+      "group": "Toy",
+      "color": "#22c55e",
+      "marker": "v",
+      "line_style": "--",
+      "source_path": "results/tables/toy_mismatch_complexity.json",
+      "source_detail": {
+        "used_fallback": false,
+        "json_key": "summary_by_complexity[medium].overlaps.posterior_drift"
+      },
+      "overlap": {
+        "3": 0.412373837576048,
+        "5": 0.6719070954018316,
+        "10": 0.8464927067667187
+      },
+      "overlap_std": {
+        "3": 0.14341945483865196,
+        "5": 0.13761497620013255,
+        "10": 0.044924125215769044
+      },
+      "r10_overlap": 0.8464927067667187,
+      "r10_overlap_std": 0.044924125215769044,
+      "dc_trend_pct": 43.127854051772445,
+      "dc_trend_source": {
+        "used_fallback": false,
+        "path": "results/tables/toy_mismatch_complexity.json",
+        "json_key": "summary_by_complexity[medium].metrics.dc_trend_pct.mean"
+      },
+      "uses_fallback": false
+    },
+    {
+      "setting": "Toy simple",
+      "group": "Toy",
+      "color": "#86efac",
+      "marker": "P",
+      "line_style": "--",
+      "source_path": "results/tables/toy_mismatch_complexity.json",
+      "source_detail": {
+        "used_fallback": false,
+        "json_key": "summary_by_complexity[simple].overlaps.posterior_drift"
+      },
+      "overlap": {
+        "3": 0.6134186643562074,
+        "5": 0.6967513591493816,
+        "10": 0.7970472254964631
+      },
+      "overlap_std": {
+        "3": 0.15971993643220686,
+        "5": 0.11283547874212983,
+        "10": 0.011900093017737909
+      },
+      "r10_overlap": 0.7970472254964631,
+      "r10_overlap_std": 0.011900093017737909,
+      "dc_trend_pct": 19.119134458165608,
+      "dc_trend_source": {
+        "used_fallback": false,
+        "path": "results/tables/toy_mismatch_complexity.json",
+        "json_key": "summary_by_complexity[simple].metrics.dc_trend_pct.mean"
+      },
+      "uses_fallback": false
+    }
+  ]
+}

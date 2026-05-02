@@ -1,0 +1,166 @@
+% Required preamble commands/packages:
+% \usepackage{amsmath,amssymb,amsthm}
+% \newtheorem{theorem}{Theorem}
+% \newtheorem{corollary}{Corollary}
+% \newcommand{\E}{\mathbb{E}}
+% \newcommand{\R}{\mathbb{R}}
+% \newcommand{\Tr}{\operatorname{tr}}
+% \newcommand{\diag}{\operatorname{diag}}
+% \newcommand{\argmin}{\operatorname*{arg\,min}}
+
+\section{Theoretical Foundation}
+
+\subsection{Problem Setup}
+
+We consider an idealized linear-Gaussian state-space model
+\begin{align}
+    x_{t+1} &= A x_t + w_t, \qquad w_t \sim \mathcal{N}(0, Q), \\
+    y_t &= C x_t + v_t, \qquad v_t \sim \mathcal{N}(0, R),
+\end{align}
+where $x_t \in \R^d$ is the latent state, $y_t$ is the observation, and $A$
+is a stable transition matrix. The model is meant as a tractable analogue of
+the deterministic component of an RSSM transition, in which the recurrent state
+evolves under a learned dynamics operator with both slowly and quickly varying
+modes.
+
+We assume that the transition has a slow-fast spectral structure. Let
+$\lambda_i(A)$ denote the eigenvalues of $A$. For a threshold
+$\lambda_{\mathrm{gap}}$, define the true slow subspace as
+\begin{equation}
+    \mathcal{S}_{\mathrm{true}}
+    =
+    \operatorname{span}\{q_i : |\lambda_i(A)| > \lambda_{\mathrm{gap}}\},
+\end{equation}
+where $q_i$ is the eigenvector or invariant-subspace direction associated with
+$\lambda_i(A)$. Intuitively, modes with $|\lambda_i(A)|$ close to one persist
+over time and therefore generate low temporal derivative energy.
+
+The corresponding slow-feature objective is
+\begin{equation}
+    \min_{U \in \R^{d \times r}}
+    \E\left[\left\|\frac{d}{dt} U^\top x_t\right\|_2^2\right]
+    \quad
+    \text{subject to}
+    \quad
+    \E\left[U^\top x_t x_t^\top U\right] = I_r.
+    \label{eq:slow_feature_objective}
+\end{equation}
+In discrete time we use $\dot{x}_t \approx x_{t+1} - x_t$, so the objective
+penalizes the derivative variance of the projected latent trajectory while the
+constraint prevents the degenerate zero solution.
+
+\subsection{Theorem 1 --- Slow Subspace Identifiability}
+
+\begin{theorem}[Slow subspace identifiability]
+\label{thm:slow_subspace_identifiability}
+Consider the linear-Gaussian model above. Assume:
+\begin{enumerate}
+    \item The latent dynamics are linear and stable: $x_{t+1}=Ax_t+w_t$ with
+    $\rho(A)<1$.
+    \item The process noise is Gaussian with nonsingular covariance, and the
+    stationary covariance $\Sigma_x=\E[x_t x_t^\top]$ exists and is positive
+    definite.
+    \item The transition admits a slow-fast decomposition with a nonzero
+    spectral gap: for the $r$ slow modes and the remaining fast modes,
+    $|1-\lambda_i|^2 < |1-\lambda_j|^2$ whenever $i$ is slow and $j$ is fast.
+    \item Sufficient data are available so that the empirical covariance and
+    derivative covariance converge to their population values.
+\end{enumerate}
+Then any global minimizer $U_\star$ of the constrained slow-feature objective
+in~\eqref{eq:slow_feature_objective} spans the true slow subspace:
+\begin{equation}
+    \operatorname{span}(U_\star) = \mathcal{S}_{\mathrm{true}},
+\end{equation}
+up to an invertible rotation within the $r$-dimensional slow subspace.
+\end{theorem}
+
+\paragraph{Proof sketch.}
+Write the discrete derivative as $\dot{x}_t=x_{t+1}-x_t=(A-I)x_t+w_t$.
+The slow-feature objective is therefore a Rayleigh quotient involving the
+derivative covariance
+\begin{equation}
+    \Sigma_{\dot{x}} = \E[\dot{x}_t \dot{x}_t^\top],
+\end{equation}
+under the whitening constraint induced by $\Sigma_x$. After whitening the
+stationary covariance, the problem reduces to selecting the eigenvectors of the
+whitened derivative covariance with the smallest eigenvalues.
+
+Under the slow-fast spectral gap assumption, the derivative variance associated
+with a transition eigenmode scales with $|1-\lambda_i|^2$ plus the contribution
+of process noise. Modes whose eigenvalues are closest to one therefore have the
+smallest derivative variance. The gap ensures that the $r$ smallest generalized
+eigenvalues are exactly the slow modes, so the minimizer recovers their span.
+
+Finally, if multiple slow modes have equal derivative variance, the objective
+identifies their shared subspace rather than a unique basis. This is why the
+recovery statement is up to rotation within $\mathcal{S}_{\mathrm{true}}$.
+TODO: In the final proof, state the exact diagonalizability/normality and
+noise-isotropy conditions needed for this eigenmode argument to hold without
+cross-mode terms.
+
+\paragraph{Remark: empirical PCA plus autocorrelation.}
+The empirical procedure used in our diagnostics is a finite-sample proxy for
+the theorem. PCA first restricts attention to high-variance latent directions,
+and lag-1 autocorrelation then ranks temporal projections by persistence. In
+the idealized linear-Gaussian setting, high persistence corresponds to small
+derivative variance. In trained nonlinear RSSMs this equivalence need not hold
+exactly, which motivates the empirical alignment checks in Section~4.
+
+\subsection{Damping Corollary}
+
+\begin{corollary}[Slow-subspace damping]
+\label{cor:damping}
+Assume the conditions of Theorem~\ref{thm:slow_subspace_identifiability}, and
+suppose $U$ is an orthonormal basis aligned with the true slow drift subspace.
+Let $\lambda_s^{\mathrm{true}}$ denote the relevant slow eigenvalue of the true
+latent dynamics and $\lambda_s^{\mathrm{model}}$ the corresponding slow
+eigenvalue of the learned imagination dynamics. Applying damping with rate
+$\eta$ along $U$ reduces slow-subspace imagination MSE if and only if
+\begin{equation}
+    0 < \eta
+    <
+    2\left(1 -
+    \frac{\lambda_s^{\mathrm{true}}}{\lambda_s^{\mathrm{model}}}
+    \right),
+    \label{eq:damping_bound}
+\end{equation}
+assuming $\lambda_s^{\mathrm{model}}>\lambda_s^{\mathrm{true}}$ and both slow
+eigenvalues are real and positive.
+\end{corollary}
+
+\paragraph{Proof sketch.}
+In the aligned slow basis, damping scales the learned slow transition by a
+factor of $(1-\eta)$. The damped model eigenvalue is therefore
+$(1-\eta)\lambda_s^{\mathrm{model}}$. Damping improves the slow-subspace
+prediction error precisely when this damped eigenvalue is closer to the true
+slow eigenvalue than the undamped model eigenvalue:
+\begin{equation}
+    \left|(1-\eta)\lambda_s^{\mathrm{model}}
+    - \lambda_s^{\mathrm{true}}\right|
+    <
+    \left|\lambda_s^{\mathrm{model}}
+    - \lambda_s^{\mathrm{true}}\right|.
+\end{equation}
+Solving this scalar inequality yields the upper bound in
+\eqref{eq:damping_bound}. The upper limit prevents over-correction: too much
+damping flips the slow update past the true transition and increases error.
+
+\paragraph{Remark: alignment caveat.}
+This result assumes $U$ aligns with the true drift subspace. Our empirical
+findings (Section~4) reveal that posterior-estimated bases may not satisfy this
+condition, motivating the use of empirically estimated drift bases.
+
+\subsection{Limitations of the Linear-Gaussian Framework}
+
+The theory does not cover the full complexity of modern RSSMs. It omits
+nonlinear transition functions, tanh saturation, learned stochastic latent
+interactions, action-conditioned dynamics, nonstationary rollout distributions,
+and decoder-induced distortions. It also treats the relevant subspaces as
+linear and time-invariant, whereas trained world models may rotate or reshape
+their drift directions across training.
+
+The purpose of the theory is therefore not to prove that SMAD must work in a
+trained Dreamer model. Instead, it identifies a clean regime in which slow
+features are recoverable and slow-subspace damping is beneficial. The following
+sections test whether the qualitative predictions of this framework hold in
+nonlinear trained models.

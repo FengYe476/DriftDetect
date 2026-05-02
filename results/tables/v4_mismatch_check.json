@@ -1,0 +1,819 @@
+{
+  "analysis": "v4_mismatch_check",
+  "task": "cheetah-run",
+  "rollout_dir": "results/rollouts_v4",
+  "rollout_files": [
+    "results/rollouts_v4/cheetah-run_v4_seed0_v1.npz",
+    "results/rollouts_v4/cheetah-run_v4_seed10_v1.npz",
+    "results/rollouts_v4/cheetah-run_v4_seed11_v1.npz",
+    "results/rollouts_v4/cheetah-run_v4_seed12_v1.npz",
+    "results/rollouts_v4/cheetah-run_v4_seed13_v1.npz",
+    "results/rollouts_v4/cheetah-run_v4_seed14_v1.npz",
+    "results/rollouts_v4/cheetah-run_v4_seed15_v1.npz",
+    "results/rollouts_v4/cheetah-run_v4_seed16_v1.npz",
+    "results/rollouts_v4/cheetah-run_v4_seed17_v1.npz",
+    "results/rollouts_v4/cheetah-run_v4_seed18_v1.npz",
+    "results/rollouts_v4/cheetah-run_v4_seed19_v1.npz",
+    "results/rollouts_v4/cheetah-run_v4_seed1_v1.npz",
+    "results/rollouts_v4/cheetah-run_v4_seed2_v1.npz",
+    "results/rollouts_v4/cheetah-run_v4_seed3_v1.npz",
+    "results/rollouts_v4/cheetah-run_v4_seed4_v1.npz",
+    "results/rollouts_v4/cheetah-run_v4_seed5_v1.npz",
+    "results/rollouts_v4/cheetah-run_v4_seed6_v1.npz",
+    "results/rollouts_v4/cheetah-run_v4_seed7_v1.npz",
+    "results/rollouts_v4/cheetah-run_v4_seed8_v1.npz",
+    "results/rollouts_v4/cheetah-run_v4_seed9_v1.npz"
+  ],
+  "available_keys_by_file": {
+    "results/rollouts_v4/cheetah-run_v4_seed0_v1.npz": {
+      "available_keys": [
+        "true_obs",
+        "imagined_obs",
+        "true_latent",
+        "imagined_latent",
+        "actions",
+        "action_mask",
+        "rewards",
+        "metadata"
+      ],
+      "true_latent_key": "true_latent",
+      "imagined_latent_key": "imagined_latent"
+    },
+    "results/rollouts_v4/cheetah-run_v4_seed10_v1.npz": {
+      "available_keys": [
+        "true_obs",
+        "imagined_obs",
+        "true_latent",
+        "imagined_latent",
+        "actions",
+        "action_mask",
+        "rewards",
+        "metadata"
+      ],
+      "true_latent_key": "true_latent",
+      "imagined_latent_key": "imagined_latent"
+    },
+    "results/rollouts_v4/cheetah-run_v4_seed11_v1.npz": {
+      "available_keys": [
+        "true_obs",
+        "imagined_obs",
+        "true_latent",
+        "imagined_latent",
+        "actions",
+        "action_mask",
+        "rewards",
+        "metadata"
+      ],
+      "true_latent_key": "true_latent",
+      "imagined_latent_key": "imagined_latent"
+    },
+    "results/rollouts_v4/cheetah-run_v4_seed12_v1.npz": {
+      "available_keys": [
+        "true_obs",
+        "imagined_obs",
+        "true_latent",
+        "imagined_latent",
+        "actions",
+        "action_mask",
+        "rewards",
+        "metadata"
+      ],
+      "true_latent_key": "true_latent",
+      "imagined_latent_key": "imagined_latent"
+    },
+    "results/rollouts_v4/cheetah-run_v4_seed13_v1.npz": {
+      "available_keys": [
+        "true_obs",
+        "imagined_obs",
+        "true_latent",
+        "imagined_latent",
+        "actions",
+        "action_mask",
+        "rewards",
+        "metadata"
+      ],
+      "true_latent_key": "true_latent",
+      "imagined_latent_key": "imagined_latent"
+    },
+    "results/rollouts_v4/cheetah-run_v4_seed14_v1.npz": {
+      "available_keys": [
+        "true_obs",
+        "imagined_obs",
+        "true_latent",
+        "imagined_latent",
+        "actions",
+        "action_mask",
+        "rewards",
+        "metadata"
+      ],
+      "true_latent_key": "true_latent",
+      "imagined_latent_key": "imagined_latent"
+    },
+    "results/rollouts_v4/cheetah-run_v4_seed15_v1.npz": {
+      "available_keys": [
+        "true_obs",
+        "imagined_obs",
+        "true_latent",
+        "imagined_latent",
+        "actions",
+        "action_mask",
+        "rewards",
+        "metadata"
+      ],
+      "true_latent_key": "true_latent",
+      "imagined_latent_key": "imagined_latent"
+    },
+    "results/rollouts_v4/cheetah-run_v4_seed16_v1.npz": {
+      "available_keys": [
+        "true_obs",
+        "imagined_obs",
+        "true_latent",
+        "imagined_latent",
+        "actions",
+        "action_mask",
+        "rewards",
+        "metadata"
+      ],
+      "true_latent_key": "true_latent",
+      "imagined_latent_key": "imagined_latent"
+    },
+    "results/rollouts_v4/cheetah-run_v4_seed17_v1.npz": {
+      "available_keys": [
+        "true_obs",
+        "imagined_obs",
+        "true_latent",
+        "imagined_latent",
+        "actions",
+        "action_mask",
+        "rewards",
+        "metadata"
+      ],
+      "true_latent_key": "true_latent",
+      "imagined_latent_key": "imagined_latent"
+    },
+    "results/rollouts_v4/cheetah-run_v4_seed18_v1.npz": {
+      "available_keys": [
+        "true_obs",
+        "imagined_obs",
+        "true_latent",
+        "imagined_latent",
+        "actions",
+        "action_mask",
+        "rewards",
+        "metadata"
+      ],
+      "true_latent_key": "true_latent",
+      "imagined_latent_key": "imagined_latent"
+    },
+    "results/rollouts_v4/cheetah-run_v4_seed19_v1.npz": {
+      "available_keys": [
+        "true_obs",
+        "imagined_obs",
+        "true_latent",
+        "imagined_latent",
+        "actions",
+        "action_mask",
+        "rewards",
+        "metadata"
+      ],
+      "true_latent_key": "true_latent",
+      "imagined_latent_key": "imagined_latent"
+    },
+    "results/rollouts_v4/cheetah-run_v4_seed1_v1.npz": {
+      "available_keys": [
+        "true_obs",
+        "imagined_obs",
+        "true_latent",
+        "imagined_latent",
+        "actions",
+        "action_mask",
+        "rewards",
+        "metadata"
+      ],
+      "true_latent_key": "true_latent",
+      "imagined_latent_key": "imagined_latent"
+    },
+    "results/rollouts_v4/cheetah-run_v4_seed2_v1.npz": {
+      "available_keys": [
+        "true_obs",
+        "imagined_obs",
+        "true_latent",
+        "imagined_latent",
+        "actions",
+        "action_mask",
+        "rewards",
+        "metadata"
+      ],
+      "true_latent_key": "true_latent",
+      "imagined_latent_key": "imagined_latent"
+    },
+    "results/rollouts_v4/cheetah-run_v4_seed3_v1.npz": {
+      "available_keys": [
+        "true_obs",
+        "imagined_obs",
+        "true_latent",
+        "imagined_latent",
+        "actions",
+        "action_mask",
+        "rewards",
+        "metadata"
+      ],
+      "true_latent_key": "true_latent",
+      "imagined_latent_key": "imagined_latent"
+    },
+    "results/rollouts_v4/cheetah-run_v4_seed4_v1.npz": {
+      "available_keys": [
+        "true_obs",
+        "imagined_obs",
+        "true_latent",
+        "imagined_latent",
+        "actions",
+        "action_mask",
+        "rewards",
+        "metadata"
+      ],
+      "true_latent_key": "true_latent",
+      "imagined_latent_key": "imagined_latent"
+    },
+    "results/rollouts_v4/cheetah-run_v4_seed5_v1.npz": {
+      "available_keys": [
+        "true_obs",
+        "imagined_obs",
+        "true_latent",
+        "imagined_latent",
+        "actions",
+        "action_mask",
+        "rewards",
+        "metadata"
+      ],
+      "true_latent_key": "true_latent",
+      "imagined_latent_key": "imagined_latent"
+    },
+    "results/rollouts_v4/cheetah-run_v4_seed6_v1.npz": {
+      "available_keys": [
+        "true_obs",
+        "imagined_obs",
+        "true_latent",
+        "imagined_latent",
+        "actions",
+        "action_mask",
+        "rewards",
+        "metadata"
+      ],
+      "true_latent_key": "true_latent",
+      "imagined_latent_key": "imagined_latent"
+    },
+    "results/rollouts_v4/cheetah-run_v4_seed7_v1.npz": {
+      "available_keys": [
+        "true_obs",
+        "imagined_obs",
+        "true_latent",
+        "imagined_latent",
+        "actions",
+        "action_mask",
+        "rewards",
+        "metadata"
+      ],
+      "true_latent_key": "true_latent",
+      "imagined_latent_key": "imagined_latent"
+    },
+    "results/rollouts_v4/cheetah-run_v4_seed8_v1.npz": {
+      "available_keys": [
+        "true_obs",
+        "imagined_obs",
+        "true_latent",
+        "imagined_latent",
+        "actions",
+        "action_mask",
+        "rewards",
+        "metadata"
+      ],
+      "true_latent_key": "true_latent",
+      "imagined_latent_key": "imagined_latent"
+    },
+    "results/rollouts_v4/cheetah-run_v4_seed9_v1.npz": {
+      "available_keys": [
+        "true_obs",
+        "imagined_obs",
+        "true_latent",
+        "imagined_latent",
+        "actions",
+        "action_mask",
+        "rewards",
+        "metadata"
+      ],
+      "true_latent_key": "true_latent",
+      "imagined_latent_key": "imagined_latent"
+    }
+  },
+  "n_rollouts": 20,
+  "horizon": 200,
+  "latent_dim": 512,
+  "latent_type": "DreamerV4 packed tokenizer latent flattened from (8, 64)",
+  "ranks": [
+    3,
+    5,
+    10
+  ],
+  "var_threshold": 0.95,
+  "drift_trim_window_inclusive": [
+    25,
+    175
+  ],
+  "key_question": {
+    "cross_architecture_threshold": 0.4,
+    "v3_rssm_specific_threshold": 0.6,
+    "conclusion": "mixed/ambiguous: V4 posterior/drift overlaps fall between the decision bands"
+  },
+  "overlaps": {
+    "3": {
+      "posterior_vs_drift": 0.641357483564669,
+      "sfa_vs_posterior": 0.04339005948434038,
+      "sfa_vs_drift": 0.00812723807649772
+    },
+    "5": {
+      "posterior_vs_drift": 0.40653711802456166,
+      "sfa_vs_posterior": 0.0704816463166036,
+      "sfa_vs_drift": 0.007476739439773253
+    },
+    "10": {
+      "posterior_vs_drift": 0.4284043269477448,
+      "sfa_vs_posterior": 0.18951644480284435,
+      "sfa_vs_drift": 0.0665252499955505
+    }
+  },
+  "posterior": {
+    "method": "PCA on pooled true V4 latents, then PCs ranked by mean within-rollout lag-1 autocorrelation.",
+    "pca": {
+      "n_components_total": 512,
+      "components_for_95_variance_raw": 35,
+      "retained_components": 35,
+      "retained_variance_explained": 0.950772844147549,
+      "total_variance": 38.133980206982066,
+      "explained_variance_ratio_top20": [
+        0.37735323807554483,
+        0.17268896393732328,
+        0.13396682920841657,
+        0.07005274526047094,
+        0.024677026244835427,
+        0.020562782692570503,
+        0.018613033813590706,
+        0.016778621529536915,
+        0.013491121013631197,
+        0.011015683023846482,
+        0.00897888807863491,
+        0.007100274659445452,
+        0.006745151552328862,
+        0.006452648297721618,
+        0.006168649741985413,
+        0.005469550384104407,
+        0.004767103349217603,
+        0.004254014833552327,
+        0.00412494164110878,
+        0.0037324043302458558
+      ],
+      "cumulative_variance_ratio_top20": [
+        0.37735323807554483,
+        0.5500422020128681,
+        0.6840090312212848,
+        0.7540617764817557,
+        0.7787388027265911,
+        0.7993015854191616,
+        0.8179146192327523,
+        0.8346932407622892,
+        0.8481843617759204,
+        0.8592000447997669,
+        0.8681789328784018,
+        0.8752792075378472,
+        0.8820243590901761,
+        0.8884770073878977,
+        0.8946456571298831,
+        0.9001152075139875,
+        0.9048823108632051,
+        0.9091363256967575,
+        0.9132612673378663,
+        0.9169936716681122
+      ],
+      "eigenvalues_top20": [
+        14.389980911813417,
+        6.585317532750126,
+        5.108688413425905,
+        2.6713900012075555,
+        0.9410332303877312,
+        0.784140748198957,
+        0.709789063039356,
+        0.6398356213078039,
+        0.5144701417038119,
+        0.4200718383977501,
+        0.3424007402713709,
+        0.2707617333274292,
+        0.2572194757896032,
+        0.24606516246793272,
+        0.23523516716467677,
+        0.20857572608852862,
+        0.18178862476370197,
+        0.16222251746289257,
+        0.15730044289699832,
+        0.14233143285404962
+      ],
+      "warnings": {
+        "near_zero_total_variance": false,
+        "top1_variance_ratio_gt_0_90": false,
+        "raw_k95_lt_3": false
+      }
+    },
+    "lag1_autocorrelation_top20_by_slow_order": [
+      0.8595706033676178,
+      0.8431544657440337,
+      0.7398870670151771,
+      0.7359601736171477,
+      0.7321259503063333,
+      0.7238493489637686,
+      0.7196421600498398,
+      0.7041948089303638,
+      0.6732915394284258,
+      0.6732658917676668,
+      0.6731256724765515,
+      0.6719104411873682,
+      0.6572106237843661,
+      0.6570342139144417,
+      0.654254138249277,
+      0.6512977509169643,
+      0.6509347933150661,
+      0.6352464718597004,
+      0.6342742215666786,
+      0.6154751951458448
+    ],
+    "slow_pc_order_top20": [
+      0,
+      2,
+      9,
+      14,
+      15,
+      6,
+      26,
+      32,
+      22,
+      1,
+      33,
+      7,
+      16,
+      25,
+      29,
+      18,
+      11,
+      20,
+      27,
+      34
+    ],
+    "selected_pc_indices_by_rank": {
+      "3": [
+        0,
+        2,
+        9
+      ],
+      "5": [
+        0,
+        2,
+        9,
+        14,
+        15
+      ],
+      "10": [
+        0,
+        2,
+        9,
+        14,
+        15,
+        6,
+        26,
+        32,
+        22,
+        1
+      ]
+    },
+    "orthonormality_by_rank": {
+      "3": {
+        "max_abs": 1.887379141862766e-15,
+        "frobenius": 2.0959909774060145e-15
+      },
+      "5": {
+        "max_abs": 1.9984014443252818e-15,
+        "frobenius": 2.8522570896010475e-15
+      },
+      "10": {
+        "max_abs": 1.9984014443252818e-15,
+        "frobenius": 3.452527899490725e-15
+      }
+    }
+  },
+  "drift": {
+    "method": "PCA on imagined_latent - true_latent over the trimmed window.",
+    "drift_pool_shape": [
+      3020,
+      512
+    ],
+    "trimmed_steps_per_rollout": 151,
+    "pca": {
+      "n_components_total": 512,
+      "components_for_95_variance_raw": 18,
+      "retained_components": 10,
+      "retained_variance_explained": 0.9161319530169598,
+      "total_variance": 84.06367558083379,
+      "explained_variance_ratio_top20": [
+        0.5182900265253125,
+        0.18440907670293263,
+        0.07360641098843125,
+        0.059199448760331966,
+        0.020181090644619846,
+        0.0174716510410728,
+        0.013382209022182685,
+        0.010943907973005249,
+        0.010037419138434901,
+        0.008610712220635926,
+        0.008141086897252719,
+        0.005212758936528207,
+        0.004632518674030767,
+        0.004194160743307437,
+        0.0038665618045176727,
+        0.003217650627159394,
+        0.0031531423591942822,
+        0.003050358056808432,
+        0.0025261636489864172,
+        0.002288114091891348
+      ],
+      "cumulative_variance_ratio_top20": [
+        0.5182900265253125,
+        0.7026991032282451,
+        0.7763055142166764,
+        0.8355049629770084,
+        0.8556860536216282,
+        0.873157704662701,
+        0.8865399136848837,
+        0.897483821657889,
+        0.9075212407963239,
+        0.9161319530169598,
+        0.9242730399142125,
+        0.9294857988507407,
+        0.9341183175247715,
+        0.938312478268079,
+        0.9421790400725967,
+        0.9453966906997561,
+        0.9485498330589504,
+        0.9516001911157588,
+        0.9541263547647452,
+        0.9564144688566365
+      ],
+      "eigenvalues_top20": [
+        43.569364646605614,
+        15.502104798116422,
+        6.187625454001004,
+        4.976523255152739,
+        1.6964966568167226,
+        1.4687312049782808,
+        1.1249576777956722,
+        0.9199851294292135,
+        0.8437823461222437,
+        0.7238481186354593,
+        0.6843696878060292,
+        0.4382036761213994,
+        0.38942654693587675,
+        0.35257656805926507,
+        0.3250373971482169,
+        0.2704875384539937,
+        0.26506473634349303,
+        0.2564243100929266,
+        0.21235860145248944,
+        0.1923472807126884
+      ],
+      "warnings": {
+        "near_zero_total_variance": false,
+        "top1_variance_ratio_gt_0_90": false,
+        "raw_k95_lt_3": false
+      }
+    },
+    "explained_variance_by_rank": {
+      "3": {
+        "top_r_ratios": [
+          0.5182900265253125,
+          0.18440907670293263,
+          0.07360641098843125
+        ],
+        "cumulative": 0.7763055142166764
+      },
+      "5": {
+        "top_r_ratios": [
+          0.5182900265253125,
+          0.18440907670293263,
+          0.07360641098843125,
+          0.059199448760331966,
+          0.020181090644619846
+        ],
+        "cumulative": 0.8556860536216282
+      },
+      "10": {
+        "top_r_ratios": [
+          0.5182900265253125,
+          0.18440907670293263,
+          0.07360641098843125,
+          0.059199448760331966,
+          0.020181090644619846,
+          0.0174716510410728,
+          0.013382209022182685,
+          0.010943907973005249,
+          0.010037419138434901,
+          0.008610712220635926
+        ],
+        "cumulative": 0.9161319530169598
+      }
+    },
+    "orthonormality_by_rank": {
+      "3": {
+        "max_abs": 2.5652223401007035e-16,
+        "frobenius": 5.915824543620404e-16
+      },
+      "5": {
+        "max_abs": 1.7763568394002505e-15,
+        "frobenius": 2.35326766874636e-15
+      },
+      "10": {
+        "max_abs": 1.9984014443252818e-15,
+        "frobenius": 3.949323138668471e-15
+      }
+    }
+  },
+  "sfa": {
+    "estimated": true,
+    "method_source": "scripts/run_cartpole_mismatch_check.py",
+    "standardization": "Per-dimension z-score over pooled posterior deter samples.",
+    "whitening_pca": {
+      "n_components_total": 512,
+      "components_for_95_variance": 57,
+      "explained_variance_ratio_top20": [
+        0.2588202245337478,
+        0.13629861361176884,
+        0.10384369166301037,
+        0.07428851676501559,
+        0.046445479956350455,
+        0.03468903965246888,
+        0.02864133540296899,
+        0.022796770563802873,
+        0.020757661072148305,
+        0.020444387663543048,
+        0.016845676536471274,
+        0.014655181772555766,
+        0.011785280671061191,
+        0.011248957533243288,
+        0.010140579085732283,
+        0.009622661927403024,
+        0.0088138015492848,
+        0.008698688278018316,
+        0.007460225599978127,
+        0.006772722318376415
+      ],
+      "cumulative_variance_ratio_top20": [
+        0.2588202245337478,
+        0.3951188381455166,
+        0.498962529808527,
+        0.5732510465735426,
+        0.619696526529893,
+        0.6543855661823619,
+        0.6830269015853309,
+        0.7058236721491338,
+        0.726581333221282,
+        0.7470257208848251,
+        0.7638713974212964,
+        0.7785265791938522,
+        0.7903118598649134,
+        0.8015608173981567,
+        0.811701396483889,
+        0.821324058411292,
+        0.8301378599605768,
+        0.8388365482385951,
+        0.8462967738385733,
+        0.8530694961569497
+      ],
+      "eigenvalues_top20": [
+        132.54909223433742,
+        69.80234075441423,
+        53.18126544782324,
+        38.04523189166088,
+        23.786032245712853,
+        17.765229609466427,
+        14.668030734003617,
+        11.674865244978312,
+        10.63058011396842,
+        10.47014401973897,
+        8.627143172466406,
+        7.505329399898524,
+        6.035572596732511,
+        5.760906483641472,
+        5.193274810597576,
+        4.928034915559236,
+        4.513794841944302,
+        4.454842108872595,
+        3.820590654852513,
+        3.4685009522467847
+      ],
+      "retained_components": 57,
+      "retained_variance_explained": 0.9506397917195717,
+      "retained_eigenvalue_min": 0.5564247508918768,
+      "retained_eigenvalue_max": 132.54909223433742
+    },
+    "whitened_dimensions": 57,
+    "retained_at_least_max_rank": true,
+    "derivative_covariance_shape": [
+      57,
+      57
+    ],
+    "slowest_derivative_eigenvalues_top20": [
+      0.023484349744324264,
+      0.03010004121009207,
+      0.057287561144967795,
+      0.06407049425528777,
+      0.09156448789046413,
+      0.11996627627127004,
+      0.12981185098532147,
+      0.13539440944163927,
+      0.15450426171746928,
+      0.17186406482361583,
+      0.1828792585505084,
+      0.1889800388262462,
+      0.20762527890909113,
+      0.24049292066167643,
+      0.2568287785036405,
+      0.27119998870406437,
+      0.2792550415896625,
+      0.2940624516425119,
+      0.3089958817784265,
+      0.32655812891161207
+    ],
+    "fastest_derivative_eigenvalues_top10": [
+      1.2686649543167996,
+      1.3597550557057667,
+      1.4669449814069264,
+      1.5041020804212668,
+      1.7733011762432542,
+      1.9300105392655684,
+      2.3109507380241814,
+      2.4295003337113688,
+      2.970163278056155,
+      3.0765176506824736
+    ],
+    "condition_summary": {
+      "slowest_eigenvalue": 0.023484349744324264,
+      "fastest_eigenvalue": 3.0765176506824736,
+      "fastest_to_slowest_ratio": 131.0028884843197
+    },
+    "basis_mapping": "Raw SFA filters use PCA whitening inverse sqrt eigenvalue scaling; columns are QR-orthonormalized before Euclidean subspace overlap.",
+    "orthonormality_by_rank": {
+      "3": {
+        "raw_filters": {
+          "max_abs": 0.9365224056666805,
+          "frobenius": 1.5305249810633121
+        },
+        "final_basis": {
+          "max_abs": 4.440892098500626e-16,
+          "frobenius": 5.985575309898252e-16
+        }
+      },
+      "5": {
+        "raw_filters": {
+          "max_abs": 0.9365224056666805,
+          "frobenius": 1.8613155943129793
+        },
+        "final_basis": {
+          "max_abs": 6.661338147750939e-16,
+          "frobenius": 9.78539353540988e-16
+        }
+      },
+      "10": {
+        "raw_filters": {
+          "max_abs": 0.9392800569858155,
+          "frobenius": 2.5343158582468193
+        },
+        "final_basis": {
+          "max_abs": 7.771561172376096e-16,
+          "frobenius": 1.7754942684802954e-15
+        }
+      }
+    }
+  },
+  "comparison_table": {
+    "V3 Cheetah": {
+      "3": 0.13226411396636534,
+      "5": 0.1674721367245057,
+      "10": 0.2827199884234227
+    },
+    "V3 Cartpole": {
+      "3": 0.061884632111497556,
+      "5": 0.08311614382913586,
+      "10": 0.11821835857814778
+    },
+    "V4 Cheetah": {
+      "3": 0.641357483564669,
+      "5": 0.40653711802456166,
+      "10": 0.4284043269477448
+    }
+  }
+}

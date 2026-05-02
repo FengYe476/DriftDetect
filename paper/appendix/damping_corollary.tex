@@ -1,0 +1,164 @@
+% Required preamble commands/packages:
+% \usepackage{amsmath,amssymb,amsthm}
+% \newtheorem{corollary}{Corollary}
+% \newcommand{\E}{\mathbb{E}}
+% \newcommand{\R}{\mathbb{R}}
+% \newcommand{\diag}{\operatorname{diag}}
+% \newcommand{\rhoop}{\rho}
+
+\section{Proof of the Damping Corollary}
+\label{app:damping_corollary}
+
+\begin{corollary}[Slow-subspace damping]
+Let the true slow dynamics have eigenvalue $\lambda_s^{\mathrm{true}}$, and
+let the learned model's slow imagination dynamics have eigenvalue
+$\lambda_s^{\mathrm{model}}$ along the same one-dimensional slow direction.
+Assume $\lambda_s^{\mathrm{model}}>\lambda_s^{\mathrm{true}}>0$ and let $U$
+be an orthonormal basis aligned with the true slow drift subspace. Then damping
+the model update along $U$ with rate $\eta$ reduces slow-subspace one-step MSE
+if and only if
+\begin{equation}
+    0 < \eta
+    <
+    2\left(1 -
+    \frac{\lambda_s^{\mathrm{true}}}{\lambda_s^{\mathrm{model}}}
+    \right).
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+Consider first the scalar slow coordinate. Let $s_t$ denote the coordinate of
+the latent state in the true slow direction. The true and model transitions are
+\begin{equation}
+    s_{t+1}^{\mathrm{true}}
+    =
+    \lambda_s^{\mathrm{true}} s_t,
+    \qquad
+    s_{t+1}^{\mathrm{model}}
+    =
+    \lambda_s^{\mathrm{model}} s_t.
+\end{equation}
+The undamped one-step slow-subspace error is
+\begin{equation}
+    e_0
+    =
+    \left(
+        \lambda_s^{\mathrm{model}}
+        -
+        \lambda_s^{\mathrm{true}}
+    \right)s_t.
+\end{equation}
+
+Damping along the aligned slow direction scales the model's slow update by
+$(1-\eta)$, so the damped transition is
+\begin{equation}
+    s_{t+1}^{\eta}
+    =
+    (1-\eta)\lambda_s^{\mathrm{model}}s_t.
+\end{equation}
+Equivalently, in vector form the effective damped transition is
+\begin{equation}
+    A_\eta = A - \eta U U^\top A,
+    \label{eq:damped_transition}
+\end{equation}
+and on the aligned slow subspace its spectral radius is
+\begin{equation}
+    \rhoop(A_\eta|_{\mathcal{S}_{\mathrm{true}}})
+    =
+    |1-\eta|\,|\lambda_s^{\mathrm{model}}|.
+\end{equation}
+For the usual damping range $0 \leq \eta \leq 1$, this is
+$(1-\eta)|\lambda_s^{\mathrm{model}}|$, so any positive damping decreases the
+model's slow spectral radius before over-correction is considered.
+TODO: If the final paper uses damping of the update
+$\Delta x_t=(A-I)x_t$ rather than damping of $A x_t$, replace
+\eqref{eq:damped_transition} with
+$A_\eta=A-\eta U U^\top(A-I)$ and update the scalar bound accordingly.
+
+The damped one-step slow-subspace error is
+\begin{equation}
+    e_\eta
+    =
+    \left(
+        (1-\eta)\lambda_s^{\mathrm{model}}
+        -
+        \lambda_s^{\mathrm{true}}
+    \right)s_t.
+\end{equation}
+Since $s_t^2 \geq 0$, damped MSE is lower than undamped MSE if and only if
+\begin{equation}
+    \left|
+        (1-\eta)\lambda_s^{\mathrm{model}}
+        -
+        \lambda_s^{\mathrm{true}}
+    \right|
+    <
+    \left|
+        \lambda_s^{\mathrm{model}}
+        -
+        \lambda_s^{\mathrm{true}}
+    \right|.
+    \label{eq:damping_error_inequality}
+\end{equation}
+Let
+\begin{equation}
+    a=\lambda_s^{\mathrm{model}},
+    \qquad
+    b=\lambda_s^{\mathrm{true}},
+\end{equation}
+with $a>b>0$. Then \eqref{eq:damping_error_inequality} becomes
+\begin{equation}
+    |(1-\eta)a-b| < |a-b|.
+\end{equation}
+Because $a-b>0$, this is equivalent to
+\begin{equation}
+    -(a-b) < (1-\eta)a-b < a-b.
+\end{equation}
+The right inequality gives
+\begin{equation}
+    (1-\eta)a-b < a-b
+    \quad
+    \Longleftrightarrow
+    -\eta a < 0
+    \quad
+    \Longleftrightarrow
+    \eta > 0.
+\end{equation}
+The left inequality gives
+\begin{align}
+    -(a-b) &< (1-\eta)a-b \\
+    -a+b &< a-\eta a-b \\
+    0 &< 2a - \eta a - 2b \\
+    \eta &< 2\left(1-\frac{b}{a}\right).
+\end{align}
+Substituting back $a=\lambda_s^{\mathrm{model}}$ and
+$b=\lambda_s^{\mathrm{true}}$ yields
+\begin{equation}
+    0 < \eta
+    <
+    2\left(1 -
+    \frac{\lambda_s^{\mathrm{true}}}{\lambda_s^{\mathrm{model}}}
+    \right).
+\end{equation}
+
+The upper bound is the over-correction threshold. For small positive $\eta$,
+the damped model eigenvalue moves toward the true slow eigenvalue. If $\eta$ is
+too large, the damped transition crosses past the true transition and the
+slow-subspace error grows again, potentially with a sign flip in the slow
+coordinate.
+
+For an $r$-dimensional aligned slow subspace, the same argument applies
+component-wise after diagonalizing the slow block. If the slow block is
+$\Lambda_s^{\mathrm{model}}=\diag(\lambda_1^{\mathrm{model}},\ldots,\lambda_r^{\mathrm{model}})$
+and the true block is
+$\Lambda_s^{\mathrm{true}}=\diag(\lambda_1^{\mathrm{true}},\ldots,\lambda_r^{\mathrm{true}})$,
+then a shared scalar damping rate must satisfy the bound for every slow mode:
+\begin{equation}
+    0 < \eta <
+    \min_i 2\left(
+        1-\frac{\lambda_i^{\mathrm{true}}}{\lambda_i^{\mathrm{model}}}
+    \right).
+\end{equation}
+TODO: Add the non-diagonal slow-block version using operator norms or a
+Lyapunov/MSE comparison in the slow coordinates.
+\end{proof}
