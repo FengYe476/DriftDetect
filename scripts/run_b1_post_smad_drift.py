@@ -76,6 +76,7 @@ def main() -> None:
             horizon=args.horizon,
             inference_eta=args.eta_inference,
             baseline_u_path=args.baseline_u_path,
+            adaptive_u_from_checkpoint=args.adaptive_u_from_checkpoint,
             rank=args.rank,
             force=args.force_recollect,
         )
@@ -287,6 +288,16 @@ def parse_args() -> argparse.Namespace:
             "load SMAD-trained weights but run vanilla img_step at inference."
         ),
     )
+    parser.add_argument(
+        "--adaptive-u-from-checkpoint",
+        "--adaptive_U_from_checkpoint",
+        dest="adaptive_u_from_checkpoint",
+        action="store_true",
+        help=(
+            "When eta_inference > 0, load adaptive_smad_scheduler_state.current_U "
+            "from --checkpoint instead of --baseline_U."
+        ),
+    )
     parser.add_argument("--trim-start", type=int, default=TRIM_START)
     parser.add_argument(
         "--trim-end-inclusive",
@@ -406,6 +417,7 @@ def prepare_rollouts(
             horizon=args.horizon,
             inference_eta=args.eta_inference,
             baseline_u_path=args.baseline_u_path,
+            adaptive_u_from_checkpoint=args.adaptive_u_from_checkpoint,
             rank=args.rank,
             force=args.force_recollect,
         )
@@ -465,6 +477,7 @@ def collect_post_smad_rollouts(
     horizon: int,
     inference_eta: float,
     baseline_u_path: Path,
+    adaptive_u_from_checkpoint: bool,
     rank: int,
     force: bool,
 ) -> None:
@@ -482,13 +495,22 @@ def collect_post_smad_rollouts(
     projector = None
     patch_description = "not applied; vanilla img_step"
     if inference_eta > 0.0:
-        from src.smad.img_step_patch import patch_img_step
+        from src.smad.img_step_patch import MutableImgStepPatch
 
-        basis = load_basis(baseline_u_path, rank=rank)
+        if adaptive_u_from_checkpoint:
+            basis = load_adaptive_basis_from_checkpoint(
+                checkpoint_path,
+                rank=rank,
+                torch_module=torch,
+            )
+            basis_source = "adaptive checkpoint current_U"
+        else:
+            basis = load_basis(baseline_u_path, rank=rank)
+            basis_source = f"basis file {relative_path(baseline_u_path)}"
         projector = torch.as_tensor(basis @ basis.T, dtype=torch.float32)
         patch_description = (
-            "src.smad.img_step_patch.patch_img_step with eta="
-            f"{inference_eta}"
+            "src.smad.img_step_patch.MutableImgStepPatch with eta="
+            f"{inference_eta} using {basis_source}"
         )
 
     def build_with_inference_eta(seed: int) -> None:
@@ -497,7 +519,7 @@ def collect_post_smad_rollouts(
             return
         assert adapter.agent is not None
         assert projector is not None
-        patch_img_step(adapter.agent._wm.dynamics, projector, eta=inference_eta)
+        MutableImgStepPatch(adapter.agent._wm.dynamics, projector, eta=inference_eta)
 
     adapter._build = build_with_inference_eta  # type: ignore[method-assign]
     adapter.load_checkpoint(str(checkpoint_path))
@@ -539,6 +561,50 @@ def collect_post_smad_rollouts(
             ),
         )
         print(f"Saved {relative_path(output_path)}.")
+
+
+def load_adaptive_basis_from_checkpoint(
+    checkpoint_path: Path,
+    *,
+    rank: int,
+    torch_module,
+) -> np.ndarray:
+    """Load the final Adaptive-SMAD basis from a training checkpoint."""
+
+    try:
+        checkpoint = torch_module.load(
+            checkpoint_path,
+            map_location="cpu",
+            weights_only=False,
+        )
+    except TypeError:
+        checkpoint = torch_module.load(checkpoint_path, map_location="cpu")
+
+    scheduler_state = checkpoint.get("adaptive_smad_scheduler_state")
+    if not isinstance(scheduler_state, dict):
+        raise KeyError(
+            f"{relative_path(checkpoint_path)} does not contain "
+            "adaptive_smad_scheduler_state."
+        )
+    if "current_U" not in scheduler_state:
+        raise KeyError(
+            f"{relative_path(checkpoint_path)} adaptive_smad_scheduler_state "
+            "does not contain current_U."
+        )
+
+    basis = np.asarray(scheduler_state["current_U"], dtype=np.float64)
+    if basis.ndim != 2:
+        raise ValueError(f"current_U must be 2D, got shape {basis.shape}.")
+    if basis.shape[0] != DETER_DIM:
+        raise ValueError(
+            f"current_U leading dimension must be {DETER_DIM}, got {basis.shape[0]}."
+        )
+    if rank > basis.shape[1]:
+        raise ValueError(
+            f"Requested rank={rank}, but checkpoint current_U only has "
+            f"{basis.shape[1]} columns."
+        )
+    return basis[:, :rank].copy()
 
 
 def discover_rollouts(rollout_dir: Path, *, min_count: int) -> list[Path]:

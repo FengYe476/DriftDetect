@@ -69,6 +69,13 @@ def normalize_checkpoint_state_dict(
     return {key.replace("._orig_mod.", "."): value for key, value in state_dict.items()}
 
 
+def load_checkpoint_file(path: Path, map_location: str) -> Mapping[str, Any]:
+    try:
+        return torch.load(path, map_location=map_location, weights_only=False)
+    except TypeError:
+        return torch.load(path, map_location=map_location)
+
+
 def clone_latent(latent: Mapping[str, torch.Tensor]) -> dict[str, torch.Tensor]:
     return {key: value.detach().clone() for key, value in latent.items()}
 
@@ -474,7 +481,10 @@ class DreamerV3Adapter(WorldModelAdapter):
             dataset=None,
         ).to(self.config.device)
         if self.checkpoint_path is not None:
-            checkpoint = torch.load(self.checkpoint_path, map_location=self.config.device)
+            checkpoint = load_checkpoint_file(
+                self.checkpoint_path,
+                map_location=self.config.device,
+            )
             self.agent.load_state_dict(
                 normalize_checkpoint_state_dict(checkpoint["agent_state_dict"])
             )
