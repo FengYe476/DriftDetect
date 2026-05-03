@@ -1,0 +1,37 @@
+# Adaptive-SMAD v1 configuration
+# Cheetah Run, 500k steps, single seed
+
+task: cheetah_run
+total_steps: 500000
+seed: 42
+
+# SMAD damping parameters
+smad:
+  eta: 0.20
+  rank: 10
+  basis_type: U_drift
+  initial_basis_path: results/smad/U_drift_cheetah_r10.npy
+
+# Adaptive re-estimation
+adaptive:
+  re_est_freq: 50000
+  n_rollouts: 10
+  imagination_start: 50
+  horizon: 200
+
+# Activation schedule
+schedule:
+  s0: 50000
+  s1: 100000
+
+# Checkpointing
+checkpoint:
+  save_freq: 5000
+  save_U_history: true
+
+# Monitoring
+monitor:
+  log_overlap_prev: true
+  log_overlap_baseline: true
+  log_j_slow: true
+  log_reest_time: true

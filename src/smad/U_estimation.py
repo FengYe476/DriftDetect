@@ -67,6 +67,32 @@ def estimate_U_drift(
         drift_chunks.append(drift[trim_start : trim_end + 1])
 
     drift_pool = np.concatenate(drift_chunks, axis=0)
+    return estimate_U_from_drift(drift_pool, r=r)
+
+
+def estimate_U_from_drift(drift_pool: np.ndarray, r: int = 10) -> np.ndarray:
+    """Estimate a rank-r drift basis from pooled deterministic drift vectors.
+
+    Args:
+        drift_pool: Array with shape ``(N, 512)`` containing deterministic
+            drift vectors.
+        r: Number of drift PCA directions to keep.
+
+    Returns:
+        ``U_drift`` with shape ``(512, r)`` and orthonormal columns.
+    """
+
+    if not 1 <= int(r) <= DETER_DIM:
+        raise ValueError(f"r must be in [1, {DETER_DIM}], got {r}.")
+    drift_pool = np.asarray(drift_pool, dtype=np.float64)
+    if drift_pool.ndim != 2 or drift_pool.shape[1] != DETER_DIM:
+        raise ValueError(
+            f"drift_pool must have shape (N, {DETER_DIM}), got {drift_pool.shape}."
+        )
+    if drift_pool.shape[0] < int(r):
+        raise ValueError(
+            f"drift_pool must contain at least r={r} vectors, got {drift_pool.shape[0]}."
+        )
     drift_pool = drift_pool - drift_pool.mean(axis=0, keepdims=True)
     _, _, vt = np.linalg.svd(drift_pool, full_matrices=False)
     U = vt[:r].T
