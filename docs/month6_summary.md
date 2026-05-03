@@ -9,7 +9,8 @@ tested the Phase 2 redistribution hypothesis on toy models.
 
 The Mismatch Finding is supported across all real-model settings. The
 redistribution hypothesis is NOT supported as a general phenomenon. B1
-correction results are pending.
+correction is complete and confirms that basis staleness is the primary cause
+of the SMAD training-time effectiveness gap.
 
 ## Deliverables Status
 
@@ -17,7 +18,7 @@ correction results are pending.
 |---|---|---|
 | scripts/run_cartpole_mismatch_check.py | Complete | Cartpole posterior/drift mismatch check |
 | scripts/run_v4_mismatch_check.py | Complete | V4 Cheetah tokenizer-latent mismatch check |
-| scripts/run_b1_post_smad_drift.py | Complete | Correction pending |
+| scripts/run_b1_post_smad_drift.py | Complete | Corrected eta=0 analysis complete |
 | scripts/run_toy_mismatch_sweep.py | Complete | Toy complexity mismatch sweep |
 | scripts/run_toy_redistribution_sweep.py | Complete | 180-condition redistribution sweep |
 | scripts/runpod_smad_retrain_and_b1.sh | Complete | RunPod retrain plus B1 correction workflow |
@@ -28,14 +29,15 @@ correction results are pending.
 | paper/appendix/damping_corollary.tex | Complete | Skeleton |
 | docs/cartpole_mismatch_check.md | Complete | Cartpole mismatch documentation |
 | docs/v4_mismatch_check.md | Complete | V4 mismatch documentation |
-| docs/b1_smad_staleness_check.md | Complete | Preliminary, correction pending |
+| docs/b1_smad_staleness_check.md | Complete | Corrected staleness verdict |
 | docs/toy_mismatch_complexity_curve.md | Complete | Toy mismatch documentation |
 | docs/redistribution_hypothesis_v1.md | Complete | Redistribution verdict |
 | docs/finding_mismatch_evidence.md | Complete | Mismatch evidence document |
 | docs/month6_summary.md | This file | Month 6 summary |
 | results/tables/cartpole_mismatch_check.json | Complete | Cartpole mismatch results |
 | results/tables/v4_mismatch_check.json | Complete | V4 mismatch results |
-| results/tables/b1_staleness_check.json | Complete | Preliminary |
+| results/tables/b1_staleness_check.json | Complete | Original contaminated preliminary |
+| results/tables/b1_staleness_check_corrected.json | Complete | Corrected eta=0 B1 result |
 | results/tables/toy_mismatch_complexity.json | Complete | Toy mismatch results |
 | results/tables/toy_redistribution_sweep.json | Complete | Toy redistribution sweep results |
 | results/tables/figure5_mismatch_summary.json | Complete | Figure 5 source table |
@@ -56,12 +58,21 @@ correction results are pending.
 
 ### B1 Staleness Check
 
-PLACEHOLDER - corrected results pending.
+Status: **COMPLETE - STALENESS CONFIRMED**.
 
-Preliminary contaminated results showed overlap `0.007-0.024` between baseline
-and post-SMAD drift directions, but these used eta=0.20 rollouts with damping
-active during collection. Correction with eta=0 rollouts is in progress on
-RunPod.
+Corrected eta=0 results confirm staleness.
+
+| Metric | Original eta=0.20 rollouts | Corrected eta=0 rollouts |
+|---|---:|---:|
+| baseline/post-SMAD overlap r=3 | 0.0068 | 0.0053 |
+| baseline/post-SMAD overlap r=5 | 0.0116 | 0.0130 |
+| baseline/post-SMAD overlap r=10 | 0.0242 | 0.0224 |
+| New basis post-hoc dc_trend reduction | 18.8% | 22.6% |
+| Old basis post-hoc dc_trend reduction | 1.0% | 0.9% |
+
+Verdict: STALENESS confirmed. Adaptive-SMAD should work. The corrected results
+are nearly identical to the original contaminated results, confirming that
+damping contamination was not a significant factor.
 
 ### Toy Redistribution Sweep: 180 Conditions
 
@@ -92,7 +103,7 @@ damping formulation.
 | A: Frequency-asymmetric drift | SUPPORTED | Unchanged |
 | B: Cross-architecture trend dominance | SUPPORTED | Unchanged |
 | C: Training dynamics | SUPPORTED | Unchanged |
-| D: SMAD intervention | MIXED | B1 correction pending; redistribution NOT general |
+| D: SMAD intervention | MIXED | B1 staleness confirmed; redistribution NOT general |
 | E: Decoder amplification | CROSS-ARCH CONFIRMED | Unchanged |
 | Mismatch (new) | SUPPORTED in real models | V3 strong, V4 partial, toy complexity-dependent |
 | Redistribution | NOT SUPPORTED as general | 0/180 toy conditions match Phase 2 pattern |
@@ -111,6 +122,10 @@ damping formulation.
 5. SMAD is harmful on simple toy tasks but beneficial on medium and hard tasks.
 6. SFA slow features are also misaligned with drift directions, confirming the
    mismatch is not a PCA artifact.
+7. B1 correction confirmed staleness is the primary cause of SMAD's
+   training-time effectiveness gap. Corrected overlap values `0.005-0.022` are
+   nearly identical to preliminary contaminated values, validating the original
+   directional conclusion.
 
 ## Compute Budget
 
@@ -128,7 +143,7 @@ damping formulation.
 |---|---|
 | Cartpole mismatch check | Complete - overlap 0.06-0.12, cross-task mismatch confirmed |
 | V4 mismatch check | Complete - overlap 0.41-0.64, mixed/partial |
-| B1 staleness check | Preliminary complete, correction in progress |
+| B1 staleness check | Complete - corrected eta=0 overlap 0.005-0.022, staleness confirmed |
 | Theorem 1 LaTeX | Skeleton complete with TODOs |
 | Toy mismatch sweep | Complete - complexity-dependent pattern |
 | Figure 5 mismatch master | Complete v1 |
@@ -138,8 +153,8 @@ damping formulation.
 
 ## Risk Assessment for Month 7
 
-1. B1 correction may show adaptation rather than staleness; this would change
-   the Adaptive-SMAD decision.
+1. Adaptive-SMAD may still underperform if the model adapts faster than the
+   basis re-estimation frequency.
 2. Mismatch Finding is strong for V3 but mixed for V4, so paper framing needs
    nuance.
 3. Theorem 1 TODOs need completion for paper submission.
@@ -151,7 +166,7 @@ damping formulation.
 - [x] Redistribution hypothesis resolved: not general
 - [x] Theory skeleton complete
 - [x] Figure 5 v1 ready
-- [ ] B1 corrected verdict - PENDING
+- [x] B1 corrected verdict complete: staleness confirmed
 - [ ] Adaptive-SMAD design - Month 7 W1
 - [ ] Mismatch theorem exploration - Month 7 W2
 - [ ] Paper Section 1 + 4 drafts - Month 7 W3
@@ -159,7 +174,3 @@ damping formulation.
 ## Git Tag
 
 Month 6 release tag: `v0.6-month6-mechanism-mismatch`
-
-Note: This summary will be updated once B1 corrected results are available. The
-B1 verdict and Month 7 plan document, `docs/b1_verdict_and_month7_plan.md`,
-will be written after the correction.

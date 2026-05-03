@@ -81,12 +81,13 @@ the empirical drift directions. This is the clearest operational consequence of
 the mismatch: the basis that looks theoretically natural from posterior slow
 features is not the basis that best controls imagination drift.
 
-Preliminary B1 analysis suggests that drift directions shift substantially
-during SMAD training, but these results used eta=0.20 rollouts, meaning damping
-was active during collection and the drift direction estimate is contaminated.
-Corrected B1 results with eta=0 rollouts are pending. The qualitative direction,
-that drift subspaces change during training, is expected to hold, but exact
-overlap values should not be cited until the correction is complete.
+B1 correction with eta=0 rollouts confirmed that drift directions shift
+substantially during SMAD training. The overlap between baseline and post-SMAD
+drift subspaces is `0.005` to `0.022` across ranks `3`, `5`, and `10`, which is
+near-orthogonal. Post-hoc damping with the re-estimated basis reduces dc_trend
+by `22.6%`, exceeding the `20%` threshold that fixed-basis SMAD failed to meet
+during training (`4.8%`). This confirms that basis staleness, not model
+adaptation, is the primary cause of the training-time effectiveness gap.
 
 ## 5. Paper Narrative
 
@@ -112,9 +113,8 @@ the slow-subspace theory and intervention in nonlinear trained world models.
 
 ## 6. Limitations
 
-B1 evidence is preliminary. The existing B1 run used eta=0.20 rollouts instead
-of eta=0 rollouts from the SMAD-trained checkpoint, so it should not be cited
-quantitatively until the corrected collection is complete.
+B1 correction with eta=0 rollouts has been completed and confirms the
+staleness interpretation.
 
 The V4 result is mixed. Rank-3 overlap is relatively high, while rank-5 and
 rank-10 overlaps are moderate. This supports partial mismatch, not a clean
