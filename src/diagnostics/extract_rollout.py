@@ -23,6 +23,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 DREAMER_ROOT = REPO_ROOT / "external" / "dreamerv3-torch"
 DEFAULT_OUTPUT = REPO_ROOT / "results" / "rollouts" / "cheetah_random_seed0.npz"
 
+sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(DREAMER_ROOT))
 
 # Proprio extraction does not need rendered frames. Avoid GLFW initialization in
@@ -169,6 +170,49 @@ def display_path(path: Path) -> str:
         return str(path)
 
 
+def deter_to_numpy_vector(tensor: torch.Tensor, name: str) -> np.ndarray:
+    array = tensor.detach().cpu().numpy()
+    vector = np.squeeze(array)
+    if vector.ndim != 1:
+        raise ValueError(
+            f"{name} must be a 1D deter vector or scalar-batch tensor, got "
+            f"{array.shape}."
+        )
+    return vector.astype(np.float64, copy=False)
+
+
+def numpy_vector_to_deter(vector: np.ndarray, template: torch.Tensor) -> torch.Tensor:
+    array = np.asarray(vector, dtype=np.float64).reshape(template.shape)
+    return torch.from_numpy(array).to(device=template.device, dtype=template.dtype)
+
+
+def hiad_history_arrays(hiad_damper: Any) -> dict[str, np.ndarray]:
+    history = hiad_damper.get_basis_history()
+    steps = np.asarray([entry["step"] for entry in history], dtype=np.int64)
+    overlaps = np.asarray(
+        [
+            np.nan
+            if entry["overlap_with_prev"] is None
+            else float(entry["overlap_with_prev"])
+            for entry in history
+        ],
+        dtype=np.float32,
+    )
+    return {
+        "hiad_basis_steps": steps,
+        "hiad_basis_overlap_with_prev": overlaps,
+    }
+
+
+def resolve_hiad_initial_basis(path: str | Path | None) -> str | None:
+    if path is None:
+        return None
+    resolved = Path(path)
+    if not resolved.is_absolute():
+        resolved = REPO_ROOT / resolved
+    return str(resolved)
+
+
 def extract_rollout(
     task: str = "dmc_cheetah_run",
     seed: int = 0,
@@ -179,6 +223,13 @@ def extract_rollout(
     checkpoint_path: str | Path | None = None,
     device: str | None = None,
     verbose: bool = False,
+    use_hiad: bool = False,
+    hiad_eta: float = 0.20,
+    hiad_r: int = 10,
+    hiad_re_est_freq: int = 25,
+    hiad_window_size: int = 25,
+    hiad_initial_basis: str | Path | None = None,
+    hiad_basis_mode: str = "initial_basis",
 ) -> Path:
     if imagination_start < 0:
         raise ValueError("imagination_start must be non-negative.")
@@ -231,6 +282,19 @@ def extract_rollout(
             "the dmc_proprio config so true_obs and imagined_obs are flat arrays."
         )
 
+    hiad_damper = None
+    if use_hiad:
+        from src.smad.hiad import HIADRolloutDamper
+
+        hiad_damper = HIADRolloutDamper(
+            rank=hiad_r,
+            eta=hiad_eta,
+            re_est_freq=hiad_re_est_freq,
+            window_size=hiad_window_size,
+            initial_basis=resolve_hiad_initial_basis(hiad_initial_basis),
+            basis_mode=hiad_basis_mode,
+        )
+
     true_obs_list: list[np.ndarray] = []
     imagined_obs_list: list[np.ndarray] = []
     actions_list: list[np.ndarray] = []
@@ -266,9 +330,30 @@ def extract_rollout(
                 # Open-loop branch: advance the RSSM with the real action, but
                 # do not feed future environment observations back into it.
                 with torch.no_grad():
-                    imag_latent = agent._wm.dynamics.img_step(
-                        imag_latent, action_tensor, sample=False
-                    )
+                    if hiad_damper is None:
+                        imag_latent = agent._wm.dynamics.img_step(
+                            imag_latent, action_tensor, sample=False
+                        )
+                    else:
+                        raw_next = agent._wm.dynamics.img_step(
+                            imag_latent, action_tensor, sample=False
+                        )
+                        z_current = deter_to_numpy_vector(
+                            imag_latent["deter"],
+                            "imag_latent['deter']",
+                        )
+                        z_raw_next = deter_to_numpy_vector(
+                            raw_next["deter"],
+                            "raw_next['deter']",
+                        )
+                        z_damped = hiad_damper.step(z_current, z_raw_next)
+                        damped_next = dict(raw_next)
+                        damped_next["deter"] = numpy_vector_to_deter(
+                            z_damped,
+                            raw_next["deter"],
+                        )
+                        # v1: keep raw stoch; v2 could recompute from damped deter.
+                        imag_latent = damped_next
                     feat = agent._wm.dynamics.get_feat(imag_latent)
                     imagined_obs = flatten_decoded_obs(decoder(feat), obs_keys)
 
@@ -316,13 +401,27 @@ def extract_rollout(
 
     output = resolve_output_path(output_path)
     output.parent.mkdir(parents=True, exist_ok=True)
+    output_arrays: dict[str, Any] = {
+        "true_obs": np.asarray(true_obs_list, dtype=np.float32),
+        "imagined_obs": np.asarray(imagined_obs_list, dtype=np.float32),
+        "actions": np.asarray(actions_list, dtype=np.float32),
+        "rewards": np.asarray(rewards_list, dtype=np.float32),
+        "metadata": np.array(metadata, dtype=object),
+    }
+    if hiad_damper is not None:
+        output_arrays.update(
+            {
+                "hiad_enabled": np.array(True),
+                "hiad_eta": np.array(hiad_eta, dtype=np.float32),
+                "hiad_r": np.array(hiad_r, dtype=np.int64),
+                "hiad_re_est_freq": np.array(hiad_re_est_freq, dtype=np.int64),
+                "hiad_basis_mode": np.array(hiad_basis_mode),
+            }
+        )
+        output_arrays.update(hiad_history_arrays(hiad_damper))
     np.savez(
         output,
-        true_obs=np.asarray(true_obs_list, dtype=np.float32),
-        imagined_obs=np.asarray(imagined_obs_list, dtype=np.float32),
-        actions=np.asarray(actions_list, dtype=np.float32),
-        rewards=np.asarray(rewards_list, dtype=np.float32),
-        metadata=np.array(metadata, dtype=object),
+        **output_arrays,
     )
 
     size_mb = output.stat().st_size / (1024 * 1024)
@@ -350,11 +449,60 @@ if __name__ == "__main__":
     parser.add_argument("--checkpoint", default=None)
     parser.add_argument("--device", default=None)
     parser.add_argument("--verbose", action="store_true")
+    parser.add_argument(
+        "--use_hiad",
+        action="store_true",
+        default=False,
+        help="Enable HIAD inference-time damping",
+    )
+    parser.add_argument(
+        "--hiad_eta",
+        type=float,
+        default=0.20,
+        help="HIAD damping strength",
+    )
+    parser.add_argument(
+        "--hiad_r",
+        type=int,
+        default=10,
+        help="HIAD basis rank",
+    )
+    parser.add_argument(
+        "--hiad_re_est_freq",
+        type=int,
+        default=25,
+        help="Steps between HIAD basis re-estimation",
+    )
+    parser.add_argument(
+        "--hiad_window_size",
+        type=int,
+        default=25,
+        help="HIAD sliding window size",
+    )
+    parser.add_argument(
+        "--hiad_initial_basis",
+        type=str,
+        default=None,
+        help="Path to initial U basis .npy file",
+    )
+    parser.add_argument(
+        "--hiad_basis_mode",
+        type=str,
+        default="initial_basis",
+        choices=["initial_basis", "self_bootstrap"],
+        help="HIAD basis initialization mode",
+    )
     args = parser.parse_args()
 
     if args.verbose:
         print(f"Using checkpoint: {args.checkpoint or 'random initialization'}", flush=True)
         print(f"Device override: {args.device or 'auto'}", flush=True)
+    if args.use_hiad:
+        print(
+            f"HIAD enabled: eta={args.hiad_eta}, r={args.hiad_r}, "
+            f"re_est_freq={args.hiad_re_est_freq}, mode={args.hiad_basis_mode}",
+            flush=True,
+        )
 
     extract_rollout(
         task=args.task,
@@ -366,4 +514,11 @@ if __name__ == "__main__":
         checkpoint_path=args.checkpoint,
         device=args.device,
         verbose=args.verbose,
+        use_hiad=args.use_hiad,
+        hiad_eta=args.hiad_eta,
+        hiad_r=args.hiad_r,
+        hiad_re_est_freq=args.hiad_re_est_freq,
+        hiad_window_size=args.hiad_window_size,
+        hiad_initial_basis=args.hiad_initial_basis,
+        hiad_basis_mode=args.hiad_basis_mode,
     )
