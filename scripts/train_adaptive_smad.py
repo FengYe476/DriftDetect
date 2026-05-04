@@ -14,6 +14,7 @@ import functools
 import json
 import pathlib
 import sys
+import types
 from collections.abc import Mapping, Sequence
 from typing import Any
 
@@ -48,6 +49,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     schedule_cfg = require_mapping(run_config, "schedule")
     checkpoint_cfg = require_mapping(run_config, "checkpoint")
     monitor_cfg = dict(run_config.get("monitor", {}))
+    anchor_cfg = normalize_anchor_config(smad_cfg.get("anchor", {}))
 
     validate_smad_config(smad_cfg)
     initial_U_path, initial_U, projector_cpu = load_initial_basis(
@@ -65,6 +67,7 @@ def main(argv: Sequence[str] | None = None) -> None:
             adaptive_cfg=adaptive_cfg,
             schedule_cfg=schedule_cfg,
             checkpoint_cfg=checkpoint_cfg,
+            anchor_cfg=anchor_cfg,
             initial_U_path=initial_U_path,
             initial_U=initial_U,
             projector_cpu=projector_cpu,
@@ -81,6 +84,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         schedule_cfg=schedule_cfg,
         checkpoint_cfg=checkpoint_cfg,
         monitor_cfg=monitor_cfg,
+        anchor_cfg=anchor_cfg,
         initial_U_path=initial_U_path,
         initial_U=initial_U,
         projector_cpu=projector_cpu,
@@ -167,6 +171,7 @@ def run_training(
     schedule_cfg: Mapping[str, Any],
     checkpoint_cfg: Mapping[str, Any],
     monitor_cfg: Mapping[str, Any],
+    anchor_cfg: Mapping[str, Any],
     initial_U_path: pathlib.Path,
     initial_U: np.ndarray,
     projector_cpu,
@@ -193,6 +198,7 @@ def run_training(
         adaptive_cfg=adaptive_cfg,
         schedule_cfg=schedule_cfg,
         checkpoint_cfg=checkpoint_cfg,
+        anchor_cfg=anchor_cfg,
         initial_U_path=initial_U_path,
         dry_run=False,
     )
@@ -268,6 +274,7 @@ def run_training(
         tools.recursively_load_optim_state_dict(agent, checkpoint["optims_state_dict"])
         agent._should_pretrain._once = False
 
+    guard_anchor_patchable(agent, anchor_cfg)
     patch = create_mutable_patch(agent, projector_cpu, eta=float(smad_cfg["eta"]))
     scheduler = create_scheduler(
         agent=agent,
@@ -284,6 +291,14 @@ def run_training(
         if scheduler_state is not None:
             scheduler.load_state_dict(scheduler_state)
         reest_log = list(checkpoint.get("adaptive_smad_reest_log", []))
+
+    install_anchor_loss_patch(
+        agent=agent,
+        scheduler=scheduler,
+        anchor_cfg=anchor_cfg,
+        tools_module=tools,
+        torch_module=torch_module,
+    )
 
     adaptive_agent = AdaptiveTrainCallable(
         agent=agent,
@@ -364,6 +379,7 @@ def dry_run_setup(
     adaptive_cfg: Mapping[str, Any],
     schedule_cfg: Mapping[str, Any],
     checkpoint_cfg: Mapping[str, Any],
+    anchor_cfg: Mapping[str, Any],
     initial_U_path: pathlib.Path,
     initial_U: np.ndarray,
     projector_cpu,
@@ -376,6 +392,7 @@ def dry_run_setup(
         adaptive_cfg=adaptive_cfg,
         schedule_cfg=schedule_cfg,
         checkpoint_cfg=checkpoint_cfg,
+        anchor_cfg=anchor_cfg,
         initial_U_path=initial_U_path,
         dry_run=True,
     )
@@ -394,6 +411,7 @@ def dry_run_setup(
             dataset=None,
         ).to(config.device)
         agent.requires_grad_(requires_grad=False)
+        guard_anchor_patchable(agent, anchor_cfg)
         patch = create_mutable_patch(agent, projector_cpu, eta=float(smad_cfg["eta"]))
         scheduler = create_scheduler(
             agent=agent,
@@ -403,6 +421,13 @@ def dry_run_setup(
             adaptive_cfg=adaptive_cfg,
             schedule_cfg=schedule_cfg,
             make_env_fn=dreamer.make_env,
+        )
+        install_anchor_loss_patch(
+            agent=agent,
+            scheduler=scheduler,
+            anchor_cfg=anchor_cfg,
+            tools_module=tools,
+            torch_module=torch_module,
         )
         result = scheduler.maybe_update(0)
         print(f"Dry-run scheduler.maybe_update(0): {result}", flush=True)
@@ -652,6 +677,338 @@ def create_mutable_patch(agent, projector_cpu, eta: float):
     return MutableImgStepPatch(agent._wm.dynamics, projector_cpu, eta=eta)
 
 
+def normalize_anchor_config(raw_cfg: Any) -> dict[str, Any]:
+    """Return normalized ``smad.anchor`` settings with backwards-safe defaults."""
+
+    if raw_cfg is None or raw_cfg is False:
+        raw_cfg = {}
+    if not isinstance(raw_cfg, Mapping):
+        raise ValueError("smad.anchor must be a mapping when provided.")
+    enabled = bool(raw_cfg.get("enabled", False))
+    beta = float(raw_cfg.get("beta", 0.0))
+    if beta < 0.0:
+        raise ValueError("smad.anchor.beta must be non-negative.")
+    anchor_points = [int(point) for point in raw_cfg.get("anchor_points", [5, 10, 15])]
+    if any(point < 0 for point in anchor_points):
+        raise ValueError("smad.anchor.anchor_points must be non-negative.")
+    if not anchor_points:
+        raise ValueError("smad.anchor.anchor_points cannot be empty.")
+    activation_step = int(raw_cfg.get("activation_step", 0))
+    if activation_step < 0:
+        raise ValueError("smad.anchor.activation_step must be non-negative.")
+    return {
+        "enabled": enabled,
+        "beta": beta,
+        "anchor_points": anchor_points,
+        "activation_step": activation_step,
+    }
+
+
+def anchor_loss_enabled(anchor_cfg: Mapping[str, Any]) -> bool:
+    return (
+        bool(anchor_cfg.get("enabled", False))
+        and float(anchor_cfg.get("beta", 0.0)) > 0.0
+    )
+
+
+def install_anchor_loss_patch(
+    *,
+    agent,
+    scheduler,
+    anchor_cfg: Mapping[str, Any],
+    tools_module,
+    torch_module,
+) -> None:
+    """Install an anchor-aware world-model train method when configured."""
+
+    if not anchor_loss_enabled(anchor_cfg):
+        return
+    guard_anchor_patchable(agent, anchor_cfg)
+
+    def anchor_aware_train(world_model, data):
+        return world_model_train_with_anchor(
+            world_model,
+            data,
+            scheduler=scheduler,
+            anchor_cfg=anchor_cfg,
+            env_step=int(agent._config.action_repeat * agent._step),
+            tools_module=tools_module,
+            torch_module=torch_module,
+        )
+
+    agent._wm._train = types.MethodType(anchor_aware_train, agent._wm)
+    print(
+        "Installed SMAD anchor loss patch: "
+        f"beta={anchor_cfg['beta']} "
+        f"anchor_points={anchor_cfg['anchor_points']} "
+        f"activation_step={anchor_cfg['activation_step']}",
+        flush=True,
+    )
+
+
+def guard_anchor_patchable(agent, anchor_cfg: Mapping[str, Any]) -> None:
+    if not anchor_loss_enabled(anchor_cfg):
+        return
+    if world_model_is_compiled(agent._wm):
+        raise RuntimeError(
+            "SMAD anchor loss requires patching agent._wm._train, but agent._wm "
+            "appears to be torch-compiled. Set dreamer.compile: false or pass "
+            "--compile False for anchor-enabled Adaptive-SMAD runs."
+        )
+
+
+def world_model_is_compiled(world_model: Any) -> bool:
+    if hasattr(world_model, "_orig_mod"):
+        return True
+    class_name = type(world_model).__name__.lower()
+    module_name = type(world_model).__module__.lower()
+    return "optimizedmodule" in class_name or "torch._dynamo" in module_name
+
+
+def world_model_train_with_anchor(
+    world_model,
+    data,
+    *,
+    scheduler,
+    anchor_cfg: Mapping[str, Any],
+    env_step: int,
+    tools_module,
+    torch_module,
+):
+    """Mirror DreamerV3 ``WorldModel._train`` and add the SMAD anchor term."""
+
+    from src.smad.anchor_loss import compute_anchor_loss
+
+    data = world_model.preprocess(data)
+    anchor_metrics: dict[str, Any] = {}
+
+    with tools_module.RequiresGrad(world_model):
+        with torch_module.cuda.amp.autocast(world_model._use_amp):
+            embed = world_model.encoder(data)
+            post, prior = world_model.dynamics.observe(
+                embed, data["action"], data["is_first"]
+            )
+            kl_free = world_model._config.kl_free
+            dyn_scale = world_model._config.dyn_scale
+            rep_scale = world_model._config.rep_scale
+            kl_loss, kl_value, dyn_loss, rep_loss = world_model.dynamics.kl_loss(
+                post, prior, kl_free, dyn_scale, rep_scale
+            )
+            assert kl_loss.shape == embed.shape[:2], kl_loss.shape
+            preds = {}
+            for name, head in world_model.heads.items():
+                grad_head = name in world_model._config.grad_heads
+                feat = world_model.dynamics.get_feat(post)
+                feat = feat if grad_head else feat.detach()
+                pred = head(feat)
+                if type(pred) is dict:
+                    preds.update(pred)
+                else:
+                    preds[name] = pred
+            losses = {}
+            for name, pred in preds.items():
+                loss = -pred.log_prob(data[name])
+                assert loss.shape == embed.shape[:2], (name, loss.shape)
+                losses[name] = loss
+            scaled = {
+                key: value * world_model._scales.get(key, 1.0)
+                for key, value in losses.items()
+            }
+            model_loss = sum(scaled.values()) + kl_loss
+            total_model_loss = torch_module.mean(model_loss)
+
+            anchor_loss, anchor_metrics = compute_training_anchor_loss(
+                world_model=world_model,
+                data=data,
+                post=post,
+                scheduler=scheduler,
+                anchor_cfg=anchor_cfg,
+                env_step=env_step,
+                torch_module=torch_module,
+                compute_anchor_loss=compute_anchor_loss,
+            )
+            total_model_loss = total_model_loss + anchor_loss
+        metrics = world_model._model_opt(total_model_loss, world_model.parameters())
+
+    metrics.update({
+        f"{name}_loss": torch_to_np(torch_module.mean(loss))
+        for name, loss in losses.items()
+    })
+    metrics["kl_free"] = kl_free
+    metrics["dyn_scale"] = dyn_scale
+    metrics["rep_scale"] = rep_scale
+    metrics["dyn_loss"] = torch_to_np(torch_module.mean(dyn_loss))
+    metrics["rep_loss"] = torch_to_np(torch_module.mean(rep_loss))
+    metrics["kl"] = torch_to_np(torch_module.mean(kl_value))
+    metrics.update(anchor_metrics)
+    with torch_module.cuda.amp.autocast(world_model._use_amp):
+        metrics["prior_ent"] = torch_to_np(
+            torch_module.mean(world_model.dynamics.get_dist(prior).entropy())
+        )
+        metrics["post_ent"] = torch_to_np(
+            torch_module.mean(world_model.dynamics.get_dist(post).entropy())
+        )
+        context = dict(
+            embed=embed,
+            feat=world_model.dynamics.get_feat(post),
+            kl=kl_value,
+            postent=world_model.dynamics.get_dist(post).entropy(),
+        )
+    post = {key: value.detach() for key, value in post.items()}
+    return post, context, metrics
+
+
+def compute_training_anchor_loss(
+    *,
+    world_model,
+    data: Mapping[str, Any],
+    post: Mapping[str, Any],
+    scheduler,
+    anchor_cfg: Mapping[str, Any],
+    env_step: int,
+    torch_module,
+    compute_anchor_loss,
+):
+    anchor_points = list(anchor_cfg["anchor_points"])
+    max_anchor = max(anchor_points)
+    beta = float(anchor_cfg["beta"])
+    gamma = 0.0 if env_step < int(anchor_cfg["activation_step"]) else 1.0
+
+    zero = post["deter"].new_zeros(())
+    if beta == 0.0 or gamma == 0.0:
+        return zero, anchor_metric_values(
+            {"anchor_loss_raw": zero, "anchor_loss_scaled": zero, "anchor_n_valid": 0},
+            beta=beta,
+            gamma=gamma,
+        )
+
+    U_current = getattr(scheduler, "current_U", None)
+    if U_current is None:
+        return zero, anchor_metric_values(
+            {"anchor_loss_raw": zero, "anchor_loss_scaled": zero, "anchor_n_valid": 0},
+            beta=beta,
+            gamma=gamma,
+        )
+
+    batch_indices, start_indices = select_anchor_starts(
+        data["is_first"],
+        max_anchor=max_anchor,
+        torch_module=torch_module,
+    )
+    if batch_indices.numel() == 0:
+        return zero, anchor_metric_values(
+            {"anchor_loss_raw": zero, "anchor_loss_scaled": zero, "anchor_n_valid": 0},
+            beta=beta,
+            gamma=gamma,
+        )
+
+    imag_deter, post_deter, start_indices = build_anchor_imagination(
+        world_model=world_model,
+        post=post,
+        actions=data["action"],
+        batch_indices=batch_indices,
+        start_indices=start_indices,
+        horizon=max_anchor + 1,
+        torch_module=torch_module,
+    )
+    U = torch_module.as_tensor(
+        U_current,
+        device=imag_deter.device,
+        dtype=imag_deter.dtype,
+    )
+    anchor_loss, metrics = compute_anchor_loss(
+        imag_deter=imag_deter,
+        post_deter=post_deter,
+        start_indices=start_indices,
+        U=U,
+        anchor_points=anchor_points,
+        beta=beta,
+        gamma=gamma,
+    )
+    return anchor_loss, anchor_metric_values(metrics, beta=beta, gamma=gamma)
+
+
+def select_anchor_starts(
+    is_first,
+    *,
+    max_anchor: int,
+    torch_module,
+):
+    if is_first.ndim != 2:
+        raise ValueError(f"is_first must have shape (B, T), got {tuple(is_first.shape)}.")
+    batch_size, time_steps = is_first.shape
+    n_candidates = int(time_steps) - int(max_anchor)
+    if n_candidates <= 0:
+        empty = torch_module.empty(0, device=is_first.device, dtype=torch_module.long)
+        return empty, empty
+
+    reset_flags = is_first.to(dtype=torch_module.bool)
+    valid = torch_module.ones(
+        (batch_size, n_candidates),
+        device=is_first.device,
+        dtype=torch_module.bool,
+    )
+    for offset in range(1, int(max_anchor) + 1):
+        valid = valid & ~reset_flags[:, offset : offset + n_candidates]
+
+    has_valid = valid.any(dim=1)
+    if not torch_module.any(has_valid):
+        empty = torch_module.empty(0, device=is_first.device, dtype=torch_module.long)
+        return empty, empty
+
+    scores = torch_module.rand(valid.shape, device=is_first.device)
+    scores = scores.masked_fill(~valid, -1.0)
+    starts = torch_module.argmax(scores, dim=1).to(dtype=torch_module.long)
+    batch_indices = torch_module.nonzero(has_valid, as_tuple=False).reshape(-1)
+    return batch_indices, starts[batch_indices]
+
+
+def build_anchor_imagination(
+    *,
+    world_model,
+    post: Mapping[str, Any],
+    actions,
+    batch_indices,
+    start_indices,
+    horizon: int,
+    torch_module,
+):
+    state = {
+        key: value[batch_indices, start_indices].detach()
+        for key, value in post.items()
+    }
+    deters = [state["deter"]]
+    for offset in range(1, int(horizon)):
+        action = actions[batch_indices, start_indices + offset].detach()
+        state = world_model.dynamics.img_step(state, action, sample=False)
+        deters.append(state["deter"])
+    imag_deter = torch_module.stack(deters, dim=0)
+    post_deter = post["deter"][batch_indices].detach().permute(1, 0, 2)
+    return imag_deter, post_deter, start_indices.to(device=imag_deter.device)
+
+
+def anchor_metric_values(
+    metrics: Mapping[str, Any],
+    *,
+    beta: float,
+    gamma: float,
+) -> dict[str, Any]:
+    values = {name: metric_to_numpy(value) for name, value in metrics.items()}
+    values["anchor_beta"] = float(beta)
+    values["anchor_gamma"] = float(gamma)
+    return values
+
+
+def metric_to_numpy(value: Any) -> Any:
+    if hasattr(value, "detach"):
+        return value.detach().cpu().numpy()
+    return value
+
+
+def torch_to_np(value: Any) -> Any:
+    return value.detach().cpu().numpy()
+
+
 def prefill_dataset(
     *,
     dreamer,
@@ -767,6 +1124,7 @@ def print_banner(
     adaptive_cfg: Mapping[str, Any],
     schedule_cfg: Mapping[str, Any],
     checkpoint_cfg: Mapping[str, Any],
+    anchor_cfg: Mapping[str, Any],
     initial_U_path: pathlib.Path,
     dry_run: bool,
 ) -> None:
@@ -783,6 +1141,14 @@ def print_banner(
     print(f"Device:          {config.device}", flush=True)
     print(f"SMAD eta:        {smad_cfg['eta']}", flush=True)
     print(f"SMAD rank:       {smad_cfg['rank']}", flush=True)
+    print(
+        "Anchor loss:     "
+        f"enabled={anchor_loss_enabled(anchor_cfg)} "
+        f"beta={anchor_cfg['beta']} "
+        f"points={anchor_cfg['anchor_points']} "
+        f"activation_step={anchor_cfg['activation_step']}",
+        flush=True,
+    )
     print(f"Initial U:       {initial_U_path}", flush=True)
     print(f"Re-est freq:     {adaptive_cfg['re_est_freq']}", flush=True)
     print(f"Rollouts/update: {adaptive_cfg['n_rollouts']}", flush=True)

@@ -1,10 +1,7 @@
-# Month 8 controlled zero-damping Adaptive-SMAD configuration.
+# Month 8 controlled anchor-only Adaptive-SMAD configuration.
 #
-# Important: scripts/train_adaptive_smad.py currently supports adaptive
-# re-estimation and SMAD damping, but it does not wire compute_anchor_loss into
-# the Dreamer training objective. With smad.eta=0.0 this run disables damping
-# while preserving periodic true-vs-imagined drift basis re-estimation and
-# checkpointing of current_U.
+# This run keeps transition damping disabled (smad.eta=0.0) while enabling the
+# SMAD anchor loss and periodic true-vs-imagined drift basis re-estimation.
 
 dreamer_configs:
   - dmc_proprio
@@ -16,12 +13,18 @@ seed: 42
 dreamer:
   batch_size: 32
   envs: 8
+  compile: false
 
 smad:
   eta: 0.0
   rank: 10
   basis_type: U_drift
   initial_basis_path: results/smad/U_drift_cheetah_r10.npy
+  anchor:
+    enabled: true
+    beta: 0.1
+    anchor_points: [5, 10, 15]
+    activation_step: 0
 
 adaptive:
   re_est_freq: 50000

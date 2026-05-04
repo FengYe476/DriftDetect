@@ -4,13 +4,7 @@ set -Eeuo pipefail
 # Month 8 Controlled Training
 # Pod: RunPod RTX 4090, standard PyTorch image
 # Expected: ~20-24 GPU-hours, ~$14-17
-# Purpose: controlled baseline + zero-damping Adaptive-SMAD on the same pod.
-#
-# NOTE: scripts/train_adaptive_smad.py does not currently wire the SMAD anchor
-# loss into DreamerV3's training objective. The "anchor_only" run below uses
-# smad.eta=0.0 with adaptive basis re-estimation enabled. Minimal fix for true
-# anchor-only training: add compute_anchor_loss(...) into train_adaptive_smad.py's
-# model loss path with beta/anchor-point config while keeping smad.eta=0.0.
+# Purpose: controlled baseline + anchor-only Adaptive-SMAD on the same pod.
 
 export MUJOCO_GL=osmesa
 export PYOPENGL_PLATFORM=osmesa
@@ -231,16 +225,17 @@ train_baseline() {
       --batch_size "${BATCH_SIZE}" \
       --envs "${ENVS}" \
       --seed "${SEED}" \
-      --device "${DEVICE_TRAIN}"
+      --device "${DEVICE_TRAIN}" \
+      --compile False
   verify_checkpoint "${BASELINE_DIR}/latest.pt"
   echo "=== Baseline done at $(date) ==="
 }
 
 train_anchor_only() {
-  echo "=== Starting zero-damping Adaptive-SMAD at $(date) ==="
-  echo "Note: current train_adaptive_smad.py has no anchor-loss hook; eta=0 keeps damping off while re-estimating U."
+  echo "=== Starting anchor-only Adaptive-SMAD at $(date) ==="
+  echo "Anchor loss enabled via ${ANCHOR_CONFIG}; eta=0 keeps transition damping off while re-estimating U."
   prepare_reest_log_link
-  run_nohup_and_wait "Zero-damping Adaptive-SMAD training" "${CONTROL_LOG_DIR}/anchor_only_train.log" \
+  run_nohup_and_wait "Anchor-only Adaptive-SMAD training" "${CONTROL_LOG_DIR}/anchor_only_train.log" \
     python scripts/train_adaptive_smad.py \
       --config "${ANCHOR_CONFIG}" \
       --run_name "${ANCHOR_RUN_NAME}" \
@@ -249,7 +244,7 @@ train_anchor_only() {
   if [ -f "${REEST_LOG_LINK}" ] && [ ! -f "${ANCHOR_DIR}/adaptive_smad_v1_reest_log.json" ]; then
     cp -f "${REEST_LOG_LINK}" "${ANCHOR_DIR}/adaptive_smad_v1_reest_log.json"
   fi
-  echo "=== Zero-damping Adaptive-SMAD done at $(date) ==="
+  echo "=== Anchor-only Adaptive-SMAD done at $(date) ==="
 }
 
 export_current_u() {
@@ -384,7 +379,7 @@ phase "Phase 1: Controlled baseline"
 train_baseline
 mark_done "${CURRENT_PHASE}"
 
-phase "Phase 2: Zero-damping Adaptive-SMAD"
+phase "Phase 2: Anchor-only Adaptive-SMAD"
 train_anchor_only
 mark_done "${CURRENT_PHASE}"
 
