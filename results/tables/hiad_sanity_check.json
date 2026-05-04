@@ -1,0 +1,273 @@
+{
+  "u_fixed_path": "results/smad/U_drift_cheetah_r10.npy",
+  "rollout_dir": "results/rollouts",
+  "rollout_files": [
+    "results/rollouts/cheetah_v3_seed0_v2.npz",
+    "results/rollouts/cheetah_v3_seed1_v2.npz",
+    "results/rollouts/cheetah_v3_seed2_v2.npz",
+    "results/rollouts/cheetah_v3_seed3_v2.npz",
+    "results/rollouts/cheetah_v3_seed4_v2.npz",
+    "results/rollouts/cheetah_v3_seed5_v2.npz",
+    "results/rollouts/cheetah_v3_seed6_v2.npz",
+    "results/rollouts/cheetah_v3_seed7_v2.npz",
+    "results/rollouts/cheetah_v3_seed8_v2.npz",
+    "results/rollouts/cheetah_v3_seed9_v2.npz",
+    "results/rollouts/cheetah_v3_seed10_v2.npz",
+    "results/rollouts/cheetah_v3_seed11_v2.npz",
+    "results/rollouts/cheetah_v3_seed12_v2.npz",
+    "results/rollouts/cheetah_v3_seed13_v2.npz",
+    "results/rollouts/cheetah_v3_seed14_v2.npz",
+    "results/rollouts/cheetah_v3_seed15_v2.npz",
+    "results/rollouts/cheetah_v3_seed16_v2.npz",
+    "results/rollouts/cheetah_v3_seed17_v2.npz",
+    "results/rollouts/cheetah_v3_seed18_v2.npz",
+    "results/rollouts/cheetah_v3_seed19_v2.npz"
+  ],
+  "rank": 10,
+  "n_seeds": 20,
+  "segment_mode": "non_overlapping",
+  "results_by_window": {
+    "25": {
+      "mean_overlap": 0.14517788591725234,
+      "std_overlap": 0.025471499238667553,
+      "min": 0.07525674216424685,
+      "max": 0.22269731236647922,
+      "window_size": 25,
+      "effective_window_size_min": 25,
+      "effective_window_size_max": 25,
+      "n_seeds": 20,
+      "n_windows": 140
+    },
+    "50": {
+      "mean_overlap": 0.17849036425656292,
+      "std_overlap": 0.03062953985614058,
+      "min": 0.11475496329679793,
+      "max": 0.2618440178946318,
+      "window_size": 50,
+      "effective_window_size_min": 50,
+      "effective_window_size_max": 50,
+      "n_seeds": 20,
+      "n_windows": 60
+    },
+    "100": {
+      "mean_overlap": 0.23762252317402094,
+      "std_overlap": 0.024713539602856095,
+      "min": 0.19140362764847602,
+      "max": 0.2806994776002207,
+      "window_size": 100,
+      "effective_window_size_min": 100,
+      "effective_window_size_max": 100,
+      "n_seeds": 20,
+      "n_windows": 20
+    },
+    "200": {
+      "mean_overlap": 0.20788910178157943,
+      "std_overlap": 0.02458673413336238,
+      "min": 0.17729674081065935,
+      "max": 0.27414269830680754,
+      "window_size": 200,
+      "effective_window_size_min": 199,
+      "effective_window_size_max": 199,
+      "n_seeds": 20,
+      "n_windows": 20
+    },
+    "full": {
+      "mean_overlap": 0.20788910178157943,
+      "std_overlap": 0.02458673413336238,
+      "min": 0.17729674081065935,
+      "max": 0.27414269830680754,
+      "window_size": "full",
+      "effective_window_size_min": 199,
+      "effective_window_size_max": 199,
+      "n_seeds": 20,
+      "n_windows": 20
+    }
+  },
+  "per_seed_default_window": [
+    {
+      "mean_overlap": 0.1423668875745799,
+      "std_overlap": 0.025684766079398874,
+      "min": 0.10709267521313785,
+      "max": 0.18537228990343066,
+      "seed": 0,
+      "n_windows": 7,
+      "effective_window_size": 25
+    },
+    {
+      "mean_overlap": 0.14950301391501736,
+      "std_overlap": 0.022460342301369236,
+      "min": 0.10901829454237325,
+      "max": 0.18199449680497717,
+      "seed": 1,
+      "n_windows": 7,
+      "effective_window_size": 25
+    },
+    {
+      "mean_overlap": 0.13698789559293092,
+      "std_overlap": 0.02603262354823736,
+      "min": 0.09663710746537939,
+      "max": 0.18560140570265032,
+      "seed": 2,
+      "n_windows": 7,
+      "effective_window_size": 25
+    },
+    {
+      "mean_overlap": 0.14721713015266574,
+      "std_overlap": 0.028825626879260047,
+      "min": 0.0865354626756408,
+      "max": 0.1818453397487102,
+      "seed": 3,
+      "n_windows": 7,
+      "effective_window_size": 25
+    },
+    {
+      "mean_overlap": 0.1465943307209649,
+      "std_overlap": 0.027088775955360935,
+      "min": 0.12356499280481523,
+      "max": 0.19674819949846947,
+      "seed": 4,
+      "n_windows": 7,
+      "effective_window_size": 25
+    },
+    {
+      "mean_overlap": 0.14830079070670005,
+      "std_overlap": 0.016034542140860017,
+      "min": 0.1274196781941972,
+      "max": 0.1754610789040116,
+      "seed": 5,
+      "n_windows": 7,
+      "effective_window_size": 25
+    },
+    {
+      "mean_overlap": 0.13980376318166682,
+      "std_overlap": 0.0279887042529861,
+      "min": 0.10325360064444229,
+      "max": 0.19220668610389083,
+      "seed": 6,
+      "n_windows": 7,
+      "effective_window_size": 25
+    },
+    {
+      "mean_overlap": 0.15059086059141633,
+      "std_overlap": 0.020945082046860596,
+      "min": 0.12420213631849916,
+      "max": 0.19370259028270623,
+      "seed": 7,
+      "n_windows": 7,
+      "effective_window_size": 25
+    },
+    {
+      "mean_overlap": 0.1514464709075324,
+      "std_overlap": 0.023924302127838283,
+      "min": 0.11338277923141767,
+      "max": 0.1929017275236401,
+      "seed": 8,
+      "n_windows": 7,
+      "effective_window_size": 25
+    },
+    {
+      "mean_overlap": 0.14393083724805142,
+      "std_overlap": 0.014407970609266843,
+      "min": 0.11877242012927407,
+      "max": 0.16644873361833484,
+      "seed": 9,
+      "n_windows": 7,
+      "effective_window_size": 25
+    },
+    {
+      "mean_overlap": 0.14629955324876662,
+      "std_overlap": 0.01923319475779858,
+      "min": 0.10987941179450189,
+      "max": 0.18017619014223474,
+      "seed": 10,
+      "n_windows": 7,
+      "effective_window_size": 25
+    },
+    {
+      "mean_overlap": 0.15278133803923993,
+      "std_overlap": 0.027901014677254928,
+      "min": 0.12503721611716015,
+      "max": 0.21490469603315213,
+      "seed": 11,
+      "n_windows": 7,
+      "effective_window_size": 25
+    },
+    {
+      "mean_overlap": 0.14601599211426913,
+      "std_overlap": 0.025397613488304487,
+      "min": 0.09188124955204115,
+      "max": 0.17260808526531451,
+      "seed": 12,
+      "n_windows": 7,
+      "effective_window_size": 25
+    },
+    {
+      "mean_overlap": 0.14393288569377563,
+      "std_overlap": 0.026552958438560103,
+      "min": 0.10656259817622771,
+      "max": 0.18301744450819596,
+      "seed": 13,
+      "n_windows": 7,
+      "effective_window_size": 25
+    },
+    {
+      "mean_overlap": 0.15559225885630815,
+      "std_overlap": 0.019625239591534983,
+      "min": 0.1125157332564791,
+      "max": 0.1740243856636493,
+      "seed": 14,
+      "n_windows": 7,
+      "effective_window_size": 25
+    },
+    {
+      "mean_overlap": 0.13900858142477626,
+      "std_overlap": 0.013060839395431274,
+      "min": 0.1253165512454999,
+      "max": 0.160867795533771,
+      "seed": 15,
+      "n_windows": 7,
+      "effective_window_size": 25
+    },
+    {
+      "mean_overlap": 0.1514296621651126,
+      "std_overlap": 0.034738995803202666,
+      "min": 0.10397570322324116,
+      "max": 0.22269731236647922,
+      "seed": 16,
+      "n_windows": 7,
+      "effective_window_size": 25
+    },
+    {
+      "mean_overlap": 0.1528542949248292,
+      "std_overlap": 0.026334548758038676,
+      "min": 0.10739957566363242,
+      "max": 0.19894121950731633,
+      "seed": 17,
+      "n_windows": 7,
+      "effective_window_size": 25
+    },
+    {
+      "mean_overlap": 0.11903722413055344,
+      "std_overlap": 0.023210926826219516,
+      "min": 0.07525674216424685,
+      "max": 0.1576401471900881,
+      "seed": 18,
+      "n_windows": 7,
+      "effective_window_size": 25
+    },
+    {
+      "mean_overlap": 0.13986394715589,
+      "std_overlap": 0.02430828875383589,
+      "min": 0.08907334597008928,
+      "max": 0.15977320630112163,
+      "seed": 19,
+      "n_windows": 7,
+      "effective_window_size": 25
+    }
+  ],
+  "verdict": "PIVOT",
+  "threshold_used": {
+    "proceed": 0.7,
+    "marginal": 0.3
+  }
+}

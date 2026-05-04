@@ -1,0 +1,149 @@
+{
+  "n_seeds": 20,
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+  ],
+  "baseline_dir": "results/rollouts",
+  "hiad_dir": "results/rollouts_hiad",
+  "baseline_files": [
+    "results/rollouts/cheetah_v3_seed0_v2.npz",
+    "results/rollouts/cheetah_v3_seed1_v2.npz",
+    "results/rollouts/cheetah_v3_seed2_v2.npz",
+    "results/rollouts/cheetah_v3_seed3_v2.npz",
+    "results/rollouts/cheetah_v3_seed4_v2.npz",
+    "results/rollouts/cheetah_v3_seed5_v2.npz",
+    "results/rollouts/cheetah_v3_seed6_v2.npz",
+    "results/rollouts/cheetah_v3_seed7_v2.npz",
+    "results/rollouts/cheetah_v3_seed8_v2.npz",
+    "results/rollouts/cheetah_v3_seed9_v2.npz",
+    "results/rollouts/cheetah_v3_seed10_v2.npz",
+    "results/rollouts/cheetah_v3_seed11_v2.npz",
+    "results/rollouts/cheetah_v3_seed12_v2.npz",
+    "results/rollouts/cheetah_v3_seed13_v2.npz",
+    "results/rollouts/cheetah_v3_seed14_v2.npz",
+    "results/rollouts/cheetah_v3_seed15_v2.npz",
+    "results/rollouts/cheetah_v3_seed16_v2.npz",
+    "results/rollouts/cheetah_v3_seed17_v2.npz",
+    "results/rollouts/cheetah_v3_seed18_v2.npz",
+    "results/rollouts/cheetah_v3_seed19_v2.npz"
+  ],
+  "hiad_files": [
+    "results/rollouts_hiad/cheetah_hiad_seed0.npz",
+    "results/rollouts_hiad/cheetah_hiad_seed1.npz",
+    "results/rollouts_hiad/cheetah_hiad_seed2.npz",
+    "results/rollouts_hiad/cheetah_hiad_seed3.npz",
+    "results/rollouts_hiad/cheetah_hiad_seed4.npz",
+    "results/rollouts_hiad/cheetah_hiad_seed5.npz",
+    "results/rollouts_hiad/cheetah_hiad_seed6.npz",
+    "results/rollouts_hiad/cheetah_hiad_seed7.npz",
+    "results/rollouts_hiad/cheetah_hiad_seed8.npz",
+    "results/rollouts_hiad/cheetah_hiad_seed9.npz",
+    "results/rollouts_hiad/cheetah_hiad_seed10.npz",
+    "results/rollouts_hiad/cheetah_hiad_seed11.npz",
+    "results/rollouts_hiad/cheetah_hiad_seed12.npz",
+    "results/rollouts_hiad/cheetah_hiad_seed13.npz",
+    "results/rollouts_hiad/cheetah_hiad_seed14.npz",
+    "results/rollouts_hiad/cheetah_hiad_seed15.npz",
+    "results/rollouts_hiad/cheetah_hiad_seed16.npz",
+    "results/rollouts_hiad/cheetah_hiad_seed17.npz",
+    "results/rollouts_hiad/cheetah_hiad_seed18.npz",
+    "results/rollouts_hiad/cheetah_hiad_seed19.npz"
+  ],
+  "hiad_config": {
+    "eta": 0.20000000298023224,
+    "r": 10,
+    "re_est_freq": 25,
+    "basis_mode": "initial_basis"
+  },
+  "frequency_eval": {
+    "bands": {
+      "dc_trend": [
+        0.0,
+        0.02
+      ],
+      "very_low": [
+        0.02,
+        0.05
+      ],
+      "low": [
+        0.05,
+        0.1
+      ],
+      "mid": [
+        0.1,
+        0.2
+      ],
+      "high": [
+        0.2,
+        0.5
+      ]
+    },
+    "signal_keys": {
+      "true": "true_obs",
+      "imagined": "imagined_obs"
+    },
+    "trim_window_inclusive": [
+      25,
+      175
+    ],
+    "filter_type": "butterworth",
+    "var_threshold": 0.95
+  },
+  "baseline": {
+    "J_slow": 3.9388022422790527,
+    "J_total": 10.43132495880127,
+    "per_band": {
+      "dc_trend": 3.9388022422790527,
+      "very_low": 0.3243236541748047,
+      "low": 2.5161242485046387,
+      "mid": 2.2550339698791504,
+      "high": 1.397040843963623
+    }
+  },
+  "hiad": {
+    "J_slow": 3.378818988800049,
+    "J_total": 12.788289189338684,
+    "per_band": {
+      "dc_trend": 3.378818988800049,
+      "very_low": 0.5225543975830078,
+      "low": 4.229424476623535,
+      "mid": 3.1412086486816406,
+      "high": 1.5162826776504517
+    }
+  },
+  "reduction": {
+    "J_slow_pct": -14.217094919571002,
+    "J_total_pct": 22.595060932779802,
+    "per_band_pct": {
+      "dc_trend": -14.217094919571002,
+      "very_low": 61.12127217873547,
+      "low": 68.09283083445224,
+      "mid": 39.29761993119693,
+      "high": 8.535314783533522
+    }
+  },
+  "verdict": "PIVOT",
+  "threshold": {
+    "continue": 25.0,
+    "marginal": 15.0
+  }
+}
