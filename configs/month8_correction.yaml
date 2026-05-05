@@ -1,0 +1,19 @@
+dreamer_configs:
+  - dmc_proprio
+
+task: dmc_cheetah_run
+total_steps: 500000
+seed: 42
+
+dreamer:
+  batch_size: 32
+  envs: 8
+  compile: false
+
+correction:
+  enabled: true
+  deter_dim: 512
+  step_embed_dim: 32
+  hidden_dim: 256
+  max_steps: 200
+  init_scale: 0.01
