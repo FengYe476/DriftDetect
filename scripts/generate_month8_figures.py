@@ -81,7 +81,7 @@ def load_seed(directory: Path, seed: int) -> dict[str, np.ndarray] | None:
     path = rollout_path(directory, seed)
     if not path.exists():
         return None
-    with np.load(path) as data:
+    with np.load(path, allow_pickle=True) as data:
         return {key: data[key] for key in data.files}
 
 
