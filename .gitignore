@@ -105,3 +105,6 @@ results/tables/*.csv
 secrets.yaml
 *.key
 *.pem
+
+# Tensorboard event files (large, regenerable)
+events.out.tfevents.*

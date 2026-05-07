@@ -71,7 +71,7 @@ def default_device() -> str:
 
 
 def load_config(task: str, seed: int, device: str | None = None) -> SimpleNamespace:
-    configs = yaml.safe_load((DREAMER_ROOT / "configs.yaml").read_text())
+    from ruamel.yaml import YAML; configs = YAML(typ='safe', pure=True).load((DREAMER_ROOT / "configs.yaml").read_text())
     values: dict[str, Any] = {}
     recursive_update(values, configs["defaults"])
     recursive_update(values, configs["dmc_proprio"])
@@ -266,7 +266,7 @@ def extract_rollout(
     checkpoint = resolve_checkpoint_path(checkpoint_path)
     if checkpoint is not None:
         log(f"Loading checkpoint from {display_path(checkpoint)}.")
-        checkpoint_data = torch.load(checkpoint, map_location=config.device)
+        checkpoint_data = torch.load(checkpoint, map_location=config.device, weights_only=False)
         agent.load_state_dict(
             normalize_checkpoint_state_dict(checkpoint_data["agent_state_dict"])
         )
@@ -297,6 +297,8 @@ def extract_rollout(
 
     true_obs_list: list[np.ndarray] = []
     imagined_obs_list: list[np.ndarray] = []
+    true_latent_list: list[np.ndarray] = []
+    imagined_latent_list: list[np.ndarray] = []
     actions_list: list[np.ndarray] = []
     rewards_list: list[float] = []
 
@@ -366,6 +368,11 @@ def extract_rollout(
                 imagined_obs_list.append(imagined_obs)
                 actions_list.append(env_action["action"])
                 rewards_list.append(float(reward))
+                # Save latent features for frequency-domain analysis
+                true_feat = agent._wm.dynamics.get_feat(latent)
+                true_latent_list.append(true_feat.detach().cpu().numpy().squeeze())
+                imag_feat = agent._wm.dynamics.get_feat(imag_latent)
+                imagined_latent_list.append(imag_feat.detach().cpu().numpy().squeeze())
 
             obs = next_obs
             done = np.array([done_bool], dtype=bool)
@@ -406,6 +413,8 @@ def extract_rollout(
         "imagined_obs": np.asarray(imagined_obs_list, dtype=np.float32),
         "actions": np.asarray(actions_list, dtype=np.float32),
         "rewards": np.asarray(rewards_list, dtype=np.float32),
+        "true_latent": np.asarray(true_latent_list, dtype=np.float32),
+        "imagined_latent": np.asarray(imagined_latent_list, dtype=np.float32),
         "metadata": np.array(metadata, dtype=object),
     }
     if hiad_damper is not None:

@@ -500,7 +500,7 @@ class DreamerV3Adapter(WorldModelAdapter):
             )
 
     def _load_config(self, seed: int) -> SimpleNamespace:
-        configs = yaml.safe_load(self.config_path.read_text())
+        from ruamel.yaml import YAML; _yaml = YAML(typ="safe", pure=True); configs = _yaml.load(self.config_path.read_text())
         values: dict[str, Any] = {}
         recursive_update(values, configs["defaults"])
         recursive_update(values, configs["dmc_proprio"])

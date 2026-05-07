@@ -980,7 +980,11 @@ def build_anchor_imagination(
     deters = [state["deter"]]
     for offset in range(1, int(horizon)):
         action = actions[batch_indices, start_indices + offset].detach()
-        state = world_model.dynamics.img_step(state, action, sample=False)
+        # Detach input state to prevent gradient backprop through the full
+        # imagination chain.  Each img_step gets a one-step gradient only,
+        # avoiding compounding gradients that cause grad_norm explosion.
+        detached_state = {k: v.detach() for k, v in state.items()}
+        state = world_model.dynamics.img_step(detached_state, action, sample=False)
         deters.append(state["deter"])
     imag_deter = torch_module.stack(deters, dim=0)
     post_deter = post["deter"][batch_indices].detach().permute(1, 0, 2)

@@ -368,19 +368,16 @@ def install_correction_head(
     behavior._correction_last_mean_abs = 0.0
     behavior._correction_last_max_abs = 0.0
 
-    actor_and_correction_params = list(behavior.actor.parameters()) + list(
-        correction_head.parameters()
-    )
-    behavior._actor_opt = tools_module.Optimizer(
-        "actor",
-        actor_and_correction_params,
-        agent._config.actor["lr"],
-        agent._config.actor["eps"],
-        agent._config.actor["grad_clip"],
-        wd=agent._config.weight_decay,
-        opt=agent._config.opt,
-        use_amp=behavior._use_amp,
-    )
+    # Register correction_head as a submodule of actor so state_dict works.
+    behavior.actor.correction_head = correction_head
+    # Add correction_head parameters to the existing actor optimizer so they
+    # actually get updated during training. Simply registering as a submodule
+    # is not enough because the Adam optimizer was already constructed.
+    behavior._actor_opt._opt.add_param_group({
+        "params": list(correction_head.parameters()),
+    })
+    total_params = sum(sum(p.numel() for p in pg["params"]) for pg in behavior._actor_opt._opt.param_groups)
+    print(f"Actor optimizer now has {total_params} parameters (including correction_head).", flush=True)
 
     patch_imagination_loop(behavior, torch_module=torch_module)
     patch_train_metrics(behavior, tools_module=tools_module)
@@ -396,59 +393,42 @@ def install_correction_head(
 
 
 def patch_imagination_loop(behavior, *, torch_module) -> None:
-    def imagine_with_correction(self, start, policy, horizon):
-        dynamics = self._world_model.dynamics
-        flatten = lambda x: x.reshape([-1] + list(x.shape[2:]))
-        state = {key: flatten(value) for key, value in start.items()}
-        start = state
-        succ_by_key: dict[str, list[Any]] = {key: [] for key in start}
-        feats = []
-        actions = []
-        correction_means = []
-        correction_maxes = []
+    """Patch img_step with a flag-gated correction, keeping static_scan intact."""
+    original_img_step = behavior._world_model.dynamics.img_step
+    behavior._correction_active = False
+    behavior._correction_step_counter = 0
+    behavior._correction_last_mean_abs = 0.0
+    behavior._correction_last_max_abs = 0.0
 
-        for step in range(int(horizon)):
-            feat = dynamics.get_feat(state)
-            inp = feat.detach()
-            action = policy(inp).sample()
-            succ = dynamics.img_step(state, action)
-            correction = self.correction_head(succ["deter"], step)
-            succ = dict(succ)
-            succ["deter"] = succ["deter"] - correction
+    def img_step_with_correction(state, action, sample=False):
+        succ = original_img_step(state, action, sample=sample)
+        if not behavior._correction_active:
+            return succ
+        step = behavior._correction_step_counter
+        correction = behavior.correction_head(succ["deter"], step)
+        corrected = dict(succ)
+        corrected["deter"] = succ["deter"] - correction
+        correction_abs = correction.detach().abs()
+        behavior._correction_last_mean_abs = float(correction_abs.mean().cpu().item())
+        behavior._correction_last_max_abs = float(correction_abs.max().cpu().item())
+        behavior._correction_step_counter += 1
+        return corrected
 
-            feats.append(feat)
-            actions.append(action)
-            for key, value in succ.items():
-                succ_by_key.setdefault(key, []).append(value)
-            correction_abs = correction.detach().abs()
-            correction_means.append(correction_abs.mean())
-            correction_maxes.append(correction_abs.max())
-            state = succ
+    behavior._world_model.dynamics.img_step = img_step_with_correction
 
-        succ = {
-            key: torch_module.stack(values, dim=0)
-            for key, values in succ_by_key.items()
-            if values
-        }
-        feats = torch_module.stack(feats, dim=0)
-        actions = torch_module.stack(actions, dim=0)
-        states = {
-            key: torch_module.cat([start[key][None], value[:-1]], dim=0)
-            for key, value in succ.items()
-        }
-        if correction_means:
-            self._correction_last_mean_abs = float(
-                torch_module.stack(correction_means).mean().cpu().item()
-            )
-            self._correction_last_max_abs = float(
-                torch_module.stack(correction_maxes).max().cpu().item()
-            )
-        else:
-            self._correction_last_mean_abs = 0.0
-            self._correction_last_max_abs = 0.0
-        return feats, states, actions
+    # Patch _imagine to enable correction only during actor imagination
+    original_imagine = behavior._imagine
 
-    behavior._imagine = types.MethodType(imagine_with_correction, behavior)
+    def imagine_with_correction_flag(self, start, policy, horizon):
+        self._correction_active = True
+        self._correction_step_counter = 0
+        try:
+            result = original_imagine(start, policy, horizon)
+        finally:
+            self._correction_active = False
+        return result
+
+    behavior._imagine = types.MethodType(imagine_with_correction_flag, behavior)
 
 
 def patch_train_metrics(behavior, *, tools_module) -> None:
