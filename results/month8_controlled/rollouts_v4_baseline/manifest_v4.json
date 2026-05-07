@@ -1,0 +1,854 @@
+{
+  "version": "v1",
+  "generated_at": "2026-05-07T13:40:14.849280+00:00",
+  "task": "cheetah-run",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+  ],
+  "context_length": 8,
+  "horizon": 200,
+  "checkpoint_revision": "local",
+  "checkpoint": {
+    "checkpoint_dir": "/workspace/DriftDetect/external/dreamer4/checkpoints",
+    "tokenizer_path": "/workspace/DriftDetect/external/dreamer4/checkpoints/tokenizer.pt",
+    "dynamics_path": "/workspace/DriftDetect/external/dreamer4/checkpoints/dynamics.pt",
+    "tokenizer_args": {
+      "data_dirs": [
+        "/data/nihansen/data/newt/frames128",
+        "/data/nihansen/data/newt/frames128-expl",
+        "/data/nihansen/data/newt/shards200"
+      ],
+      "seq_len": 8,
+      "num_workers": 8,
+      "batch_size": 8,
+      "H": 128,
+      "W": 128,
+      "C": 3,
+      "patch": 4,
+      "d_model": 256,
+      "n_heads": 4,
+      "depth": 8,
+      "n_latents": 16,
+      "d_bottleneck": 32,
+      "dropout": 0.05,
+      "mlp_ratio": 4.0,
+      "time_every": 1,
+      "mae_p_min": 0.0,
+      "mae_p_max": 0.9,
+      "lr": 0.0001,
+      "weight_decay": 0.01,
+      "max_steps": 10000000,
+      "grad_accum": 1,
+      "lpips_weight": 0.2,
+      "lpips_frac": 0.5,
+      "lpips_net": "alex",
+      "log_every": 100,
+      "print_every": 100,
+      "viz_every": 500,
+      "viz_max_items": 4,
+      "viz_max_T": 8,
+      "wandb_project": "dreamer4-tokenizer",
+      "wandb_run_name": "0112-dmc",
+      "wandb_entity": null,
+      "ckpt_dir": "./logs/tokenizer_ckpts",
+      "save_every": 5000,
+      "resume": null,
+      "seed": 0,
+      "compile": false
+    },
+    "dynamics_args": {
+      "data_dirs": [
+        "/data/nihansen/data/newt/data",
+        "/data/nihansen/data/newt/data-expl",
+        "/data/nihansen/data/newt/data200"
+      ],
+      "frame_dirs": [
+        "/data/nihansen/data/newt/frames128",
+        "/data/nihansen/data/newt/frames128-expl",
+        "/data/nihansen/data/newt/shards200"
+      ],
+      "tasks_json": "../tasks.json",
+      "seq_len": 32,
+      "num_workers": 8,
+      "batch_size": 24,
+      "tokenizer_ckpt": "./logs/tokenizer_ckpts/latest.pt",
+      "H": null,
+      "W": null,
+      "C": null,
+      "patch": null,
+      "d_model_dyn": 512,
+      "dyn_depth": 8,
+      "n_heads": 4,
+      "dropout": 0.0,
+      "mlp_ratio": 4.0,
+      "time_every": 1,
+      "packing_factor": 2,
+      "n_register": 4,
+      "n_agent": 1,
+      "space_mode": "wm_agent_isolated",
+      "k_max": 8,
+      "bootstrap_start": 5000,
+      "self_fraction": 0.25,
+      "use_actions": true,
+      "lr": 0.0001,
+      "weight_decay": 0.01,
+      "max_steps": 10000000,
+      "grad_accum": 1,
+      "grad_clip": 1.0,
+      "eval_every": 1000,
+      "eval_batch_size": 4,
+      "eval_max_items": 4,
+      "eval_ctx": 8,
+      "eval_horizon": 16,
+      "eval_schedule": "shortcut",
+      "eval_d": 0.25,
+      "log_every": 200,
+      "wandb_project": "dreamer4-dynamics",
+      "wandb_run_name": "0112-dmc-again",
+      "wandb_entity": null,
+      "ckpt_dir": "./logs/dynamics_ckpts",
+      "save_every": 5000,
+      "resume": "./logs/dynamics_ckpts/latest.pt",
+      "seed": 0,
+      "compile": false
+    },
+    "config": {
+      "k_max": 8,
+      "packing_factor": 2,
+      "n_latents": 16,
+      "d_bottleneck": 32,
+      "n_spatial": 8,
+      "d_spatial": 64,
+      "H": 128,
+      "W": 128,
+      "C": 3,
+      "patch": 4,
+      "schedule": "shortcut",
+      "schedule_d": 0.25,
+      "use_amp": true
+    },
+    "schedule": {
+      "K": 4,
+      "e": 2,
+      "dt": 0.25,
+      "tau": [
+        0.0,
+        0.25,
+        0.5,
+        0.75
+      ],
+      "tau_idx": [
+        0,
+        2,
+        4,
+        6
+      ]
+    }
+  },
+  "schedule": "shortcut",
+  "schedule_d": 0.25,
+  "files": [
+    {
+      "file": "results/month8_controlled/rollouts_v4_baseline/cheetah-run_v4_seed0_v1.npz",
+      "seed": 0,
+      "sha256": "11adbfcf730cc64e41e16707e1a22678b671d7638d5015d7c087aeeaabd73c39",
+      "elapsed_s": 4.727276380872354,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/month8_controlled/rollouts_v4_baseline/cheetah-run_v4_seed1_v1.npz",
+      "seed": 1,
+      "sha256": "2c709c1db5c13232d1e63f07c09e98662754c9ba8a6dea8d2d88e813058581a8",
+      "elapsed_s": 3.6902926191687584,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/month8_controlled/rollouts_v4_baseline/cheetah-run_v4_seed2_v1.npz",
+      "seed": 2,
+      "sha256": "5ba6c28463de82855086728dcd7b053e7e7c6070cc348ccef9d58647abba7da9",
+      "elapsed_s": 3.7014451429713517,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/month8_controlled/rollouts_v4_baseline/cheetah-run_v4_seed3_v1.npz",
+      "seed": 3,
+      "sha256": "8b60bee2b9ccb96634155d2f5c17deb7d9192b9e152cfc92eb84be9931699959",
+      "elapsed_s": 3.659939669072628,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/month8_controlled/rollouts_v4_baseline/cheetah-run_v4_seed4_v1.npz",
+      "seed": 4,
+      "sha256": "96a2183eace55738d4f410bb323fbc3e2ee7b643dde3e058dfe5f789ae7a59db",
+      "elapsed_s": 4.133515328168869,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/month8_controlled/rollouts_v4_baseline/cheetah-run_v4_seed5_v1.npz",
+      "seed": 5,
+      "sha256": "cec337a24c6c2eef26a9f709c218596c6819fb0b13eb175675c2b6c2005150e5",
+      "elapsed_s": 3.611031430074945,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/month8_controlled/rollouts_v4_baseline/cheetah-run_v4_seed6_v1.npz",
+      "seed": 6,
+      "sha256": "48e14ba9802fbea870cb743c9d5571f775b35945178938b04e2e179c01016305",
+      "elapsed_s": 3.638249058974907,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/month8_controlled/rollouts_v4_baseline/cheetah-run_v4_seed7_v1.npz",
+      "seed": 7,
+      "sha256": "05b303966886ba92fc25133bf4c67431f3bc7e4d109c6adf88c0b951ed98e7dc",
+      "elapsed_s": 3.6606823690235615,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/month8_controlled/rollouts_v4_baseline/cheetah-run_v4_seed8_v1.npz",
+      "seed": 8,
+      "sha256": "6f343dfb184f695fd83550d43ef73536020df2c060f6e989494cf7a1033881fb",
+      "elapsed_s": 4.197795070940629,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/month8_controlled/rollouts_v4_baseline/cheetah-run_v4_seed9_v1.npz",
+      "seed": 9,
+      "sha256": "31f9cb21650f3de85da179bfc069bed4566710866b36cccb3e8704d7ba12f5c8",
+      "elapsed_s": 3.660666409879923,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/month8_controlled/rollouts_v4_baseline/cheetah-run_v4_seed10_v1.npz",
+      "seed": 10,
+      "sha256": "250b238160d188a2d8927ad9ea3019ca22a306d8c9033643d2dd8dfc2bbcfff3",
+      "elapsed_s": 3.695138362934813,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/month8_controlled/rollouts_v4_baseline/cheetah-run_v4_seed11_v1.npz",
+      "seed": 11,
+      "sha256": "534bc0e3d6c328d4ab0015f8cfe4be813f2c0e6f3a431693f4579e0ebacac638",
+      "elapsed_s": 3.679040200775489,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/month8_controlled/rollouts_v4_baseline/cheetah-run_v4_seed12_v1.npz",
+      "seed": 12,
+      "sha256": "5878975cef73963737ab223fa9e36197f250844ad9f84347d27f188c20b43508",
+      "elapsed_s": 3.918676027096808,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/month8_controlled/rollouts_v4_baseline/cheetah-run_v4_seed13_v1.npz",
+      "seed": 13,
+      "sha256": "b5859973893e96fdcebb4a2a4db3356b09816da2e0ee7b0ebd44e05e63be2c74",
+      "elapsed_s": 3.697622034000233,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/month8_controlled/rollouts_v4_baseline/cheetah-run_v4_seed14_v1.npz",
+      "seed": 14,
+      "sha256": "7181b7bde772af4e601041d148c2176e48a6ad3913adb0082abc363aae84f97a",
+      "elapsed_s": 3.651309391949326,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/month8_controlled/rollouts_v4_baseline/cheetah-run_v4_seed15_v1.npz",
+      "seed": 15,
+      "sha256": "6c64c29187d73cad6335d2ccce1622cfad9130b2a93dcbe73fc0244ec96c0314",
+      "elapsed_s": 3.665249906014651,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    },
+    {
+      "file": "results/month8_controlled/rollouts_v4_baseline/cheetah-run_v4_seed16_v1.npz",
+      "seed": 16,
+      "sha256": "77b5bbb6b2f6d31e47e715f2d98a33e1df4acc001ba4b75421e41939a18b92c9",
+      "elapsed_s": 3.727580475853756,
+      "shapes": {
+        "true_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "imagined_obs": [
+          200,
+          3,
+          128,
+          128
+        ],
+        "true_latent": [
+          200,
+          512
+        ],
+        "imagined_latent": [
+          200,
+          512
+        ],
+        "actions": [
+          208,
+          16
+        ],
+        "action_mask": [
+          208,
+          16
+        ],
+        "rewards": [
+          200
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "seed": 17,
+      "elapsed_s": 0.1316408661659807,
+      "error": "IndexError('list index out of range')",
+      "traceback": "Traceback (most recent call last):\n  File \"/workspace/DriftDetect/scripts/batch_extract_v4.py\", line 188, in main\n    adapter.extract_rollout(\n  File \"/workspace/DriftDetect/src/models/dreamerv4_adapter.py\", line 448, in extract_rollout\n    sample, dataset_meta = self._load_dataset_window(\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/DriftDetect/src/models/dreamerv4_adapter.py\", line 726, in _load_dataset_window\n    sample = dataset[dataset_index]\n             ~~~~~~~^^^^^^^^^^^^^^^\n  File \"/workspace/DriftDetect/external/dreamer4/dreamer4/wm_dataset.py\", line 439, in __getitem__\n    obs = self._get_frames(task_idx, start, self.T + 1)  # (T+1,3,H,W) uint8\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/DriftDetect/external/dreamer4/dreamer4/wm_dataset.py\", line 416, in _get_frames\n    frames = self._load_shard_frames(task_idx, seg_idx, shard_idx)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/DriftDetect/external/dreamer4/dreamer4/wm_dataset.py\", line 376, in _load_shard_frames\n    path = self.shard_lists[task_idx][seg_idx][shard_idx]\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^\nIndexError: list index out of range\n"
+    },
+    {
+      "seed": 18,
+      "elapsed_s": 0.152076582191512,
+      "error": "IndexError('list index out of range')",
+      "traceback": "Traceback (most recent call last):\n  File \"/workspace/DriftDetect/scripts/batch_extract_v4.py\", line 188, in main\n    adapter.extract_rollout(\n  File \"/workspace/DriftDetect/src/models/dreamerv4_adapter.py\", line 448, in extract_rollout\n    sample, dataset_meta = self._load_dataset_window(\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/DriftDetect/src/models/dreamerv4_adapter.py\", line 726, in _load_dataset_window\n    sample = dataset[dataset_index]\n             ~~~~~~~^^^^^^^^^^^^^^^\n  File \"/workspace/DriftDetect/external/dreamer4/dreamer4/wm_dataset.py\", line 439, in __getitem__\n    obs = self._get_frames(task_idx, start, self.T + 1)  # (T+1,3,H,W) uint8\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/DriftDetect/external/dreamer4/dreamer4/wm_dataset.py\", line 416, in _get_frames\n    frames = self._load_shard_frames(task_idx, seg_idx, shard_idx)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/DriftDetect/external/dreamer4/dreamer4/wm_dataset.py\", line 376, in _load_shard_frames\n    path = self.shard_lists[task_idx][seg_idx][shard_idx]\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^\nIndexError: list index out of range\n"
+    },
+    {
+      "seed": 19,
+      "elapsed_s": 0.12270557205192745,
+      "error": "IndexError('list index out of range')",
+      "traceback": "Traceback (most recent call last):\n  File \"/workspace/DriftDetect/scripts/batch_extract_v4.py\", line 188, in main\n    adapter.extract_rollout(\n  File \"/workspace/DriftDetect/src/models/dreamerv4_adapter.py\", line 448, in extract_rollout\n    sample, dataset_meta = self._load_dataset_window(\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/DriftDetect/src/models/dreamerv4_adapter.py\", line 726, in _load_dataset_window\n    sample = dataset[dataset_index]\n             ~~~~~~~^^^^^^^^^^^^^^^\n  File \"/workspace/DriftDetect/external/dreamer4/dreamer4/wm_dataset.py\", line 439, in __getitem__\n    obs = self._get_frames(task_idx, start, self.T + 1)  # (T+1,3,H,W) uint8\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/DriftDetect/external/dreamer4/dreamer4/wm_dataset.py\", line 416, in _get_frames\n    frames = self._load_shard_frames(task_idx, seg_idx, shard_idx)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/DriftDetect/external/dreamer4/dreamer4/wm_dataset.py\", line 376, in _load_shard_frames\n    path = self.shard_lists[task_idx][seg_idx][shard_idx]\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^\nIndexError: list index out of range\n"
+    }
+  ]
+}
