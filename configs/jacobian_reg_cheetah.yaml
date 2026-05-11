@@ -1,0 +1,17 @@
+dreamer_configs:
+  - dmc_proprio
+
+task: dmc_cheetah_run
+total_steps: 500000
+seed: 42
+
+dreamer:
+  batch_size: 32
+  envs: 8
+  compile: false
+
+jacobian_reg:
+  lambda_jac: 0.01
+  n_starts: 8
+  n_projections: 1
+  warmup_env_steps: 50000

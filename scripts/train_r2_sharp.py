@@ -376,19 +376,70 @@ def load_r2_config(args: argparse.Namespace):
     return config
 
 
-def save_checkpoint(agent: Any, logdir: pathlib.Path) -> None:
+def save_checkpoint(agent: Any, logdir: pathlib.Path, *, step: int) -> pathlib.Path:
+    import torch
     import tools
 
     logdir.mkdir(parents=True, exist_ok=True)
+    checkpoint_path = logdir / "latest.pt"
     torch.save(
         {
             "agent_state_dict": agent.state_dict(),
             "optims_state_dict": tools.recursively_collect_optim_state_dict(agent),
+            "step": int(step),
             "sharp": vars(getattr(agent, "_sharp_cfg", SimpleNamespace())),
         },
-        logdir / "latest.pt",
+        checkpoint_path,
     )
-    print(f"Saved checkpoint: {logdir / 'latest.pt'}", flush=True)
+    print(f"Saved checkpoint: {checkpoint_path}", flush=True)
+    return checkpoint_path
+
+
+def verify_checkpoint(path: str | pathlib.Path) -> bool:
+    import torch
+
+    checkpoint_path = pathlib.Path(path).expanduser()
+    size_mb = 0.0
+    if checkpoint_path.exists():
+        size_mb = checkpoint_path.stat().st_size / (1024 * 1024)
+
+    try:
+        if not checkpoint_path.is_file() or checkpoint_path.stat().st_size <= 0:
+            raise ValueError("checkpoint file is missing or empty")
+
+        checkpoint = torch.load(
+            checkpoint_path,
+            map_location="cpu",
+            weights_only=False,
+        )
+        if not isinstance(checkpoint, dict):
+            raise ValueError("checkpoint must be a dict")
+
+        required_keys = ("agent_state_dict", "optims_state_dict", "step")
+        missing = [key for key in required_keys if key not in checkpoint]
+        if missing:
+            raise ValueError(f"missing required keys: {missing}")
+
+        agent_state_dict = checkpoint["agent_state_dict"]
+        if not isinstance(agent_state_dict, dict) or len(agent_state_dict) == 0:
+            raise ValueError("agent_state_dict must be a non-empty dict")
+
+        step = checkpoint["step"]
+        if isinstance(step, bool) or not isinstance(step, int) or step <= 0:
+            raise ValueError(f"step must be a positive integer, got {step!r}")
+
+        print(
+            f"CHECKPOINT VERIFY PASS: {checkpoint_path} ({size_mb:.1f} MB), "
+            f"agent_state_dict: {len(agent_state_dict)} keys, step={step}",
+            flush=True,
+        )
+        return True
+    except Exception as exc:
+        print(
+            f"CHECKPOINT VERIFY FAIL: {checkpoint_path} ({size_mb:.1f} MB): {exc}",
+            flush=True,
+        )
+        return False
 
 
 def close_env_group(env_group: Any) -> None:
@@ -464,7 +515,10 @@ def main() -> None:
         trainer.begin(agent)
     finally:
         if agent is not None:
-            save_checkpoint(agent, logdir)
+            step = int(replay_buffer.count() * int(config.trainer.action_repeat))
+            checkpoint_path = save_checkpoint(agent, logdir, step=step)
+            if not verify_checkpoint(checkpoint_path):
+                raise RuntimeError(f"Saved checkpoint failed verification: {checkpoint_path}")
         if train_envs is not None:
             close_env_group(train_envs)
         if eval_envs is not None:

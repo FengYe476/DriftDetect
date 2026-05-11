@@ -1,0 +1,54 @@
+# V3 Cheetah SHARP multi-seed replication plan.
+#
+# The runpod wrapper generates train_moment_match.py-compatible per-seed
+# baseline and SHARP configs from configs/month8_moment_match.yaml. The
+# baseline and SHARP configs are identical except beta_mean and beta_var.
+
+planned_seeds:
+  - 43
+  - 44
+  - 45
+
+task: dmc_cheetah_run
+total_steps: 500000
+dreamer_configs:
+  - dmc_proprio
+
+dreamer:
+  batch_size: 32
+  envs: 8
+  compile: false
+
+baseline:
+  moment_match:
+    beta_mean: 0.0
+    beta_var: 0.0
+    n_starts: 8
+    warmup_env_steps: 50000
+
+sharp:
+  moment_match:
+    beta_mean: 1.0
+    beta_var: 0.1
+    n_starts: 8
+    warmup_env_steps: 50000
+
+rollout_eval:
+  num_rollout_seeds: 20
+  total_steps: 1000
+  imagination_start: 200
+  horizon: 200
+  primary_trim_window_half_open:
+    start: 25
+    end: 175
+  rollout_file_template: cheetah_v3_seed{seed}_v2.npz
+
+methodology:
+  comparison: same_pod_seed_pair
+  description: >
+    For each training seed, run baseline first and SHARP second on the same
+    RunPod pod so both checkpoints share hardware, software environment, and
+    dependency versions. This controls the Month 7 cross-pod confound.
+  baseline_vs_sharp_difference: >
+    The generated baseline and SHARP training configs must differ only in
+    moment_match.beta_mean and moment_match.beta_var.
