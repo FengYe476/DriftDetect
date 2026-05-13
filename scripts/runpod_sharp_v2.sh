@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# SHARP-v2 Run A launcher for RunPod.
+# SHARP-v2 Run A/B/C launcher for RunPod.
 #
 # Usage:
 #   bash scripts/runpod_sharp_v2.sh cheetah
 #   bash scripts/runpod_sharp_v2.sh cartpole
+#   RUN=B bash scripts/runpod_sharp_v2.sh cheetah
+#   RUN=C bash scripts/runpod_sharp_v2.sh cheetah
 
 if [ "$#" -ne 1 ]; then
   echo "Usage: bash scripts/runpod_sharp_v2.sh cheetah|cartpole"
@@ -14,23 +16,38 @@ fi
 
 TASK_CHOICE="$1"
 SEED=42
+RUN="${RUN:-A}"
+
+case "${RUN}" in
+  A|B|C)
+    ;;
+  *)
+    echo "RUN must be one of A, B, or C, got '${RUN}'."
+    exit 2
+    ;;
+esac
 
 case "${TASK_CHOICE}" in
   cheetah)
     TASK_SHORT="cheetah"
     DMC_TASK="dmc_cheetah_run"
-    CONFIG_PATH="configs/sharp_v2_runA_cheetah.yaml"
     ;;
   cartpole)
     TASK_SHORT="cartpole"
     DMC_TASK="dmc_cartpole_swingup"
-    CONFIG_PATH="configs/sharp_v2_runA_cartpole.yaml"
     ;;
   *)
     echo "TASK must be 'cheetah' or 'cartpole', got '${TASK_CHOICE}'."
     exit 2
     ;;
 esac
+
+if [ "${RUN}" = "C" ] && [ "${TASK_SHORT}" != "cheetah" ]; then
+  echo "RUN=C currently has only configs/sharp_v2_runC_cheetah.yaml; '${TASK_SHORT}' is unsupported."
+  exit 2
+fi
+
+CONFIG_PATH="configs/sharp_v2_run${RUN}_${TASK_SHORT}.yaml"
 
 export MUJOCO_GL=osmesa
 export PYOPENGL_PLATFORM=osmesa
@@ -55,8 +72,8 @@ HORIZON="${HORIZON:-200}"
 DEVICE_TRAIN="${DEVICE_TRAIN:-cuda:0}"
 DEVICE_EXTRACT="${DEVICE_EXTRACT:-cuda:0}"
 
-ROOT="results/sharp_v2_runA"
-RUN_NAME="sharp_v2_runA/${TASK_SHORT}_seed${SEED}"
+ROOT="results/sharp_v2_run${RUN}"
+RUN_NAME="sharp_v2_run${RUN}/${TASK_SHORT}_seed${SEED}"
 RUN_DIR="results/${RUN_NAME}"
 CKPT="${RUN_DIR}/latest.pt"
 LOG_DIR="${ROOT}/logs/${TASK_SHORT}_seed${SEED}"
@@ -203,7 +220,7 @@ if not sys.version.startswith("3.12."):
 if not torch.__version__.startswith("2.8."):
     raise SystemExit("Expected PyTorch 2.8.x on the RunPod image.")
 if not torch.cuda.is_available():
-    raise SystemExit("CUDA is required for SHARP-v2 Run A training.")
+    raise SystemExit("CUDA is required for SHARP-v2 training.")
 print(f"CUDA device: {torch.cuda.get_device_name(0)}")
 PY
 }
@@ -214,6 +231,7 @@ prepare_dirs() {
 
 print_config() {
   echo ""
+  echo "Run: ${RUN}"
   echo "Task: ${TASK_SHORT} (${DMC_TASK})"
   echo "Config: ${CONFIG_PATH}"
   echo "Run dir: ${RUN_DIR}"
@@ -259,9 +277,9 @@ PY
 }
 
 train_sharp_v2() {
-  phase "${TASK_SHORT} SHARP-v2 Run A training seed ${SEED}"
+  phase "${TASK_SHORT} SHARP-v2 Run ${RUN} training seed ${SEED}"
   run_nohup_and_wait \
-    "V3 ${TASK_SHORT} SHARP-v2 Run A seed ${SEED}" \
+    "V3 ${TASK_SHORT} SHARP-v2 Run ${RUN} seed ${SEED}" \
     "${LOG_DIR}/train_${RUN_ID}.log" \
     python scripts/train_moment_match_v2.py \
       --config "${CONFIG_PATH}" \
@@ -272,9 +290,9 @@ train_sharp_v2() {
 }
 
 extract_rollouts() {
-  phase "${TASK_SHORT} SHARP-v2 Run A rollout extraction seed ${SEED}"
+  phase "${TASK_SHORT} SHARP-v2 Run ${RUN} rollout extraction seed ${SEED}"
   run_logged \
-    "${TASK_SHORT} SHARP-v2 Run A rollout extraction seed ${SEED}" \
+    "${TASK_SHORT} SHARP-v2 Run ${RUN} rollout extraction seed ${SEED}" \
     "${LOG_DIR}/extract_${RUN_ID}.log" \
     python scripts/batch_extract_v3_multiseed.py \
       --checkpoint "${CKPT}" \
@@ -285,7 +303,7 @@ extract_rollouts() {
       --imagination_start "${IMAGINATION_START}" \
       --horizon "${HORIZON}" \
       --device "${DEVICE_EXTRACT}" \
-      --manifest_name "manifest_${TASK_SHORT}_sharp_v2_runA_seed${SEED}.json"
+      --manifest_name "manifest_${TASK_SHORT}_sharp_v2_run${RUN}_seed${SEED}.json"
   verify_rollouts "${RUN_DIR}/rollouts" "${N_ROLLOUT_SEEDS}"
   mark_done "${CURRENT_PHASE}"
 }
@@ -303,7 +321,7 @@ verify_rollouts() {
 }
 
 list_outputs() {
-  echo "SHARP-v2 Run A outputs for ${TASK_SHORT} seed ${SEED}:"
+  echo "SHARP-v2 Run ${RUN} outputs for ${TASK_SHORT} seed ${SEED}:"
   find "${ROOT}" -maxdepth 4 \( -type f -o -type l \) 2>/dev/null | sort || true
 }
 
@@ -321,4 +339,4 @@ mark_done "${CURRENT_PHASE}"
 train_sharp_v2
 extract_rollouts
 list_outputs
-echo "=== V3 ${TASK_SHORT} SHARP-v2 Run A seed ${SEED} complete at $(date) ==="
+echo "=== V3 ${TASK_SHORT} SHARP-v2 Run ${RUN} seed ${SEED} complete at $(date) ==="

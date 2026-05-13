@@ -1,4 +1,4 @@
-# SHARP-v2 Run A Design
+# SHARP-v2 Design
 
 ## Motivation
 
@@ -50,28 +50,57 @@ SHARP auxiliary objective. The ordinary Dreamer model loss still trains the
 encoder, posterior, decoder, reward head, KL terms, and actor-related world
 model surfaces exactly as before.
 
-## Expected Outcomes
+## Run A Outcome
 
-Run A should trade some raw scale collapse for healthier normalized and decoded
-behavior:
+Run A traded some of SHARP v1's raw collapse for healthier decoded behavior,
+but still left a scale artifact:
 
-- Imag trace reduction below `40%`, instead of the v1 `82-96%` collapse.
-- Normalized `J_total` reduction above `50%`, improving on the weak Cheetah
-  normalized result.
-- Step 0/1 observation error ratio below `2x`, fixing the Cartpole early
-  fidelity failure.
-- Eval return within `5%` of the baseline.
+- Raw `J_total` reduction was `69.6%`.
+- Normalized `J_total` reduction was only about `21.5%`, below the `>40%`
+  target.
+- Imag trace reduction was `65.9%`, still above the `<40%` target.
+- Step 0/1 observation error was healthy at `0.107`.
+- Eval return reached a `702` peak, then dropped to about `350`.
 
-If these outcomes hold, the result supports the interpretation that SHARP's
-useful part is transition hardening, while the v1 failure mode was posterior
-representation compression.
+Run A supports transition-only SHARP as the right gradient direction, but shows
+that the raw loss can still reward latent-scale contraction.
+
+## Run B: Normalized Transition-Only SHARP
+
+Run B makes the SHARP loss scale-invariant by normalizing one-step transition
+errors by detached posterior scale:
+
+```text
+sigma_t = stopgrad(std_batch(post_deter[t + 1]) + eps)
+epsilon_norm_t = (img_step(post_t, action_t) - post_deter[t + 1]) / sigma_t
+
+L_SHARP = beta_mean * ||E_batch[epsilon_norm_t]||^2
+        + beta_var  * ||Var_batch[epsilon_norm_t] - tau||^2
+```
+
+The normalization uses per-dimension posterior deterministic-state standard
+deviation across the batch, clamped with `eps=1e-6`. `sigma_t` is detached, so
+SHARP cannot reduce the loss by changing the normalization denominator through
+the posterior path.
+
+Run B also changes the variance term from a zero target to a calibrated target:
+`tau=1.0`. This prevents the auxiliary loss from directly rewarding collapse
+of normalized residual variance. The training script logs `mm_norm_scale`, the
+mean sampled `sigma_t`, so contraction can be monitored during training. If
+`mm_norm_scale` trends toward zero, posterior scale is still shrinking despite
+normalization.
+
+The screening configs use `300k` environment steps. Expected Run B outcomes:
+
+- Normalized `J_total` reduction above `35-40%`.
+- Imag trace reduction below `60%`.
+- Step 0/1 observation error remains healthy.
 
 ## Future Runs
 
-- Run B: normalized SHARP, measuring prediction errors in a scale-normalized
-  latent space to remove latent magnitude incentives.
-- Run C: variance floor, preventing the auxiliary loss from rewarding
-  near-zero posterior spread.
+- Run C: normalized SHARP with a config-only `trace_floor` placeholder at
+  `20.0`; the training script intentionally ignores this key until the
+  trace-floor loss is implemented after Run B results.
 - Run D: overshooting, extending the transition-only objective beyond one step
   while preserving the posterior detach boundary.
 - Run E: prior fidelity, adding checks or losses that keep transition priors

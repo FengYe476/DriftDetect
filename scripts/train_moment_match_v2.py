@@ -71,6 +71,14 @@ def main():
     beta_var = float(mm_cfg.get("beta_var", 0.1))
     n_starts = int(mm_cfg.get("n_starts", 8))
     warmup_env_steps = int(mm_cfg.get("warmup_env_steps", 50000))
+    normalize_mode = args.normalize_mode or str(mm_cfg.get("normalize_mode", "raw"))
+    if normalize_mode not in {"raw", "per_dim"}:
+        raise ValueError(f"Unsupported normalize_mode: {normalize_mode!r}")
+    variance_target = (
+        float(args.variance_target)
+        if args.variance_target is not None
+        else float(mm_cfg.get("variance_target", 1.0))
+    )
     
     print("=" * 70)
     print("DreamerV3 + SHARP-v2 (transition-only)")
@@ -78,7 +86,11 @@ def main():
     print(f"Task: {config.task}, Seed: {config.seed}")
     print(f"beta_mean={beta_mean}, beta_var={beta_var}")
     print(f"n_starts={n_starts}, warmup_env_steps={warmup_env_steps}")
-    print(f"Loss: ||E[eps]||^2 + ||Var[eps] - 0||^2")
+    print(f"normalize_mode={normalize_mode}, variance_target={variance_target}")
+    if normalize_mode == "raw":
+        print("Loss: ||E[eps]||^2 + ||Var[eps] - 0||^2")
+    else:
+        print("Loss: ||E[eps/sigma]||^2 + ||Var[eps/sigma] - tau||^2")
     print("Closes mean (true_bias) and variance escape routes")
     print("=" * 70, flush=True)
     
@@ -125,6 +137,8 @@ def main():
             beta_mean=beta_mean if active else 0.0,
             beta_var=beta_var if active else 0.0,
             n_starts=n_starts,
+            normalize_mode=normalize_mode,
+            variance_target=variance_target,
             tools_module=tools,
             torch_module=torch,
         )
@@ -170,6 +184,7 @@ def main():
 def world_model_train_with_moment_match(
     world_model, data, *,
     beta_mean: float, beta_var: float, n_starts: int,
+    normalize_mode: str, variance_target: float,
     tools_module, torch_module,
 ):
     """Mirror DreamerV3 WorldModel._train and add moment matching loss."""
@@ -178,6 +193,7 @@ def world_model_train_with_moment_match(
     mm_metrics = {
         "mm_mean_loss": 0.0, "mm_var_loss": 0.0,
         "mm_active": 0.0, "mm_noise_var": 0.0,
+        "mm_norm_scale": 0.0,
     }
     
     with tools_module.RequiresGrad(world_model):
@@ -222,6 +238,8 @@ def world_model_train_with_moment_match(
                     n_starts=n_starts,
                     beta_mean=beta_mean,
                     beta_var=beta_var,
+                    normalize_mode=normalize_mode,
+                    variance_target=variance_target,
                     torch_module=torch_module,
                 )
                 total_model_loss = total_model_loss + mm_loss
@@ -259,21 +277,34 @@ def world_model_train_with_moment_match(
 
 
 def compute_moment_match_loss(
-    *, world_model, post, actions, n_starts, beta_mean, beta_var, torch_module
+    *,
+    world_model,
+    post,
+    actions,
+    n_starts,
+    beta_mean,
+    beta_var,
+    normalize_mode,
+    variance_target,
+    torch_module,
 ):
     """L = beta_mean * ||E[eps]||^2 + beta_var * ||Var[eps]||^2"""
     
     post_deter = post["deter"]
     if post_deter.ndim != 3:
         return torch_module.tensor(0.0, device=post_deter.device), {
-            "mm_mean_loss": 0.0, "mm_var_loss": 0.0, "mm_noise_var": 0.0,
+            "mm_mean_loss": 0.0, "mm_var_loss": 0.0,
+            "mm_noise_var": 0.0, "mm_norm_scale": 0.0,
         }
     
     T, B, D = post_deter.shape
     if T < 2:
         return torch_module.tensor(0.0, device=post_deter.device), {
-            "mm_mean_loss": 0.0, "mm_var_loss": 0.0, "mm_noise_var": 0.0,
+            "mm_mean_loss": 0.0, "mm_var_loss": 0.0,
+            "mm_noise_var": 0.0, "mm_norm_scale": 0.0,
         }
+    if normalize_mode not in {"raw", "per_dim"}:
+        raise ValueError(f"Unsupported normalize_mode: {normalize_mode!r}")
     
     if not isinstance(actions, torch_module.Tensor):
         actions = torch_module.tensor(actions, device=post_deter.device)
@@ -281,6 +312,7 @@ def compute_moment_match_loss(
     starts = torch_module.randint(0, T - 1, (n_starts,))
     
     epsilons = []
+    norm_scales = []
     for start in starts:
         t = int(start)
         # SHARP-v2 transition-only boundary:
@@ -297,6 +329,10 @@ def compute_moment_match_loss(
         next_state = world_model.dynamics.img_step(state, action, sample=False)
         target = post_deter[t + 1].detach()
         epsilon = next_state["deter"] - target
+        if normalize_mode == "per_dim":
+            sigma = target.std(dim=0).clamp(min=1e-6).detach()
+            epsilon = epsilon / sigma
+            norm_scales.append(sigma.mean())
         epsilons.append(epsilon)
     
     all_epsilon = torch_module.cat(epsilons, dim=0)  # (n_starts*B, D)
@@ -305,9 +341,15 @@ def compute_moment_match_loss(
     bias_estimate = all_epsilon.mean(dim=0)
     L_mean = bias_estimate.pow(2).sum()
     
-    # Variance term: ||Var[eps]||^2 (target = 0)
+    # Variance term: raw mode preserves Run A's zero target exactly; per-dim
+    # mode uses a calibrated nonzero target in normalized residual units.
     eps_var = all_epsilon.var(dim=0)  # (D,)
-    L_var = eps_var.pow(2).sum()  # penalize large variance
+    if normalize_mode == "raw":
+        L_var = eps_var.pow(2).sum()
+        norm_scale = all_epsilon.new_tensor(0.0)
+    else:
+        L_var = (eps_var - variance_target).pow(2).sum()
+        norm_scale = torch_module.stack(norm_scales).mean()
     
     # Combined
     L_total = beta_mean * L_mean + beta_var * L_var
@@ -316,6 +358,7 @@ def compute_moment_match_loss(
         "mm_mean_loss": float(L_mean.detach().cpu().item()),
         "mm_var_loss": float(L_var.detach().cpu().item()),
         "mm_noise_var": float(eps_var.sum().detach().cpu().item()),
+        "mm_norm_scale": float(norm_scale.detach().cpu().item()),
     }
 
 
@@ -336,6 +379,8 @@ def parse_args():
     p.add_argument("--config", default=str(PROJECT_ROOT / "configs" / "month8_moment_match.yaml"))
     p.add_argument("--run_name", default="month8_moment_match")
     p.add_argument("--device", default=None)
+    p.add_argument("--normalize_mode", choices=("raw", "per_dim"), default=None)
+    p.add_argument("--variance_target", type=float, default=None)
     return p.parse_args()
 
 
