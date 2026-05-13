@@ -1,0 +1,61 @@
+# V3 Walker SHARP multi-seed replication plan.
+#
+# Walker uses the same Month 8 Cheetah SHARP settings, with only the task
+# changed to dmc_walker_walk in configs/month8_moment_match_walker.yaml.
+# The eventual unified runpod wrapper configs should differ between baseline
+# and SHARP only in beta_mean and beta_var.
+
+planned_seeds:
+  - 42
+  - 43
+  - 44
+
+task: dmc_walker_walk
+total_steps: 500000
+dreamer_configs:
+  - dmc_proprio
+
+dreamer:
+  batch_size: 32
+  envs: 8
+  compile: false
+
+baseline:
+  moment_match:
+    beta_mean: 0.0
+    beta_var: 0.0
+    n_starts: 8
+    warmup_env_steps: 50000
+
+sharp:
+  moment_match:
+    beta_mean: 1.0
+    beta_var: 0.1
+    n_starts: 8
+    warmup_env_steps: 50000
+
+rollout_eval:
+  num_rollout_seeds: 20
+  total_steps: 1000
+  imagination_start: 200
+  horizon: 200
+  primary_trim_window_half_open:
+    start: 25
+    end: 175
+  rollout_file_template: walker_v3_seed{seed}_v2.npz
+
+methodology:
+  comparison: same_pod_seed_pair
+  description: >
+    For each training seed, run baseline first and SHARP second on the same
+    RunPod pod so both checkpoints share hardware, software environment, and
+    dependency versions. This follows the Cheetah and Cartpole controlled
+    multi-seed methodology.
+  baseline_vs_sharp_difference: >
+    The generated baseline and SHARP training configs must differ only in
+    moment_match.beta_mean and moment_match.beta_var.
+  cheetah_config_comparison: >
+    configs/month8_moment_match_walker.yaml is copied from
+    configs/month8_moment_match.yaml with only task changed to dmc_walker_walk;
+    batch_size, envs, SHARP beta values, n_starts, warmup, and total_steps are
+    identical.
