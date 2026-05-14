@@ -1,0 +1,22 @@
+# SHARP-v2 Run B0: diagnostic only, no SHARP gradients
+# Purpose: measure natural scale of normalized losses and sigma distribution
+dreamer_configs:
+  - dmc_proprio
+
+task: dmc_cheetah_run
+total_steps: 100000
+seed: 42
+
+dreamer:
+  batch_size: 32
+  envs: 8
+  compile: false
+
+moment_match:
+  beta_mean: 1.0      # doesn't matter, diagnostic_only ignores it
+  beta_var: 0.1        # doesn't matter
+  n_starts: 8
+  warmup_env_steps: 0  # activate immediately so we see metrics from step 0
+  normalize_mode: "per_dim"
+  variance_target: 1.0
+  diagnostic_only: true

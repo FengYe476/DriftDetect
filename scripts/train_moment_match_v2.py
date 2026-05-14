@@ -79,6 +79,7 @@ def main():
         if args.variance_target is not None
         else float(mm_cfg.get("variance_target", 1.0))
     )
+    diagnostic_only = bool(mm_cfg.get("diagnostic_only", False)) or bool(args.diagnostic_only)
     
     print("=" * 70)
     print("DreamerV3 + SHARP-v2 (transition-only)")
@@ -87,6 +88,8 @@ def main():
     print(f"beta_mean={beta_mean}, beta_var={beta_var}")
     print(f"n_starts={n_starts}, warmup_env_steps={warmup_env_steps}")
     print(f"normalize_mode={normalize_mode}, variance_target={variance_target}")
+    if diagnostic_only:
+        print("MODE: DIAGNOSTIC ONLY (no SHARP gradients)")
     if normalize_mode == "raw":
         print("Loss: ||E[eps]||^2 + ||Var[eps] - 0||^2")
     else:
@@ -139,6 +142,7 @@ def main():
             n_starts=n_starts,
             normalize_mode=normalize_mode,
             variance_target=variance_target,
+            diagnostic_only=diagnostic_only,
             tools_module=tools,
             torch_module=torch,
         )
@@ -184,17 +188,14 @@ def main():
 def world_model_train_with_moment_match(
     world_model, data, *,
     beta_mean: float, beta_var: float, n_starts: int,
-    normalize_mode: str, variance_target: float,
+    normalize_mode: str, variance_target: float, diagnostic_only: bool,
     tools_module, torch_module,
 ):
     """Mirror DreamerV3 WorldModel._train and add moment matching loss."""
     
     data = world_model.preprocess(data)
-    mm_metrics = {
-        "mm_mean_loss": 0.0, "mm_var_loss": 0.0,
-        "mm_active": 0.0, "mm_noise_var": 0.0,
-        "mm_norm_scale": 0.0,
-    }
+    mm_metrics = zero_moment_match_metrics()
+    mm_metrics["mm_active"] = 0.0
     
     with tools_module.RequiresGrad(world_model):
         with torch_module.cuda.amp.autocast(world_model._use_amp):
@@ -230,7 +231,7 @@ def world_model_train_with_moment_match(
             total_model_loss = torch_module.mean(model_loss)
             
             # ===== Moment Matching Loss =====
-            if beta_mean > 0 or beta_var > 0:
+            if diagnostic_only or beta_mean > 0 or beta_var > 0:
                 mm_loss, mm_metrics = compute_moment_match_loss(
                     world_model=world_model,
                     post=post,
@@ -240,6 +241,7 @@ def world_model_train_with_moment_match(
                     beta_var=beta_var,
                     normalize_mode=normalize_mode,
                     variance_target=variance_target,
+                    diagnostic_only=diagnostic_only,
                     torch_module=torch_module,
                 )
                 total_model_loss = total_model_loss + mm_loss
@@ -276,7 +278,73 @@ def world_model_train_with_moment_match(
     return post, context, metrics
 
 
+def zero_moment_match_metrics():
+    return {
+        "mm_mean_loss": 0.0,
+        "mm_var_loss": 0.0,
+        "mm_noise_var": 0.0,
+        "mm_norm_scale": 0.0,
+        "mm_sigma_mean": 0.0,
+        "mm_sigma_min": 0.0,
+        "mm_sigma_p05": 0.0,
+        "mm_sigma_p50": 0.0,
+        "mm_sigma_p95": 0.0,
+        "mm_sigma_max": 0.0,
+        "mm_sigma_below_01": 0,
+        "mm_eps_raw_mean": 0.0,
+        "mm_eps_raw_std": 0.0,
+        "mm_eps_raw_max": 0.0,
+        "mm_eps_norm_mean": 0.0,
+        "mm_eps_norm_std": 0.0,
+        "mm_eps_norm_max": 0.0,
+    }
+
+
 def compute_moment_match_loss(
+    *,
+    world_model,
+    post,
+    actions,
+    n_starts,
+    beta_mean,
+    beta_var,
+    normalize_mode,
+    variance_target,
+    torch_module,
+    diagnostic_only=False,
+):
+    """L = beta_mean * ||E[eps]||^2 + beta_var * ||Var[eps]||^2"""
+
+    if diagnostic_only:
+        post_deter = post["deter"]
+        with torch_module.no_grad():
+            _, metrics = _compute_moment_match_loss_impl(
+                world_model=world_model,
+                post=post,
+                actions=actions,
+                n_starts=n_starts,
+                beta_mean=beta_mean,
+                beta_var=beta_var,
+                normalize_mode=normalize_mode,
+                variance_target=variance_target,
+                torch_module=torch_module,
+            )
+        return post_deter.new_tensor(0.0), metrics
+
+    return _compute_moment_match_loss_impl(
+        world_model=world_model,
+        post=post,
+        actions=actions,
+        n_starts=n_starts,
+        beta_mean=beta_mean,
+        beta_var=beta_var,
+        normalize_mode=normalize_mode,
+        variance_target=variance_target,
+        torch_module=torch_module,
+    )
+
+
+def _compute_moment_match_loss_impl(
     *,
     world_model,
     post,
@@ -289,20 +357,14 @@ def compute_moment_match_loss(
     torch_module,
 ):
     """L = beta_mean * ||E[eps]||^2 + beta_var * ||Var[eps]||^2"""
-    
+
     post_deter = post["deter"]
     if post_deter.ndim != 3:
-        return torch_module.tensor(0.0, device=post_deter.device), {
-            "mm_mean_loss": 0.0, "mm_var_loss": 0.0,
-            "mm_noise_var": 0.0, "mm_norm_scale": 0.0,
-        }
+        return torch_module.tensor(0.0, device=post_deter.device), zero_moment_match_metrics()
     
     T, B, D = post_deter.shape
     if T < 2:
-        return torch_module.tensor(0.0, device=post_deter.device), {
-            "mm_mean_loss": 0.0, "mm_var_loss": 0.0,
-            "mm_noise_var": 0.0, "mm_norm_scale": 0.0,
-        }
+        return torch_module.tensor(0.0, device=post_deter.device), zero_moment_match_metrics()
     if normalize_mode not in {"raw", "per_dim"}:
         raise ValueError(f"Unsupported normalize_mode: {normalize_mode!r}")
     
@@ -312,7 +374,9 @@ def compute_moment_match_loss(
     starts = torch_module.randint(0, T - 1, (n_starts,))
     
     epsilons = []
-    norm_scales = []
+    raw_epsilons = []
+    norm_epsilons = []
+    sigmas = []
     for start in starts:
         t = int(start)
         # SHARP-v2 transition-only boundary:
@@ -328,11 +392,24 @@ def compute_moment_match_loss(
         
         next_state = world_model.dynamics.img_step(state, action, sample=False)
         target = post_deter[t + 1].detach()
-        epsilon = next_state["deter"] - target
+        epsilon_raw = next_state["deter"] - target
+        epsilon = epsilon_raw
         if normalize_mode == "per_dim":
             sigma = target.std(dim=0).clamp(min=1e-6).detach()
+            if not getattr(compute_moment_match_loss, "_printed_sigma_debug", False):
+                sigma_debug = sigma.float()
+                print(
+                    "DEBUG sigma stats: "
+                    f"mean={sigma_debug.mean().item():.6f} "
+                    f"min={sigma_debug.min().item():.6f} "
+                    f"max={sigma_debug.max().item():.6f}",
+                    flush=True,
+                )
+                compute_moment_match_loss._printed_sigma_debug = True
             epsilon = epsilon / sigma
-            norm_scales.append(sigma.mean())
+            sigmas.append(sigma)
+            raw_epsilons.append(epsilon_raw)
+            norm_epsilons.append(epsilon)
         epsilons.append(epsilon)
     
     all_epsilon = torch_module.cat(epsilons, dim=0)  # (n_starts*B, D)
@@ -349,17 +426,41 @@ def compute_moment_match_loss(
         norm_scale = all_epsilon.new_tensor(0.0)
     else:
         L_var = (eps_var - variance_target).pow(2).sum()
-        norm_scale = torch_module.stack(norm_scales).mean()
+        sigma_all = torch_module.stack(sigmas, dim=0)
+        sigma_flat = sigma_all.float().reshape(-1)
+        raw_epsilon_all = torch_module.cat(raw_epsilons, dim=0)
+        norm_epsilon_all = torch_module.cat(norm_epsilons, dim=0)
+        raw_epsilon_diag = raw_epsilon_all.detach()
+        norm_epsilon_diag = norm_epsilon_all.detach()
+        norm_scale = sigma_flat.mean()
     
     # Combined
     L_total = beta_mean * L_mean + beta_var * L_var
     
-    return L_total, {
+    metrics = zero_moment_match_metrics()
+    metrics.update({
         "mm_mean_loss": float(L_mean.detach().cpu().item()),
         "mm_var_loss": float(L_var.detach().cpu().item()),
         "mm_noise_var": float(eps_var.sum().detach().cpu().item()),
         "mm_norm_scale": float(norm_scale.detach().cpu().item()),
-    }
+    })
+    if normalize_mode == "per_dim":
+        metrics.update({
+            "mm_sigma_mean": float(sigma_flat.mean().detach().cpu().item()),
+            "mm_sigma_min": float(sigma_flat.min().detach().cpu().item()),
+            "mm_sigma_p05": float(sigma_flat.quantile(0.05).detach().cpu().item()),
+            "mm_sigma_p50": float(sigma_flat.quantile(0.50).detach().cpu().item()),
+            "mm_sigma_p95": float(sigma_flat.quantile(0.95).detach().cpu().item()),
+            "mm_sigma_max": float(sigma_flat.max().detach().cpu().item()),
+            "mm_sigma_below_01": int((sigma_flat < 0.1).sum().detach().cpu().item()),
+            "mm_eps_raw_mean": float(raw_epsilon_diag.abs().mean().cpu().item()),
+            "mm_eps_raw_std": float(raw_epsilon_diag.std().cpu().item()),
+            "mm_eps_raw_max": float(raw_epsilon_diag.abs().max().cpu().item()),
+            "mm_eps_norm_mean": float(norm_epsilon_diag.abs().mean().cpu().item()),
+            "mm_eps_norm_std": float(norm_epsilon_diag.std().cpu().item()),
+            "mm_eps_norm_max": float(norm_epsilon_diag.abs().max().cpu().item()),
+        })
+    return L_total, metrics
 
 
 def torch_to_np(x):
@@ -381,6 +482,7 @@ def parse_args():
     p.add_argument("--device", default=None)
     p.add_argument("--normalize_mode", choices=("raw", "per_dim"), default=None)
     p.add_argument("--variance_target", type=float, default=None)
+    p.add_argument("--diagnostic_only", action="store_true")
     return p.parse_args()
 
 
