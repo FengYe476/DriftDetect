@@ -96,11 +96,36 @@ The screening configs use `300k` environment steps. Expected Run B outcomes:
 - Imag trace reduction below `60%`.
 - Step 0/1 observation error remains healthy.
 
+## Run C: Trace Floor + Optional Jacobian Reg
+
+Run C returns to Run A's raw transition-only SHARP objective because it gave the
+strongest drift pressure, then adds an explicit posterior trace floor to block
+the latent-collapse route. SHARP still detaches every posterior-derived input
+to `dynamics.img_step()`, so SHARP gradients remain transition-only.
+
+The trace floor is intentionally different: it uses live `post["deter"]`
+without detach, so its gradients can reach the representation path and resist
+posterior compression:
+
+```text
+current_trace = mean_t sum_dim Var_batch(post_deter[t])
+L_trace = beta_trace * relu(trace_floor - current_trace)^2
+```
+
+Trace floor starts from step 0. Optional Jacobian regularization is warmup-gated
+with SHARP and penalizes local transition amplification through a Hutchinson
+estimate of `||d deter_{t+1} / d deter_t||_F^2`.
+
+Run C screening variants:
+
+| Run | SHARP mode | Trace floor | beta_trace | Jacobian lambda | Purpose |
+|---|---:|---:|---:|---:|---|
+| C1 | raw | 20.0 | 0.1 | 0.0 | Run A drift pressure with 0.5x baseline trace floor |
+| C2 | raw | 24.0 | 0.1 | 0.0 | Slightly stronger 0.6x baseline trace floor |
+| C3 | raw | 20.0 | 0.1 | 0.001 | C1 plus small local Jacobian control |
+
 ## Future Runs
 
-- Run C: normalized SHARP with a config-only `trace_floor` placeholder at
-  `20.0`; the training script intentionally ignores this key until the
-  trace-floor loss is implemented after Run B results.
 - Run D: overshooting, extending the transition-only objective beyond one step
   while preserving the posterior detach boundary.
 - Run E: prior fidelity, adding checks or losses that keep transition priors

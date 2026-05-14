@@ -1,0 +1,24 @@
+# Run C1: transition-only SHARP + trace floor 0.5x baseline
+dreamer_configs:
+  - dmc_proprio
+
+task: dmc_cheetah_run
+total_steps: 300000
+seed: 42
+
+dreamer:
+  batch_size: 32
+  envs: 8
+  compile: false
+
+moment_match:
+  beta_mean: 1.0
+  beta_var: 0.1
+  n_starts: 8
+  warmup_env_steps: 50000
+  normalize_mode: "raw"
+  variance_target: 1.0
+  trace_floor: 20.0
+  beta_trace: 0.1
+  jacobian_lambda: 0.0
+  jacobian_n_projections: 1

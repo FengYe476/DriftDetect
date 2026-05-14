@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# SHARP-v2 Run A/B/C launcher for RunPod.
+# SHARP-v2 Run A/B/C/C1/C2/C3 launcher for RunPod.
 #
 # Usage:
 #   bash scripts/runpod_sharp_v2.sh cheetah
 #   bash scripts/runpod_sharp_v2.sh cartpole
 #   RUN=B bash scripts/runpod_sharp_v2.sh cheetah
 #   RUN=C bash scripts/runpod_sharp_v2.sh cheetah
+#   RUN=C1 bash scripts/runpod_sharp_v2.sh cheetah
+#   RUN=C2 bash scripts/runpod_sharp_v2.sh cheetah
+#   RUN=C3 bash scripts/runpod_sharp_v2.sh cheetah
 
 if [ "$#" -ne 1 ]; then
   echo "Usage: bash scripts/runpod_sharp_v2.sh cheetah|cartpole"
@@ -19,10 +22,10 @@ SEED=42
 RUN="${RUN:-A}"
 
 case "${RUN}" in
-  A|B|C)
+  A|B|C|C1|C2|C3)
     ;;
   *)
-    echo "RUN must be one of A, B, or C, got '${RUN}'."
+    echo "RUN must be one of A, B, C, C1, C2, or C3, got '${RUN}'."
     exit 2
     ;;
 esac
@@ -42,10 +45,14 @@ case "${TASK_CHOICE}" in
     ;;
 esac
 
-if [ "${RUN}" = "C" ] && [ "${TASK_SHORT}" != "cheetah" ]; then
-  echo "RUN=C currently has only configs/sharp_v2_runC_cheetah.yaml; '${TASK_SHORT}' is unsupported."
-  exit 2
-fi
+case "${RUN}" in
+  C|C1|C2|C3)
+    if [ "${TASK_SHORT}" != "cheetah" ]; then
+      echo "RUN=${RUN} currently has only a Cheetah config; '${TASK_SHORT}' is unsupported."
+      exit 2
+    fi
+    ;;
+esac
 
 CONFIG_PATH="configs/sharp_v2_run${RUN}_${TASK_SHORT}.yaml"
 
@@ -230,6 +237,10 @@ prepare_dirs() {
 }
 
 print_config() {
+  if [ ! -f "${CONFIG_PATH}" ]; then
+    echo "Missing config: ${CONFIG_PATH}"
+    exit 2
+  fi
   echo ""
   echo "Run: ${RUN}"
   echo "Task: ${TASK_SHORT} (${DMC_TASK})"

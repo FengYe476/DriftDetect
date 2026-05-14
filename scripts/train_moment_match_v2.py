@@ -80,6 +80,22 @@ def main():
         else float(mm_cfg.get("variance_target", 1.0))
     )
     diagnostic_only = bool(mm_cfg.get("diagnostic_only", False)) or bool(args.diagnostic_only)
+    trace_floor = (
+        float(args.trace_floor)
+        if args.trace_floor is not None
+        else float(mm_cfg.get("trace_floor", 0.0))
+    )
+    beta_trace = (
+        float(args.beta_trace)
+        if args.beta_trace is not None
+        else float(mm_cfg.get("beta_trace", 0.1))
+    )
+    jacobian_lambda = (
+        float(args.jacobian_lambda)
+        if args.jacobian_lambda is not None
+        else float(mm_cfg.get("jacobian_lambda", 0.0))
+    )
+    jacobian_n_projections = int(mm_cfg.get("jacobian_n_projections", 1))
     
     print("=" * 70)
     print("DreamerV3 + SHARP-v2 (transition-only)")
@@ -88,6 +104,11 @@ def main():
     print(f"beta_mean={beta_mean}, beta_var={beta_var}")
     print(f"n_starts={n_starts}, warmup_env_steps={warmup_env_steps}")
     print(f"normalize_mode={normalize_mode}, variance_target={variance_target}")
+    print(f"trace_floor={trace_floor}, beta_trace={beta_trace}")
+    print(
+        f"jacobian_lambda={jacobian_lambda}, "
+        f"jacobian_n_projections={jacobian_n_projections}"
+    )
     if diagnostic_only:
         print("MODE: DIAGNOSTIC ONLY (no SHARP gradients)")
     if normalize_mode == "raw":
@@ -143,6 +164,10 @@ def main():
             normalize_mode=normalize_mode,
             variance_target=variance_target,
             diagnostic_only=diagnostic_only,
+            trace_floor=trace_floor,
+            beta_trace=beta_trace,
+            jacobian_lambda=jacobian_lambda if active else 0.0,
+            jacobian_n_projections=jacobian_n_projections,
             tools_module=tools,
             torch_module=torch,
         )
@@ -189,6 +214,8 @@ def world_model_train_with_moment_match(
     world_model, data, *,
     beta_mean: float, beta_var: float, n_starts: int,
     normalize_mode: str, variance_target: float, diagnostic_only: bool,
+    trace_floor: float, beta_trace: float,
+    jacobian_lambda: float, jacobian_n_projections: int,
     tools_module, torch_module,
 ):
     """Mirror DreamerV3 WorldModel._train and add moment matching loss."""
@@ -247,6 +274,49 @@ def world_model_train_with_moment_match(
                 total_model_loss = total_model_loss + mm_loss
                 mm_metrics["mm_active"] = 1.0
             # ================================
+
+            # ===== Trace Floor Loss =====
+            if not diagnostic_only and trace_floor > 0:
+                post_deter_live = post["deter"]
+                if post_deter_live.ndim == 3:
+                    current_trace = post_deter_live.var(dim=1).sum(dim=-1).mean()
+                    trace_loss = torch_module.relu(trace_floor - current_trace).pow(2).mean()
+                    weighted_trace_loss = float(beta_trace) * trace_loss
+                    total_model_loss = total_model_loss + weighted_trace_loss
+                    mm_metrics.update({
+                        "mm_trace_loss": float(trace_loss.detach().cpu().item()),
+                        "mm_trace_weighted_loss": float(
+                            weighted_trace_loss.detach().cpu().item()
+                        ),
+                        "mm_current_trace": float(current_trace.detach().cpu().item()),
+                        "mm_trace_floor": float(trace_floor),
+                        "mm_beta_trace": float(beta_trace),
+                    })
+            # ============================
+
+            # ===== Jacobian Regularization =====
+            if not diagnostic_only and jacobian_lambda > 0:
+                from src.regularization.jacobian_reg import jacobian_reg_loss
+
+                jac_loss, _ = jacobian_reg_loss(
+                    world_model.dynamics,
+                    post["stoch"].transpose(0, 1),
+                    post["deter"].transpose(0, 1),
+                    data["action"].transpose(0, 1),
+                    n_starts=n_starts,
+                    n_projections=jacobian_n_projections,
+                )
+                weighted_jac_loss = float(jacobian_lambda) * jac_loss
+                total_model_loss = total_model_loss + weighted_jac_loss
+                mm_metrics.update({
+                    "mm_jacobian_loss": float(jac_loss.detach().cpu().item()),
+                    "mm_jacobian_weighted_loss": float(
+                        weighted_jac_loss.detach().cpu().item()
+                    ),
+                    "mm_jacobian_lambda": float(jacobian_lambda),
+                    "mm_jacobian_n_projections": float(jacobian_n_projections),
+                })
+            # ===================================
         
         metrics = world_model._model_opt(total_model_loss, world_model.parameters())
     
@@ -297,6 +367,15 @@ def zero_moment_match_metrics():
         "mm_eps_norm_mean": 0.0,
         "mm_eps_norm_std": 0.0,
         "mm_eps_norm_max": 0.0,
+        "mm_trace_loss": 0.0,
+        "mm_trace_weighted_loss": 0.0,
+        "mm_current_trace": 0.0,
+        "mm_trace_floor": 0.0,
+        "mm_beta_trace": 0.0,
+        "mm_jacobian_loss": 0.0,
+        "mm_jacobian_weighted_loss": 0.0,
+        "mm_jacobian_lambda": 0.0,
+        "mm_jacobian_n_projections": 0.0,
     }
 
 
@@ -416,16 +495,19 @@ def _compute_moment_match_loss_impl(
     
     # Mean term: ||E[eps]||^2
     bias_estimate = all_epsilon.mean(dim=0)
-    L_mean = bias_estimate.pow(2).sum()
     
     # Variance term: raw mode preserves Run A's zero target exactly; per-dim
     # mode uses a calibrated nonzero target in normalized residual units.
     eps_var = all_epsilon.var(dim=0)  # (D,)
     if normalize_mode == "raw":
+        # .sum() matches Run A raw SHARP; Run B per_dim mode was tested with
+        # .mean() to control loss scale.
+        L_mean = bias_estimate.pow(2).sum()
         L_var = eps_var.pow(2).sum()
         norm_scale = all_epsilon.new_tensor(0.0)
     else:
-        L_var = (eps_var - variance_target).pow(2).sum()
+        L_mean = bias_estimate.pow(2).mean()
+        L_var = (eps_var - variance_target).pow(2).mean()
         sigma_all = torch_module.stack(sigmas, dim=0)
         sigma_flat = sigma_all.float().reshape(-1)
         raw_epsilon_all = torch_module.cat(raw_epsilons, dim=0)
@@ -483,6 +565,9 @@ def parse_args():
     p.add_argument("--normalize_mode", choices=("raw", "per_dim"), default=None)
     p.add_argument("--variance_target", type=float, default=None)
     p.add_argument("--diagnostic_only", action="store_true")
+    p.add_argument("--trace_floor", type=float, default=None)
+    p.add_argument("--beta_trace", type=float, default=None)
+    p.add_argument("--jacobian_lambda", type=float, default=None)
     return p.parse_args()
 
 
