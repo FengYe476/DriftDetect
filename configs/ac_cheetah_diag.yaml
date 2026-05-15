@@ -1,0 +1,22 @@
+# AC Step 1 Diagnostic: measure baseline amplification curve
+dreamer_configs:
+  - dmc_proprio
+
+task: dmc_cheetah_run
+total_steps: 100000
+seed: 42
+
+dreamer:
+  batch_size: 32
+  envs: 8
+  compile: false
+
+amplification_control:
+  enabled: false        # diagnostic only, no training
+  diagnostic: true      # log gain curves
+  horizons: [1, 2, 4, 8, 15]
+  n_dirs: 4
+  delta_scale: 0.01
+  rho: 1.0              # placeholder, will be set from diagnostics
+  n_starts: 4
+  warmup_env_steps: 0
