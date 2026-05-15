@@ -297,7 +297,9 @@ def world_model_train_with_moment_match(
             if not diagnostic_only and trace_floor > 0:
                 post_deter_live = post["deter"]
                 if post_deter_live.ndim == 3:
-                    current_trace = post_deter_live.var(dim=1).sum(dim=-1).mean()
+                    batch_trace = post_deter_live.var(dim=0).sum(dim=-1).mean()
+                    time_trace = post_deter_live.var(dim=1).sum(dim=-1).mean()
+                    current_trace = time_trace
                     trace_loss = torch_module.relu(trace_floor - current_trace).pow(2).mean()
                     weighted_trace_loss = float(beta_trace) * trace_loss
                     total_model_loss = total_model_loss + weighted_trace_loss
@@ -307,6 +309,8 @@ def world_model_train_with_moment_match(
                             weighted_trace_loss.detach().cpu().item()
                         ),
                         "mm_current_trace": float(current_trace.detach().cpu().item()),
+                        "mm_batch_trace": float(batch_trace.detach().cpu().item()),
+                        "mm_time_trace": float(time_trace.detach().cpu().item()),
                         "mm_trace_floor": float(trace_floor),
                         "mm_beta_trace": float(beta_trace),
                     })
@@ -314,7 +318,7 @@ def world_model_train_with_moment_match(
 
             # ===== Posterior Trace Floor =====
             if not diagnostic_only and post_trace_floor > 0:
-                post_deter_live = post["deter"]  # (T, B, D), no detach.
+                post_deter_live = post["deter"]  # (B, T, D), no detach.
                 if post_deter_live.ndim == 3:
                     post_current_trace = post_deter_live.var(dim=1).sum(dim=-1).mean()
                     post_trace_loss = torch_module.relu(
@@ -342,9 +346,9 @@ def world_model_train_with_moment_match(
 
                 jac_loss, _ = jacobian_reg_loss(
                     world_model.dynamics,
-                    post["stoch"].transpose(0, 1),
-                    post["deter"].transpose(0, 1),
-                    data["action"].transpose(0, 1),
+                    post["stoch"],
+                    post["deter"],
+                    data["action"],
                     n_starts=n_starts,
                     n_projections=jacobian_n_projections,
                 )
@@ -412,6 +416,8 @@ def zero_moment_match_metrics():
         "mm_trace_loss": 0.0,
         "mm_trace_weighted_loss": 0.0,
         "mm_current_trace": 0.0,
+        "mm_batch_trace": 0.0,
+        "mm_time_trace": 0.0,
         "mm_trace_floor": 0.0,
         "mm_beta_trace": 0.0,
         "mm_post_trace_loss": 0.0,
@@ -484,17 +490,21 @@ def _compute_moment_match_loss_impl(
     """L = beta_mean * ||E[eps]||^2 + beta_var * ||Var[eps]||^2"""
 
     post_deter = post["deter"]
-    if post_deter.ndim != 3:
-        return torch_module.tensor(0.0, device=post_deter.device), zero_moment_match_metrics()
-    
-    T, B, D = post_deter.shape
+    if not isinstance(actions, torch_module.Tensor):
+        actions = torch_module.tensor(actions, device=post_deter.device)
+
+    assert post_deter.ndim == 3, f"Expected 3D tensor, got {post_deter.ndim}D"
+    assert actions.ndim == 3, f"Expected 3D action tensor, got {actions.ndim}D"
+
+    # post["deter"] shape: [B, T, D] where B=batch, T=time, D=latent_dim
+    B, T, D = post_deter.shape
+    assert B == actions.shape[0], f"Batch mismatch: post {B} vs action {actions.shape[0]}"
+    assert T == actions.shape[1], f"Time mismatch: post {T} vs action {actions.shape[1]}"
+
     if T < 2:
         return torch_module.tensor(0.0, device=post_deter.device), zero_moment_match_metrics()
     if normalize_mode not in {"raw", "per_dim"}:
         raise ValueError(f"Unsupported normalize_mode: {normalize_mode!r}")
-    
-    if not isinstance(actions, torch_module.Tensor):
-        actions = torch_module.tensor(actions, device=post_deter.device)
     
     starts = torch_module.randint(0, T - 1, (n_starts,))
     
@@ -511,12 +521,12 @@ def _compute_moment_match_loss_impl(
         # posterior-derived state tensor here so SHARP gradients update only
         # dynamics.img_step() transition parameters. Detach replay actions as a
         # no-op guard; they are not posterior-derived and normally require no grad.
-        state = {k: v[t].detach() for k, v in post.items()}
-        action = actions[t] if actions.ndim == 3 else actions[:, t]
+        state = {k: v[:, t].detach() for k, v in post.items()}
+        action = actions[:, t]
         action = action.detach()
         
         next_state = world_model.dynamics.img_step(state, action, sample=False)
-        target = post_deter[t + 1].detach()
+        target = post_deter[:, t + 1].detach()
         epsilon_raw = next_state["deter"] - target
         epsilon = epsilon_raw
         if normalize_mode == "per_dim":

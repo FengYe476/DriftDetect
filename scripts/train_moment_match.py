@@ -264,30 +264,32 @@ def compute_moment_match_loss(
     """L = beta_mean * ||E[eps]||^2 + beta_var * ||Var[eps]||^2"""
     
     post_deter = post["deter"]
-    if post_deter.ndim != 3:
-        return torch_module.tensor(0.0, device=post_deter.device), {
-            "mm_mean_loss": 0.0, "mm_var_loss": 0.0, "mm_noise_var": 0.0,
-        }
-    
-    T, B, D = post_deter.shape
+    if not isinstance(actions, torch_module.Tensor):
+        actions = torch_module.tensor(actions, device=post_deter.device)
+
+    assert post_deter.ndim == 3, f"Expected 3D tensor, got {post_deter.ndim}D"
+    assert actions.ndim == 3, f"Expected 3D action tensor, got {actions.ndim}D"
+
+    # post["deter"] shape: [B, T, D] where B=batch, T=time, D=latent_dim
+    B, T, D = post_deter.shape
+    assert B == actions.shape[0], f"Batch mismatch: post {B} vs action {actions.shape[0]}"
+    assert T == actions.shape[1], f"Time mismatch: post {T} vs action {actions.shape[1]}"
+
     if T < 2:
         return torch_module.tensor(0.0, device=post_deter.device), {
             "mm_mean_loss": 0.0, "mm_var_loss": 0.0, "mm_noise_var": 0.0,
         }
-    
-    if not isinstance(actions, torch_module.Tensor):
-        actions = torch_module.tensor(actions, device=post_deter.device)
     
     starts = torch_module.randint(0, T - 1, (n_starts,))
     
     epsilons = []
     for start in starts:
         t = int(start)
-        state = {k: v[t] for k, v in post.items()}
-        action = actions[t] if actions.ndim == 3 else actions[:, t]
+        state = {k: v[:, t] for k, v in post.items()}
+        action = actions[:, t]
         
         next_state = world_model.dynamics.img_step(state, action, sample=False)
-        epsilon = next_state["deter"] - post_deter[t + 1].detach()
+        epsilon = next_state["deter"] - post_deter[:, t + 1].detach()
         epsilons.append(epsilon)
     
     all_epsilon = torch_module.cat(epsilons, dim=0)  # (n_starts*B, D)
