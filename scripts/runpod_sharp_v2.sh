@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# SHARP-v2 Run A/B/C/C1/C2/C3 launcher for RunPod.
+# SHARP-v2 Run A/B/C/C1/C2/C2a/C3 launcher for RunPod.
 #
 # Usage:
 #   bash scripts/runpod_sharp_v2.sh cheetah
@@ -10,6 +10,7 @@ set -Eeuo pipefail
 #   RUN=C bash scripts/runpod_sharp_v2.sh cheetah
 #   RUN=C1 bash scripts/runpod_sharp_v2.sh cheetah
 #   RUN=C2 bash scripts/runpod_sharp_v2.sh cheetah
+#   RUN=C2a bash scripts/runpod_sharp_v2.sh cheetah
 #   RUN=C3 bash scripts/runpod_sharp_v2.sh cheetah
 
 if [ "$#" -ne 1 ]; then
@@ -22,10 +23,10 @@ SEED=42
 RUN="${RUN:-A}"
 
 case "${RUN}" in
-  A|B|C|C1|C2|C3)
+  A|B|C|C1|C2|C2a|C3)
     ;;
   *)
-    echo "RUN must be one of A, B, C, C1, C2, or C3, got '${RUN}'."
+    echo "RUN must be one of A, B, C, C1, C2, C2a, or C3, got '${RUN}'."
     exit 2
     ;;
 esac
@@ -46,7 +47,7 @@ case "${TASK_CHOICE}" in
 esac
 
 case "${RUN}" in
-  C|C1|C2|C3)
+  C|C1|C2|C2a|C3)
     if [ "${TASK_SHORT}" != "cheetah" ]; then
       echo "RUN=${RUN} currently has only a Cheetah config; '${TASK_SHORT}' is unsupported."
       exit 2

@@ -90,6 +90,16 @@ def main():
         if args.beta_trace is not None
         else float(mm_cfg.get("beta_trace", 0.1))
     )
+    post_trace_floor = (
+        float(args.post_trace_floor)
+        if args.post_trace_floor is not None
+        else float(mm_cfg.get("post_trace_floor", 0.0))
+    )
+    beta_post_trace = (
+        float(args.beta_post_trace)
+        if args.beta_post_trace is not None
+        else float(mm_cfg.get("beta_post_trace", 0.1))
+    )
     jacobian_lambda = (
         float(args.jacobian_lambda)
         if args.jacobian_lambda is not None
@@ -111,6 +121,11 @@ def main():
     )
     if diagnostic_only:
         print("MODE: DIAGNOSTIC ONLY (no SHARP gradients)")
+    if post_trace_floor > 0:
+        print(
+            f"post_trace_floor={post_trace_floor}, "
+            f"beta_post_trace={beta_post_trace}"
+        )
     if normalize_mode == "raw":
         print("Loss: ||E[eps]||^2 + ||Var[eps] - 0||^2")
     else:
@@ -166,6 +181,8 @@ def main():
             diagnostic_only=diagnostic_only,
             trace_floor=trace_floor,
             beta_trace=beta_trace,
+            post_trace_floor=post_trace_floor,
+            beta_post_trace=beta_post_trace,
             jacobian_lambda=jacobian_lambda if active else 0.0,
             jacobian_n_projections=jacobian_n_projections,
             tools_module=tools,
@@ -215,6 +232,7 @@ def world_model_train_with_moment_match(
     beta_mean: float, beta_var: float, n_starts: int,
     normalize_mode: str, variance_target: float, diagnostic_only: bool,
     trace_floor: float, beta_trace: float,
+    post_trace_floor: float, beta_post_trace: float,
     jacobian_lambda: float, jacobian_n_projections: int,
     tools_module, torch_module,
 ):
@@ -294,6 +312,30 @@ def world_model_train_with_moment_match(
                     })
             # ============================
 
+            # ===== Posterior Trace Floor =====
+            if not diagnostic_only and post_trace_floor > 0:
+                post_deter_live = post["deter"]  # (T, B, D), no detach.
+                if post_deter_live.ndim == 3:
+                    post_current_trace = post_deter_live.var(dim=1).sum(dim=-1).mean()
+                    post_trace_loss = torch_module.relu(
+                        post_trace_floor - post_current_trace
+                    ).pow(2)
+                    weighted_post_trace = float(beta_post_trace) * post_trace_loss
+                    total_model_loss = total_model_loss + weighted_post_trace
+                    mm_metrics.update({
+                        "mm_post_trace_loss": float(
+                            post_trace_loss.detach().cpu().item()
+                        ),
+                        "mm_post_trace_weighted": float(
+                            weighted_post_trace.detach().cpu().item()
+                        ),
+                        "mm_post_current_trace": float(
+                            post_current_trace.detach().cpu().item()
+                        ),
+                        "mm_post_trace_floor": float(post_trace_floor),
+                    })
+            # ==================================
+
             # ===== Jacobian Regularization =====
             if not diagnostic_only and jacobian_lambda > 0:
                 from src.regularization.jacobian_reg import jacobian_reg_loss
@@ -372,6 +414,10 @@ def zero_moment_match_metrics():
         "mm_current_trace": 0.0,
         "mm_trace_floor": 0.0,
         "mm_beta_trace": 0.0,
+        "mm_post_trace_loss": 0.0,
+        "mm_post_trace_weighted": 0.0,
+        "mm_post_current_trace": 0.0,
+        "mm_post_trace_floor": 0.0,
         "mm_jacobian_loss": 0.0,
         "mm_jacobian_weighted_loss": 0.0,
         "mm_jacobian_lambda": 0.0,
@@ -567,6 +613,8 @@ def parse_args():
     p.add_argument("--diagnostic_only", action="store_true")
     p.add_argument("--trace_floor", type=float, default=None)
     p.add_argument("--beta_trace", type=float, default=None)
+    p.add_argument("--post_trace_floor", type=float, default=None)
+    p.add_argument("--beta_post_trace", type=float, default=None)
     p.add_argument("--jacobian_lambda", type=float, default=None)
     return p.parse_args()
 
