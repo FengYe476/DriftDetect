@@ -1,0 +1,21 @@
+dreamer_configs:
+  - dmc_proprio
+
+task: dmc_cheetah_run
+total_steps: 150000
+seed: 42
+
+dreamer:
+  batch_size: 32
+  envs: 8
+  compile: false
+
+amplification_control:
+  beta_ac: 1.0
+  horizons: [1]
+  horizon_weights: "uniform"
+  n_starts: 4
+  n_dirs: 1
+  delta_scale: 0.01
+  rho: 0.780
+  warmup_env_steps: 50000
