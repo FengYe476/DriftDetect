@@ -1,0 +1,22 @@
+dreamer_configs:
+  - dmc_proprio
+
+task: dmc_cheetah_run
+total_steps: 150000
+seed: 42
+
+dreamer:
+  batch_size: 32
+  envs: 8
+  compile: false
+
+sp_dpr:
+  basis_path: "results/baseline_100k/cheetah_seed42/drift_basis.npy"
+  beta_dpr: 1.0
+  target_horizons: [1, 2, 4, 8, 15]
+  horizon_weights: "sqrt_inv"
+  n_starts: 4
+  batch_subsample: 0.25
+  apply_every: 2
+  loss_cap: 0.03
+  warmup_env_steps: 50000
