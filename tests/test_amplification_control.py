@@ -23,9 +23,13 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
 if TORCH_AVAILABLE:
-    from src.regularization.amplification_control import amplification_control_loss
+    from src.regularization.amplification_control import (
+        amplification_control_loss,
+        amplification_control_loss_lite,
+    )
 else:
     amplification_control_loss = None
+    amplification_control_loss_lite = None
 
 
 class ScaleDynamics(nn.Module):
@@ -68,6 +72,21 @@ class GatedDynamics(nn.Module):
             "stoch": state["stoch"],
             "deter": gate * state["deter"],
         }
+
+
+class RecordingScaleDynamics(ScaleDynamics):
+    def __init__(self, scale: float) -> None:
+        super().__init__(scale)
+        self.grad_enabled: list[bool] = []
+
+    def img_step(
+        self,
+        state: dict[str, torch.Tensor],
+        action: torch.Tensor,
+        sample: bool = False,
+    ) -> dict[str, torch.Tensor]:
+        self.grad_enabled.append(torch.is_grad_enabled())
+        return super().img_step(state, action, sample)
 
 
 def make_inputs(
@@ -222,4 +241,125 @@ def test_ac_rejects_unknown_horizon_weights() -> None:
             post_deter,
             action,
             horizon_weights="linear",
+        )
+
+
+def test_ac_lite_basic() -> None:
+    """Verify lite mode rollouts with no_grad, then one-step with grad."""
+    torch.manual_seed(6)
+    B, D_act = 4, 4
+    post_stoch, post_deter, _ = make_inputs(batch=B, action_dim=D_act)
+    actions = torch.randn(B, 5, D_act)
+
+    loss, metrics = amplification_control_loss_lite(
+        GatedDynamics(stoch_flat_dim=8, action_dim=D_act, scale=1.4),
+        post_stoch,
+        post_deter,
+        actions,
+        n_dirs=2,
+        rho=0.5,
+        future_steps=(0, 1, 4),
+        horizon_weights="sqrt_inv",
+        loss_type="log1p",
+    )
+
+    assert loss.shape == torch.Size([])
+    assert torch.isfinite(loss)
+    assert loss.item() > 0.0
+    assert "ac_gain_f0_mean" in metrics
+    assert "ac_gain_f1_p90" in metrics
+    assert "ac_gain_f4_max" in metrics
+    assert metrics["ac_weight_f0"] > metrics["ac_weight_f4"]
+    assert torch.equal(metrics["ac_loss"], loss.detach())
+
+
+def test_ac_lite_gradient_safety() -> None:
+    """Verify gradients don't flow through the multi-step rollout chain."""
+    torch.manual_seed(7)
+    B, D_act = 4, 4
+    post_stoch, post_deter, _ = make_inputs(batch=B, action_dim=D_act)
+    actions = torch.randn(B, 3, D_act)
+    dynamics = RecordingScaleDynamics(2.0)
+
+    loss, _ = amplification_control_loss_lite(
+        dynamics,
+        post_stoch,
+        post_deter,
+        actions,
+        rho=0.0,
+        future_steps=(0, 2),
+        loss_type="log1p",
+    )
+    loss.backward()
+
+    assert dynamics.grad_enabled[:2] == [False, False]
+    assert dynamics.grad_enabled[2:] == [True, True, True, True]
+    assert dynamics.scale.grad is not None
+    assert torch.any(dynamics.scale.grad != 0)
+
+
+def test_ac_log1p_loss() -> None:
+    """Verify log1p loss is less sensitive to outliers than squared."""
+    torch.manual_seed(8)
+    B, D_act = 4, 4
+    post_stoch, post_deter, _ = make_inputs(batch=B, action_dim=D_act)
+    actions = torch.randn(B, 1, D_act)
+
+    log_loss, _ = amplification_control_loss_lite(
+        ScaleDynamics(80.0),
+        post_stoch,
+        post_deter,
+        actions,
+        rho=1.0,
+        future_steps=(0,),
+        loss_type="log1p",
+    )
+    squared_loss, _ = amplification_control_loss_lite(
+        ScaleDynamics(80.0),
+        post_stoch,
+        post_deter,
+        actions,
+        rho=1.0,
+        future_steps=(0,),
+        loss_type="squared",
+    )
+
+    assert log_loss.item() < 5.0
+    assert squared_loss.item() > 1000.0
+    assert log_loss.item() < squared_loss.item() / 100.0
+
+
+def test_ac_lite_batch_subsample_and_validation() -> None:
+    torch.manual_seed(9)
+    B, D_act = 8, 4
+    post_stoch, post_deter, _ = make_inputs(batch=B, action_dim=D_act)
+    actions = torch.randn(B, 2, D_act)
+
+    loss, metrics = amplification_control_loss_lite(
+        ScaleDynamics(2.0),
+        post_stoch,
+        post_deter,
+        actions,
+        rho=0.0,
+        future_steps=(0, 1),
+        batch_subsample=0.25,
+    )
+    assert loss.item() > 0.0
+    assert torch.equal(metrics["ac_batch_subsample"], torch.tensor(0.25))
+
+    with pytest.raises(ValueError, match="Unsupported loss_type"):
+        amplification_control_loss_lite(
+            ScaleDynamics(1.0),
+            post_stoch,
+            post_deter,
+            actions,
+            loss_type="raw",
+        )
+
+    with pytest.raises(ValueError, match="actions must contain at least one time step"):
+        amplification_control_loss_lite(
+            ScaleDynamics(1.0),
+            post_stoch,
+            post_deter,
+            actions[:, :0],
         )

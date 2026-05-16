@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""DreamerV3 + Amplification Control (AC-1).
+"""DreamerV3 + Amplification Control training.
 
 Adds a guarded transition amplification penalty to the world-model loss:
 
@@ -67,23 +67,37 @@ def main() -> None:
     pathlib.Path(config.evaldir).mkdir(parents=True, exist_ok=True)
 
     ac_cfg = run_config.get("amplification_control", run_config.get("moment_match", {}))
+    mode = str(ac_cfg.get("mode", "standard"))
+    if mode not in {"standard", "lite"}:
+        raise ValueError(f"Unsupported amplification_control.mode: {mode!r}")
     beta_ac = float(ac_cfg.get("beta_ac", 1.0))
     horizons = tuple(int(h) for h in ac_cfg.get("horizons", [1]))
+    future_steps = tuple(int(h) for h in ac_cfg.get("future_steps", [0, 1, 2, 4, 8]))
     horizon_weights = str(ac_cfg.get("horizon_weights", "uniform"))
     n_starts = int(ac_cfg.get("n_starts", 4))
     n_dirs = int(ac_cfg.get("n_dirs", 1))
     delta_scale = float(ac_cfg.get("delta_scale", 0.01))
     rho = float(ac_cfg.get("rho", 1.0))
+    loss_type = str(ac_cfg.get("loss_type", "log1p"))
+    batch_subsample = float(ac_cfg.get("batch_subsample", 1.0))
+    apply_every = int(ac_cfg.get("apply_every", 1))
+    loss_cap = float(ac_cfg.get("loss_cap", 0.0))
     warmup_env_steps = int(ac_cfg.get("warmup_env_steps", 50000))
+    if apply_every <= 0:
+        raise ValueError("amplification_control.apply_every must be positive.")
 
+    run_label = "AC-2-lite" if mode == "lite" else "AC-1"
     print("=" * 70)
-    print("DreamerV3 + Amplification Control (AC-1)")
+    print(f"DreamerV3 + Amplification Control ({run_label})")
     print("=" * 70)
     print(f"Task: {config.task}, Seed: {config.seed}")
-    print(f"horizons={list(horizons)}, rho={rho:.3f}, beta_ac={beta_ac}, n_dirs={n_dirs}")
+    print(f"mode={mode}, rho={rho:.3f}, beta_ac={beta_ac}, n_dirs={n_dirs}")
+    print(f"horizons={list(horizons)}, future_steps={list(future_steps)}")
     print(f"n_starts={n_starts}, delta_scale={delta_scale}")
-    print(f"horizon_weights={horizon_weights}, warmup_env_steps={warmup_env_steps}")
-    print("Loss: L_DreamerV3 + beta_ac * ReLU(gain - rho)^2")
+    print(f"horizon_weights={horizon_weights}, loss_type={loss_type}")
+    print(f"batch_subsample={batch_subsample}, apply_every={apply_every}, loss_cap={loss_cap}")
+    print(f"warmup_env_steps={warmup_env_steps}")
+    print("Loss: L_DreamerV3 + capped beta_ac * guarded amplification loss")
     print("=" * 70, flush=True)
 
     step = dreamer.count_steps(config.traindir)
@@ -133,22 +147,33 @@ def main() -> None:
     ).to(config.device)
     agent.requires_grad_(requires_grad=False)
 
+    ac_update_count = {"count": 0}
+
     def ac_aware_train(world_model, data):
         env_step = agent._step * config.action_repeat
         active = env_step >= warmup_env_steps
-        return world_model_train_with_ac(
+        apply_ac = active and (ac_update_count["count"] % apply_every == 0)
+        result = world_model_train_with_ac(
             world_model,
             data,
-            beta_ac=beta_ac if active else 0.0,
+            beta_ac=beta_ac if apply_ac else 0.0,
+            mode=mode,
             horizons=horizons,
+            future_steps=future_steps,
             horizon_weights=horizon_weights,
             n_starts=n_starts,
             n_dirs=n_dirs,
             delta_scale=delta_scale,
             rho=rho,
+            loss_type=loss_type,
+            batch_subsample=batch_subsample,
+            loss_cap=loss_cap,
             tools_module=tools,
             torch_module=torch,
         )
+        if active:
+            ac_update_count["count"] += 1
+        return result
 
     agent._wm._train = types.MethodType(ac_aware_train, agent._wm)
 
@@ -210,19 +235,28 @@ def world_model_train_with_ac(
     data,
     *,
     beta_ac: float,
+    mode: str,
     horizons: tuple[int, ...],
+    future_steps: tuple[int, ...],
     horizon_weights: str,
     n_starts: int,
     n_dirs: int,
     delta_scale: float,
     rho: float,
+    loss_type: str,
+    batch_subsample: float,
+    loss_cap: float,
     tools_module,
     torch_module,
 ):
     """Mirror DreamerV3 WorldModel._train and add AC loss."""
 
     data = world_model.preprocess(data)
-    ac_metrics = zero_ac_metrics(horizons)
+    ac_metrics = zero_ac_metrics(
+        horizons if mode == "standard" else (),
+        future_steps if mode == "lite" else (),
+        mode,
+    )
 
     with tools_module.RequiresGrad(world_model):
         with torch_module.cuda.amp.autocast(world_model._use_amp):
@@ -258,22 +292,56 @@ def world_model_train_with_ac(
             total_model_loss = torch_module.mean(model_loss)
 
             if beta_ac > 0:
-                ac_loss, ac_metrics = compute_ac_loss(
-                    world_model=world_model,
-                    post=post,
-                    actions=data["action"],
-                    horizons=horizons,
-                    horizon_weights=horizon_weights,
-                    n_starts=n_starts,
-                    n_dirs=n_dirs,
-                    delta_scale=delta_scale,
-                    rho=rho,
-                    torch_module=torch_module,
-                )
-                weighted_ac_loss = float(beta_ac) * ac_loss
+                if mode == "standard":
+                    ac_loss, ac_metrics = compute_ac_loss(
+                        world_model=world_model,
+                        post=post,
+                        actions=data["action"],
+                        horizons=horizons,
+                        horizon_weights=horizon_weights,
+                        n_starts=n_starts,
+                        n_dirs=n_dirs,
+                        delta_scale=delta_scale,
+                        rho=rho,
+                        torch_module=torch_module,
+                    )
+                elif mode == "lite":
+                    ac_loss, ac_metrics = compute_ac_lite_loss(
+                        world_model=world_model,
+                        post=post,
+                        actions=data["action"],
+                        future_steps=future_steps,
+                        horizon_weights=horizon_weights,
+                        n_starts=n_starts,
+                        n_dirs=n_dirs,
+                        delta_scale=delta_scale,
+                        rho=rho,
+                        loss_type=loss_type,
+                        batch_subsample=batch_subsample,
+                        torch_module=torch_module,
+                    )
+                else:
+                    raise ValueError(f"Unsupported AC mode: {mode!r}")
+
+                weighted_ac_uncapped = float(beta_ac) * ac_loss
+                if loss_cap > 0:
+                    cap_value = float(loss_cap) * total_model_loss.detach()
+                    weighted_ac_loss = torch_module.minimum(weighted_ac_uncapped, cap_value)
+                    ac_capped = float(
+                        (weighted_ac_uncapped.detach() > cap_value.detach()).cpu().item()
+                    )
+                else:
+                    cap_value = total_model_loss.new_tensor(0.0)
+                    weighted_ac_loss = weighted_ac_uncapped
+                    ac_capped = 0.0
                 total_model_loss = total_model_loss + weighted_ac_loss
                 ac_metrics["ac_loss"] = tensor_to_float(ac_loss)
                 ac_metrics["ac_weighted_loss"] = tensor_to_float(weighted_ac_loss)
+                ac_metrics["ac_weighted_uncapped_loss"] = tensor_to_float(
+                    weighted_ac_uncapped
+                )
+                ac_metrics["ac_loss_cap_value"] = tensor_to_float(cap_value)
+                ac_metrics["ac_capped"] = ac_capped
                 ac_metrics["ac_active"] = 1.0
                 ac_metrics["ac_beta"] = float(beta_ac)
 
@@ -387,13 +455,104 @@ def compute_ac_loss(
     return total_loss, metrics
 
 
-def zero_ac_metrics(horizons: tuple[int, ...]) -> dict[str, float]:
+def compute_ac_lite_loss(
+    *,
+    world_model,
+    post,
+    actions,
+    future_steps: tuple[int, ...],
+    horizon_weights: str,
+    n_starts: int,
+    n_dirs: int,
+    delta_scale: float,
+    rho: float,
+    loss_type: str,
+    batch_subsample: float,
+    torch_module,
+):
+    """Sample starts and average AC-2-lite loss across future-state rollouts."""
+
+    from src.regularization.amplification_control import amplification_control_loss_lite
+
+    post_deter = post["deter"]
+    if not isinstance(actions, torch_module.Tensor):
+        actions = torch_module.tensor(actions, device=post_deter.device)
+
+    assert post_deter.ndim == 3, f"Expected 3D tensor, got {post_deter.ndim}D"
+    assert actions.ndim == 3, f"Expected 3D action tensor, got {actions.ndim}D"
+
+    # post["deter"] shape: [B, T, D] where B=batch, T=time, D=latent_dim.
+    B, T, D = post_deter.shape
+    del D
+    assert B == actions.shape[0], f"Batch mismatch: post {B} vs action {actions.shape[0]}"
+    assert T == actions.shape[1], f"Time mismatch: post {T} vs action {actions.shape[1]}"
+
+    future_steps = tuple(int(step) for step in future_steps)
+    max_future = max(future_steps)
+    if T < max_future + 1:
+        zero = post_deter.new_tensor(0.0)
+        return zero, zero_ac_metrics((), future_steps, "lite")
+
+    starts = torch_module.randint(
+        0,
+        T - max_future,
+        (int(n_starts),),
+        device=post_deter.device,
+    )
+
+    losses = []
+    metric_values: dict[str, list] = {}
+    for start in starts:
+        t = int(start.item())
+        stoch = post["stoch"][:, t].detach()
+        deter = post_deter[:, t].detach()
+        actions_seq = actions[:, t : t + max_future + 1].detach()
+
+        ac_loss, ac_metrics = amplification_control_loss_lite(
+            world_model.dynamics,
+            stoch,
+            deter,
+            actions_seq,
+            n_dirs=n_dirs,
+            delta_scale=delta_scale,
+            rho=rho,
+            future_steps=future_steps,
+            horizon_weights=horizon_weights,
+            batch_subsample=batch_subsample,
+            loss_type=loss_type,
+        )
+        losses.append(ac_loss)
+        for key, value in ac_metrics.items():
+            if key == "ac_loss":
+                continue
+            metric_values.setdefault(key, []).append(value)
+
+    total_loss = torch_module.stack(losses).mean()
+    metrics = zero_ac_metrics((), future_steps, "lite")
+    metrics.update({
+        key: tensor_to_float(torch_module.stack(values).mean())
+        for key, values in metric_values.items()
+    })
+    metrics["ac_n_starts"] = float(n_starts)
+    return total_loss, metrics
+
+
+def zero_ac_metrics(
+    horizons: tuple[int, ...],
+    future_steps: tuple[int, ...] = (),
+    mode: str = "standard",
+) -> dict[str, float]:
     metrics = {
         "ac_loss": 0.0,
         "ac_weighted_loss": 0.0,
+        "ac_weighted_uncapped_loss": 0.0,
+        "ac_loss_cap_value": 0.0,
+        "ac_capped": 0.0,
         "ac_active": 0.0,
         "ac_beta": 0.0,
         "ac_n_starts": 0.0,
+        "ac_mode_standard": 1.0 if mode == "standard" else 0.0,
+        "ac_mode_lite": 1.0 if mode == "lite" else 0.0,
     }
     for horizon in horizons:
         metrics[f"ac_gain_h{horizon}_mean"] = 0.0
@@ -401,6 +560,12 @@ def zero_ac_metrics(horizons: tuple[int, ...]) -> dict[str, float]:
         metrics[f"ac_gain_h{horizon}_max"] = 0.0
         metrics[f"ac_loss_h{horizon}"] = 0.0
         metrics[f"ac_weight_h{horizon}"] = 0.0
+    for future_step in future_steps:
+        metrics[f"ac_gain_f{future_step}_mean"] = 0.0
+        metrics[f"ac_gain_f{future_step}_p90"] = 0.0
+        metrics[f"ac_gain_f{future_step}_max"] = 0.0
+        metrics[f"ac_loss_f{future_step}"] = 0.0
+        metrics[f"ac_weight_f{future_step}"] = 0.0
     return metrics
 
 
