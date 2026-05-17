@@ -1,0 +1,31 @@
+dreamer_configs:
+- dmc_proprio
+total_steps: 150000
+seed: 42
+dreamer:
+  batch_size: 32
+  envs: 8
+  compile: false
+sp_dpr:
+  basis_path: auto
+  auto_k_method: variance
+  auto_k_threshold: 0.85
+  auto_k_min: 8
+  auto_k_max: 64
+  auto_horizon: 50
+  auto_n_batches: 3
+  auto_n_rollouts: 5
+  beta_dpr: 1.0
+  target_horizons:
+  - 1
+  - 2
+  - 4
+  - 8
+  - 15
+  horizon_weights: sqrt_inv
+  n_starts: 4
+  batch_subsample: 0.25
+  apply_every: 2
+  loss_cap: 0.03
+  warmup_env_steps: 50000
+task: dmc_cartpole_swingup

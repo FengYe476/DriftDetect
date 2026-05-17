@@ -60,7 +60,9 @@ def main() -> None:
     tools.set_seed_everywhere(config.seed)
 
     sp_cfg = run_config.get("sp_dpr", {})
-    basis_path = resolve_project_path(str(sp_cfg["basis_path"]))
+    basis_path_value = str(sp_cfg["basis_path"])
+    auto_basis = basis_path_value == "auto"
+    basis_path = None if auto_basis else resolve_project_path(basis_path_value)
     beta_dpr = float(sp_cfg.get("beta_dpr", 1.0))
     target_horizons = tuple(int(h) for h in sp_cfg.get("target_horizons", [1, 2, 4, 8, 15]))
     horizon_weights = str(sp_cfg.get("horizon_weights", "uniform"))
@@ -69,17 +71,37 @@ def main() -> None:
     apply_every = int(sp_cfg.get("apply_every", 1))
     loss_cap = float(sp_cfg.get("loss_cap", 0.0))
     warmup_env_steps = int(sp_cfg.get("warmup_env_steps", 50000))
+    auto_k_method = str(sp_cfg.get("auto_k_method", "variance"))
+    auto_k_threshold = float(sp_cfg.get("auto_k_threshold", 0.85))
+    auto_k_min = int(sp_cfg.get("auto_k_min", 8))
+    auto_k_max = int(sp_cfg.get("auto_k_max", 64))
+    auto_horizon = int(sp_cfg.get("auto_horizon", 50))
+    auto_n_batches = int(sp_cfg.get("auto_n_batches", 3))
+    auto_n_rollouts = int(sp_cfg.get("auto_n_rollouts", 5))
     if apply_every <= 0:
         raise ValueError("sp_dpr.apply_every must be positive.")
     if not target_horizons:
         raise ValueError("sp_dpr.target_horizons must not be empty.")
+    if auto_basis:
+        validate_auto_basis_config(
+            auto_k_method=auto_k_method,
+            auto_k_threshold=auto_k_threshold,
+            auto_k_min=auto_k_min,
+            auto_k_max=auto_k_max,
+            auto_horizon=auto_horizon,
+            auto_n_batches=auto_n_batches,
+            auto_n_rollouts=auto_n_rollouts,
+        )
 
-    U_basis = load_basis(
-        basis_path=basis_path,
-        deter_dim=int(config.dyn_deter),
-        device=config.device,
-        torch_module=torch,
-    )
+    U_basis = None
+    if not auto_basis:
+        assert basis_path is not None
+        U_basis = load_basis(
+            basis_path=basis_path,
+            deter_dim=int(config.dyn_deter),
+            device=config.device,
+            torch_module=torch,
+        )
 
     logdir = pathlib.Path(config.logdir).expanduser()
     config.traindir = config.traindir or logdir / "train_eps"
@@ -96,7 +118,8 @@ def main() -> None:
     print_banner(
         config=config,
         basis_path=basis_path,
-        basis_dim=int(U_basis.shape[1]),
+        auto_basis=auto_basis,
+        basis_dim=None if U_basis is None else int(U_basis.shape[1]),
         target_horizons=target_horizons,
         beta_dpr=beta_dpr,
         horizon_weights=horizon_weights,
@@ -105,6 +128,9 @@ def main() -> None:
         apply_every=apply_every,
         loss_cap=loss_cap,
         warmup_env_steps=warmup_env_steps,
+        auto_k_threshold=auto_k_threshold,
+        auto_k_min=auto_k_min,
+        auto_k_max=auto_k_max,
     )
 
     step = dreamer.count_steps(config.traindir)
@@ -155,15 +181,42 @@ def main() -> None:
     agent.requires_grad_(requires_grad=False)
 
     dpr_update_count = {"count": 0}
+    basis_state = {"basis": U_basis}
 
     def sp_dpr_aware_train(world_model, data):
         env_step = agent._step * config.action_repeat
         active = env_step >= warmup_env_steps
-        apply_dpr = active and (dpr_update_count["count"] % apply_every == 0)
+        if auto_basis and active and basis_state["basis"] is None:
+            basis_state["basis"] = calibrate_drift_basis(
+                world_model=world_model,
+                train_dataset=train_dataset,
+                deter_dim=int(config.dyn_deter),
+                device=config.device,
+                logdir=logdir,
+                auto_k_method=auto_k_method,
+                auto_k_threshold=auto_k_threshold,
+                auto_k_min=auto_k_min,
+                auto_k_max=auto_k_max,
+                auto_horizon=auto_horizon,
+                auto_n_batches=auto_n_batches,
+                auto_n_rollouts=auto_n_rollouts,
+                torch_module=torch,
+            )
+            print(
+                f"SP-DPR activated: basis {tuple(basis_state['basis'].shape)}, "
+                f"k={basis_state['basis'].shape[1]}",
+                flush=True,
+            )
+
+        apply_dpr = (
+            active
+            and basis_state["basis"] is not None
+            and (dpr_update_count["count"] % apply_every == 0)
+        )
         result = world_model_train_with_sp_dpr(
             world_model,
             data,
-            U_basis=U_basis,
+            U_basis=basis_state["basis"],
             beta_dpr=beta_dpr if apply_dpr else 0.0,
             target_horizons=target_horizons,
             horizon_weights=horizon_weights,
@@ -285,6 +338,8 @@ def world_model_train_with_sp_dpr(
             total_model_loss = torch_module.mean(model_loss)
 
             if beta_dpr > 0.0:
+                if U_basis is None:
+                    raise RuntimeError("SP-DPR is active but U_basis has not been calibrated or loaded.")
                 from src.regularization.sp_dpr import sp_dpr_loss
 
                 dpr_loss, raw_dpr_metrics = sp_dpr_loss(
@@ -352,6 +407,118 @@ def world_model_train_with_sp_dpr(
     return post, context, metrics
 
 
+def calibrate_drift_basis(
+    *,
+    world_model,
+    train_dataset,
+    deter_dim: int,
+    device: str,
+    logdir: pathlib.Path,
+    auto_k_method: str,
+    auto_k_threshold: float,
+    auto_k_min: int,
+    auto_k_max: int,
+    auto_horizon: int,
+    auto_n_batches: int,
+    auto_n_rollouts: int,
+    torch_module,
+):
+    if auto_k_method != "variance":
+        raise ValueError(f"Unsupported sp_dpr.auto_k_method: {auto_k_method!r}.")
+
+    try:
+        from sklearn.decomposition import PCA
+    except ModuleNotFoundError as exc:
+        raise ModuleNotFoundError(
+            "A-SP-DPR auto calibration requires scikit-learn for PCA."
+        ) from exc
+
+    all_deltas: list[np.ndarray] = []
+    was_training = world_model.training
+    world_model.eval()
+    try:
+        with torch_module.no_grad():
+            for batch_i in range(int(auto_n_batches)):
+                raw_data = next(train_dataset)
+                data = world_model.preprocess(raw_data)
+                embed = world_model.encoder(data)
+                post, _prior = world_model.dynamics.observe(
+                    embed,
+                    data["action"],
+                    data["is_first"],
+                )
+                actions = data["action"]
+                assert_batch_major(post, actions)
+                B, T, D = post["deter"].shape
+                if D != deter_dim:
+                    raise ValueError(f"Expected deter dim {deter_dim}, got {D}.")
+                if T <= auto_horizon:
+                    print(
+                        f"[SP-DPR Calibration] skipping short batch {batch_i + 1}: "
+                        f"T={T} <= auto_horizon={auto_horizon}",
+                        flush=True,
+                    )
+                    continue
+
+                for _ in range(int(auto_n_rollouts)):
+                    t_start = int(
+                        torch_module.randint(
+                            0,
+                            T - auto_horizon,
+                            (1,),
+                            device=post["deter"].device,
+                        ).item()
+                    )
+                    state = {key: value[:, t_start].detach() for key, value in post.items()}
+                    for h in range(int(auto_horizon)):
+                        action = actions[:, t_start + h].detach()
+                        state = world_model.dynamics.img_step(state, action, sample=False)
+                        state = {key: value.detach() for key, value in state.items()}
+                    delta = state["deter"] - post["deter"][:, t_start + auto_horizon].detach()
+                    all_deltas.append(delta.detach().cpu().numpy())
+    finally:
+        if was_training:
+            world_model.train()
+
+    if not all_deltas:
+        raise RuntimeError(
+            "SP-DPR auto calibration collected no drift vectors. "
+            "Lower sp_dpr.auto_horizon or check replay batch length."
+        )
+
+    deltas = np.concatenate(all_deltas, axis=0).astype(np.float64, copy=False)
+    if deltas.ndim != 2 or deltas.shape[1] != deter_dim:
+        raise ValueError(f"Expected drift deltas shape (N, {deter_dim}), got {deltas.shape}.")
+
+    max_k = min(int(auto_k_max), deltas.shape[0], deltas.shape[1])
+    if max_k <= 0:
+        raise ValueError(f"Cannot calibrate basis with max_k={max_k}, deltas shape={deltas.shape}.")
+    pca = PCA(n_components=max_k).fit(deltas)
+    cumvar = np.cumsum(pca.explained_variance_ratio_)
+    chosen_k = int(np.searchsorted(cumvar, float(auto_k_threshold))) + 1
+    chosen_k = max(int(auto_k_min), min(int(auto_k_max), chosen_k))
+    chosen_k = min(max_k, chosen_k)
+
+    U = pca.components_[:chosen_k]
+    Q, _r = np.linalg.qr(U.T)
+    Q = Q[:, :chosen_k].astype(np.float32, copy=False)
+    validate_basis_array(Q, expected_dim=deter_dim)
+
+    basis_path = logdir / "drift_basis_auto.npy"
+    np.save(basis_path, Q)
+
+    variance_explained = float(cumvar[chosen_k - 1])
+    drift_erank = effective_rank(pca.singular_values_)
+    print(
+        f"[SP-DPR Calibration] drift samples={deltas.shape[0]}, "
+        f"auto_k={chosen_k}, variance_explained={variance_explained * 100.0:.1f}%, "
+        f"drift_erank={drift_erank:.1f}",
+        flush=True,
+    )
+    print(f"[SP-DPR Calibration] saved basis to {basis_path}", flush=True)
+    return torch_module.as_tensor(Q, dtype=torch_module.float32, device=device)
+
+
 def load_basis(*, basis_path: pathlib.Path, deter_dim: int, device: str, torch_module):
     if not basis_path.exists():
         raise FileNotFoundError(f"SP-DPR basis not found: {basis_path}")
@@ -365,11 +532,70 @@ def load_basis(*, basis_path: pathlib.Path, deter_dim: int, device: str, torch_m
         )
     if basis_np.shape[1] <= 0:
         raise ValueError(f"SP-DPR basis must contain at least one vector, got {basis_np.shape}.")
+    validate_basis_array(basis_np, expected_dim=deter_dim)
+    return torch_module.as_tensor(basis_np, dtype=torch_module.float32, device=device)
+
+
+def validate_basis_array(basis_np: np.ndarray, *, expected_dim: int) -> None:
+    if basis_np.ndim != 2:
+        raise ValueError(f"SP-DPR basis must be 2D, got {basis_np.shape}.")
+    if basis_np.shape[0] != expected_dim:
+        raise ValueError(
+            f"SP-DPR basis leading dimension {basis_np.shape[0]} "
+            f"does not match config dyn_deter {expected_dim}."
+        )
+    if basis_np.shape[1] <= 0:
+        raise ValueError(f"SP-DPR basis must contain at least one vector, got {basis_np.shape}.")
     gram = basis_np.T @ basis_np
     orth_err = float(np.max(np.abs(gram - np.eye(basis_np.shape[1]))))
     if orth_err > 1e-4:
         raise ValueError(f"SP-DPR basis columns are not orthonormal: max error {orth_err}.")
-    return torch_module.as_tensor(basis_np, dtype=torch_module.float32, device=device)
+
+
+def assert_batch_major(post, actions) -> None:
+    post_deter = post["deter"]
+    assert post_deter.ndim == 3, f"Expected post['deter'] [B,T,D], got {post_deter.shape}"
+    assert actions.ndim == 3, f"Expected actions [B,T,A], got {actions.shape}"
+    B, T, D = post_deter.shape
+    del D
+    assert B == actions.shape[0], f"Batch mismatch: post {B} vs action {actions.shape[0]}"
+    assert T == actions.shape[1], f"Time mismatch: post {T} vs action {actions.shape[1]}"
+
+
+def effective_rank(singular_values: np.ndarray) -> float:
+    values = np.asarray(singular_values, dtype=np.float64)
+    values = values[np.isfinite(values) & (values > 0)]
+    if values.size == 0:
+        return 0.0
+    probs = values / values.sum()
+    entropy = -float(np.sum(probs * np.log(probs + 1e-12)))
+    return float(np.exp(entropy))
+
+
+def validate_auto_basis_config(
+    *,
+    auto_k_method: str,
+    auto_k_threshold: float,
+    auto_k_min: int,
+    auto_k_max: int,
+    auto_horizon: int,
+    auto_n_batches: int,
+    auto_n_rollouts: int,
+) -> None:
+    if auto_k_method != "variance":
+        raise ValueError(f"Unsupported sp_dpr.auto_k_method: {auto_k_method!r}.")
+    if not 0.0 < auto_k_threshold <= 1.0:
+        raise ValueError("sp_dpr.auto_k_threshold must be in (0, 1].")
+    if auto_k_min <= 0:
+        raise ValueError("sp_dpr.auto_k_min must be positive.")
+    if auto_k_max < auto_k_min:
+        raise ValueError("sp_dpr.auto_k_max must be >= auto_k_min.")
+    if auto_horizon <= 0:
+        raise ValueError("sp_dpr.auto_horizon must be positive.")
+    if auto_n_batches <= 0:
+        raise ValueError("sp_dpr.auto_n_batches must be positive.")
+    if auto_n_rollouts <= 0:
+        raise ValueError("sp_dpr.auto_n_rollouts must be positive.")
 
 
 def zero_dpr_metrics(target_horizons: tuple[int, ...], batch_subsample: float) -> dict[str, float]:
@@ -395,8 +621,9 @@ def zero_dpr_metrics(target_horizons: tuple[int, ...], batch_subsample: float) -
 def print_banner(
     *,
     config: argparse.Namespace,
-    basis_path: pathlib.Path,
-    basis_dim: int,
+    basis_path: pathlib.Path | None,
+    auto_basis: bool,
+    basis_dim: int | None,
     target_horizons: tuple[int, ...],
     beta_dpr: float,
     horizon_weights: str,
@@ -405,12 +632,26 @@ def print_banner(
     apply_every: int,
     loss_cap: float,
     warmup_env_steps: int,
+    auto_k_threshold: float,
+    auto_k_min: int,
+    auto_k_max: int,
 ) -> None:
     print("=" * 70)
-    print("DreamerV3 + SP-DPR (Subspace-Projected Deter Prior Recovery)")
+    if auto_basis:
+        print("DreamerV3 + A-SP-DPR (Adaptive Subspace-Projected Deter Prior Recovery)")
+    else:
+        print("DreamerV3 + SP-DPR (Subspace-Projected Deter Prior Recovery)")
     print("=" * 70)
     print(f"Task: {config.task}, Seed: {config.seed}")
-    print(f"basis: {basis_path.name} ({basis_dim} dims)")
+    if auto_basis:
+        print("basis: auto (calibrated at warmup end)")
+        print(
+            f"auto_k: variance >= {auto_k_threshold * 100.0:.0f}%, "
+            f"k in [{auto_k_min}, {auto_k_max}]"
+        )
+    else:
+        assert basis_path is not None and basis_dim is not None
+        print(f"basis: {basis_path.name} ({basis_dim} dims)")
     print(f"horizons={list(target_horizons)}, beta={beta_dpr}")
     print(f"horizon_weights={horizon_weights}, n_starts={n_starts}")
     print(f"batch_subsample={batch_subsample}, apply_every={apply_every}")
